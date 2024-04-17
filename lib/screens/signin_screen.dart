@@ -1,5 +1,4 @@
 import 'package:build_app/page/mainPage.dart';
-import 'package:build_app/page/mainPage1.dart';
 import 'package:build_app/screens/forget_password.dart';
 import 'package:build_app/screens/signup_screen.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
@@ -33,7 +32,7 @@ class _SignInScreenState extends State<SignInScreen> {
         Expanded(
             flex: 7,
             child: Container(
-              padding: EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
+              padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
               decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -54,7 +53,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             color: lightColorScheme.primary,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 40.0,
                         ),
                         // EMAIL
@@ -84,7 +83,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         // PASSWORD
@@ -109,15 +108,15 @@ class _SignInScreenState extends State<SignInScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
+                                  borderSide: const BorderSide(
                                     color: Colors.black12,
                                   ),
                                   borderRadius: BorderRadius.circular(10)),
                               suffixIcon: IconButton(
                                 icon: hidden
-                                    ? Icon(Icons.visibility_off,
+                                    ? const Icon(Icons.visibility_off,
                                         color: Colors.black54)
-                                    : Icon(Icons.visibility,
+                                    : const Icon(Icons.visibility,
                                         color: Colors.black54),
                                 onPressed: () {
                                   setState(() {
@@ -126,7 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 },
                               )),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         // CHECK BOX UNTUK INGAT SAYA DAN LUPA PASSWORD
@@ -176,7 +175,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size(328, 50),
+                              minimumSize: const Size(328, 50),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -251,11 +250,11 @@ class _SignInScreenState extends State<SignInScreen> {
                           height: 25.0,
                         ),
                         // sign up social media logo
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Logo(logoAsset: "assets/images/google.png"),
-                            const SizedBox(width: 22),
+                            SizedBox(width: 22),
                             Logo(logoAsset: "assets/images/facebook.png"),
                           ],
                         ),

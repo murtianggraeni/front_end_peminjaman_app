@@ -65,6 +65,9 @@ flutter:
     - assets/images/screen.png
     - assets/images/google.png
     - assets/images/facebook.png
+    - assets/images/foto_cnc.png
+    - assets/images/foto_lasercut.png
+    - assets/images/foto_3dp.png
 
   #   - images/a_dot_ham.jpeg
 

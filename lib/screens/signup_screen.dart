@@ -210,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const mainPage()));
+                                                const mainPageSatu()));
                                     // Navigator.pushReplacementNamed(
                                     //     context,
                                     //     MaterialPageRoute(

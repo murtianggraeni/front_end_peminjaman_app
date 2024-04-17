@@ -16,14 +16,14 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     return CustomScaffold(
         child: Column(
       children: [
-        Expanded(
+        const Expanded(
           child: SizedBox(height: 10),
         ),
         Expanded(
           flex: 7,
           child: Container(
-            padding: EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
+            decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40.0),

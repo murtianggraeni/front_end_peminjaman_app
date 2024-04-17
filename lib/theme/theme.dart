@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Color(0xFF115C7C), 
+  primary: Color(0xFF115C7C),
   onPrimary: Color(0xFFFFFFFF),
   secondary: Color(0xFF6EAEE7),
   onSecondary: Color(0xFFFFFFFF),
@@ -39,21 +39,15 @@ ThemeData lightMode = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       backgroundColor: MaterialStateProperty.all<Color>(
-        lightColorScheme.primary // Slightly darker shade for the button
-      ),
-      foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // text color
+          lightColorScheme.primary // Slightly darker shade for the button
+          ),
+      foregroundColor:
+          MaterialStateProperty.all<Color>(Colors.white), // text color
       elevation: MaterialStateProperty.all<double>(5.0),
       padding: MaterialStateProperty.all<EdgeInsets>(
-        const EdgeInsets.symmetric(
-        horizontal: 20, 
-        vertical: 18
-        )
-      ),
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 18)),
       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16)
-        )
-      ),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
     ),
   ),
 );
@@ -63,3 +57,16 @@ ThemeData darkMode = ThemeData(
   brightness: Brightness.dark,
   colorScheme: darkColorScheme,
 );
+
+const pageMode = ColorScheme(
+    brightness: Brightness.light,
+    primary: Color(0xFF115C7C),
+    onPrimary: Color(0xFFE6EDF0), // Dashboard Peminjaman, Jadwal Peminjaman
+    secondary: Color(0xFFF2F8FA), // Tap Kecil CNC dan Lainnya
+    onSecondary: Color(0xFFC4CCD0),
+    error: Color(0xFFBA1A1A),
+    onError: Color(0xFFE6EDF0),
+    background: Colors.white,
+    onBackground: Color(0xFFFFFF),
+    surface: Color(0xFFFFFF),
+    onSurface: Color(0xFFFFFF));
