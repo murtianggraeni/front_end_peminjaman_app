@@ -1,7 +1,9 @@
+import 'package:build_app/theme/theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class customScaffoldMain extends StatelessWidget {
-  const customScaffoldMain({super.key, required this.body});
+class customScaffoldPage extends StatelessWidget {
+  const customScaffoldPage({super.key, required this.body});
 
   final Widget? body;
 
@@ -12,7 +14,7 @@ class customScaffoldMain extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Color(0xFF115C7C),
+              color: pageModeScheme.primary,
             ),
           ),
           SafeArea(child: body!)

@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class dbPeminjaman extends StatefulWidget {
-  const dbPeminjaman({
+class cobaPage extends StatefulWidget {
+  const cobaPage({
     super.key,
-    required this.page,
+    required this.mesin,
     required this.objekDipilih,
     required this.merekMesin,
     required this.namaMesin,
@@ -19,7 +19,7 @@ class dbPeminjaman extends StatefulWidget {
     this.cardWidth = 156.0,
   });
 
-  final Widget page;
+  final int mesin;
   final String objekDipilih;
   final String merekMesin;
   final String namaMesin;
@@ -32,31 +32,25 @@ class dbPeminjaman extends StatefulWidget {
   final double cardWidth;
 
   @override
-  State<dbPeminjaman> createState() => _dbPeminjamanState();
+  State<cobaPage> createState() => _cobaPageState();
 }
 
-class _dbPeminjamanState extends State<dbPeminjaman> {
+class _cobaPageState extends State<cobaPage> {
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Card(
+      elevation: 2.0,
+      color: Color(0xFFE1EBF2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
       child: InkWell(
         onTap: () {
           print(widget.objekDipilih);
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => widget.page,
-          ));
         },
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        borderRadius: BorderRadius.all(Radius.circular(12.04)),
-        child: Ink(
-          height: 247.0,
-          width: 156.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: pageModeScheme.onPrimary,
-            borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-          ),
+        child: SizedBox(
+          height: widget.cardHeight,
+          width: widget.cardWidth,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0),
             child: Column(

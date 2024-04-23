@@ -1,13 +1,20 @@
+import 'package:build_app/form_peminjaman/form_peminjaman_3dp.dart';
+import 'package:build_app/form_peminjaman/form_peminjaman_cnc.dart';
+import 'package:build_app/form_peminjaman/form_peminjaman_lasercut.dart';
+import 'package:build_app/theme/theme.dart';
 import 'package:build_app/utility/dashboard_choose.dart';
 import 'package:build_app/utility/dashboard_peminjaman.dart';
-import 'package:build_app/widget/custom_scaffold_main.dart';
+import 'package:build_app/backup/custom_calendar.dart';
+import 'package:build_app/widget/custom_form_page.dart';
+import 'package:build_app/widget/custom_scaffold_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-const activeDbColor = Color(0xFFD8E5EB);
-const inactiveDbColor = Color(0xFFE6EDF0);
+// const activeDbColor = Color(0xFFD8E5EB);
+// const inactiveDbColor = Color(0xFFE6EDF0);
 
 class mainPageSatu extends StatefulWidget {
   const mainPageSatu({super.key});
@@ -17,31 +24,31 @@ class mainPageSatu extends StatefulWidget {
 }
 
 class _mainPageSatuState extends State<mainPageSatu> {
-  Color cncCardColor = inactiveDbColor;
-  Color lasercutCardColor = inactiveDbColor;
-  Color printingCardColor = inactiveDbColor;
+  // Color cncCardColor = inactiveDbColor;
+  // Color lasercutCardColor = inactiveDbColor;
+  // Color printingCardColor = inactiveDbColor;
 
-  void updateColor(int mesin) {
-    setState(() {
-      // Matikan semua kartu terlebih dahulu
-      cncCardColor = inactiveDbColor;
-      lasercutCardColor = inactiveDbColor;
-      printingCardColor = inactiveDbColor;
+  // void updateColor(int mesin) {
+  //   setState(() {
+  //     // Matikan semua kartu terlebih dahulu
+  //     cncCardColor = inactiveDbColor;
+  //     lasercutCardColor = inactiveDbColor;
+  //     printingCardColor = inactiveDbColor;
 
-      // Kemudian aktifkan kartu yang dipilih
-      if (mesin == 1) {
-        cncCardColor = activeDbColor;
-      } else if (mesin == 2) {
-        lasercutCardColor = activeDbColor;
-      } else if (mesin == 3) {
-        printingCardColor = activeDbColor;
-      }
-    });
-  }
+  //     // Kemudian aktifkan kartu yang dipilih
+  //     if (mesin == 1) {
+  //       cncCardColor = activeDbColor;
+  //     } else if (mesin == 2) {
+  //       lasercutCardColor = activeDbColor;
+  //     } else if (mesin == 3) {
+  //       printingCardColor = activeDbColor;
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return customScaffoldMain(
+    return customScaffoldPage(
         body: Column(
       children: [
         Padding(
@@ -163,14 +170,15 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         )
                       ],
                     ),
-                    const SizedBox(height: 13),
-                    SingleChildScrollView(
+                    const SizedBox(height: 13.0),
+                    const SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
                           dbPeminjaman(
-                            colorPage: cncCardColor,
-                            mesin: 1,
+                            /* page: customFormPeminjaman(
+                              body: formPeminjamanCnc(), showNavBar: false), */
+                            page: formPeminjamanCnc(),
                             objekDipilih: "Memilih CNC Milling",
                             merekMesin: "MTU 200 M",
                             namaMesin: "CNC Milling",
@@ -179,12 +187,10 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             leftImage: 23.0,
                             topImage: 4.0,
                             topArrow: 2.0,
-                            onCardTap: updateColor,
                           ),
-                          const SizedBox(width: 17.0),
+                          SizedBox(width: 11.0),
                           dbPeminjaman(
-                            colorPage: lasercutCardColor,
-                            mesin: 2,
+                            page: formPeminjamanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
                             merekMesin: "TQL-1390",
                             namaMesin: "Laser Cutting",
@@ -193,12 +199,10 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             leftImage: 3.0,
                             topImage: 18.0,
                             topArrow: 11.0,
-                            onCardTap: updateColor,
                           ),
-                          const SizedBox(width: 17.0),
+                          SizedBox(width: 11.0),
                           dbPeminjaman(
-                            colorPage: printingCardColor,
-                            mesin: 3,
+                            page: formPeminjamanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
                             merekMesin: "Anycubic 4Max Pro",
                             namaMesin: "3D Printing",
@@ -207,7 +211,6 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             leftImage: 6.0,
                             topImage: 9.0,
                             topArrow: 4.5,
-                            onCardTap: updateColor,
                           ),
                         ],
                       ),
@@ -232,11 +235,43 @@ class _mainPageSatuState extends State<mainPageSatu> {
                               color: Color(0xFF3D8FEF)),
                         )
                       ],
-                    )
+                    ),
+                    const SizedBox(
+                      height: 13.0,
+                    ),
+                    SingleChildScrollView(
+                      child: Container(
+                        height: 400,
+                        decoration: BoxDecoration(
+                            color: pageModeScheme.onPrimary,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20.0),
+                                topRight: Radius.circular(20.0))),
+                        child: TableCalendar(
+                          focusedDay: DateTime.now(),
+                          firstDay: DateTime.utc(2024, 01, 01),
+                          lastDay: DateTime.utc(2050, 01, 01),
+                          // selectedDayPredicate: (day) {
+                          //   return isSameDay(_selectedDay, day);
+                          // },
+                          // onDaySelected: (selectedDay, focusedDay) {
+                          //   setState(() {
+                          //     _selectedDay = selectedDay;
+                          //     _focusedDay =
+                          //         focusedDay; // update `_focusedDay` here as well
+                          //   });
+                          // },
+                          calendarStyle: CalendarStyle(
+                            cellMargin: EdgeInsets.all(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               )),
-        )
+        ),
       ],
     ));
   }

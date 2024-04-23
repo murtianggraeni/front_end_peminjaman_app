@@ -31,8 +31,8 @@ class _dbPilihState extends State<dbPilih> {
       style: OutlinedButton.styleFrom(
           minimumSize: Size(widget.ukuranLebar, widget.ukuranTinggi),
           padding: const EdgeInsets.all(11.0),
-          backgroundColor: pageMode.secondary,
-          side: BorderSide(color: pageMode.onSecondary)),
+          backgroundColor: pageModeScheme.secondary,
+          side: BorderSide(color: pageModeScheme.onSecondary)),
       child: Text(
         widget.namaMesin,
         style: GoogleFonts.inter(

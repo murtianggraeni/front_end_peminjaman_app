@@ -58,7 +58,7 @@ ThemeData darkMode = ThemeData(
   colorScheme: darkColorScheme,
 );
 
-const pageMode = ColorScheme(
+const pageModeScheme = ColorScheme(
     brightness: Brightness.light,
     primary: Color(0xFF115C7C),
     onPrimary: Color(0xFFE6EDF0), // Dashboard Peminjaman, Jadwal Peminjaman
@@ -70,3 +70,6 @@ const pageMode = ColorScheme(
     onBackground: Color(0xFFFFFF),
     surface: Color(0xFFFFFF),
     onSurface: Color(0xFFFFFF));
+
+ThemeData pageMode = ThemeData(
+    colorScheme: pageModeScheme, primaryColor: pageModeScheme.onPrimary);

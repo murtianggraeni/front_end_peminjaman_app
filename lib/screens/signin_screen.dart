@@ -1,9 +1,10 @@
-import 'package:build_app/page/mainPage.dart';
 import 'package:build_app/screens/forget_password.dart';
 import 'package:build_app/screens/signup_screen.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
+import 'package:build_app/widget/custom_button_nav.dart';
 import 'package:build_app/widget/custom_scaffold.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -197,7 +198,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          const mainPageSatu(),
+                                          const customButtonNav(),
                                     ));
                               } else if (rememberPassword) {
                                 ScaffoldMessenger.of(context)
