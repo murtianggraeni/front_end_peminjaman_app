@@ -38,6 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   icons_plus: ^5.0.0
   gradient_icon: ^2.0.9
+  flutter_animated_icons: ^1.0.1
+  ming_cute_icons: ^0.0.5
 
   #fonts
   google_fonts: ^6.2.0
@@ -50,6 +52,15 @@ dependencies:
   # syncfusion_flutter_calendar: ^25.1.40
   # flutter_clean_calendar: ^1.1.0
   table_calendar: ^3.1.1
+
+  #dialog
+  awesome_dialog: ^3.2.0
+
+  #toogle switch
+  toggle_switch: ^2.3.0
+
+  #carousel
+  card_swiper: ^3.0.1
 
   #API
   firebase_core: ^2.27.1
@@ -84,6 +95,7 @@ flutter:
     - assets/images/foto_cnc.png
     - assets/images/foto_lasercut.png
     - assets/images/foto_3dp.png
+    - assets/images/desain_informasi.png
 
   #   - images/a_dot_ham.jpeg
 

@@ -1,8 +1,8 @@
+import 'package:build_app/page/custom/custom_buttom_nav.dart';
 import 'package:build_app/screens/forget_password.dart';
 import 'package:build_app/screens/signup_screen.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
-import 'package:build_app/widget/custom_button_nav.dart';
 import 'package:build_app/widget/custom_scaffold.dart';
 
 import 'package:flutter/material.dart';
@@ -168,10 +168,85 @@ class _SignInScreenState extends State<SignInScreen> {
                             )
                           ],
                         ),
+                        /*
                         const SizedBox(
                           height: 25.0,
                         ),
                         // SIGN IN BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          child:
+                            AnimatedButton(
+                              width: 328.0,
+                              height: 30.0,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12.0)),
+                              text: 'Sign in',
+                              color: lightColorScheme.primary,
+                              pressEvent: () {
+                                if (_formSignInKey.currentState!.validate() &&
+                                    !rememberPassword) {
+                                  AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.success,
+                                    animType: AnimType.bottomSlide,
+                                    showCloseIcon: true,
+                                    title: 'Success',
+                                    desc: 'Data diproses',
+                                  ).show();
+
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => customButtomNav(),
+                                      ));
+                                }
+                              },
+                            ),
+                              ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(328, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: lightColorScheme.primary,
+                              textStyle: GoogleFonts.inter(
+                                fontSize: 15.0,
+                              ),
+                            ),
+                            onPressed: () {
+                              if (_formSignInKey.currentState!.validate() &&
+                                  !rememberPassword) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Data diproses"),
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: Duration(seconds: 2),
+                                ));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const customButtomNav(),
+                                    ));
+                              } else if (rememberPassword) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      "Menyetujui untuk menyimpan data personal"),
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: Duration(seconds: 2),
+                                ));
+                              }
+                            },
+                            child: const Text(
+                              "Sign in",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        */
+                        SizedBox(height: 25.0),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -198,7 +273,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          const customButtonNav(),
+                                          const customButtomNav(),
                                     ));
                               } else if (rememberPassword) {
                                 ScaffoldMessenger.of(context)

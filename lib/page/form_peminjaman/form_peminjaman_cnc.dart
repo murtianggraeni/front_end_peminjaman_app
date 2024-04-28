@@ -1,4 +1,5 @@
-import 'package:build_app/widget/custom_form_page.dart';
+import 'package:build_app/page/custom/custom_form_page.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +16,9 @@ class _formPeminjamanCncState extends State<formPeminjamanCnc> {
   @override
   Widget build(BuildContext context) {
     return customFormPeminjaman(
+      namaMesin: "CNC Milling",
       body: TextFormField(),
-      showNavBar: showNavBar,
+      // showNavBar: showNavBar,
     );
   }
 }

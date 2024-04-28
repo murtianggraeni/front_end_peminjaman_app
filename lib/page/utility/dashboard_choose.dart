@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
-class dbPilih extends StatefulWidget {
-  const dbPilih({
+class buttonPilihMesin extends StatefulWidget {
+  const buttonPilihMesin({
     super.key,
     required this.pilihanMesin,
     required this.namaMesin,
@@ -18,10 +18,10 @@ class dbPilih extends StatefulWidget {
   final double ukuranTinggi;
 
   @override
-  State<dbPilih> createState() => _dbPilihState();
+  State<buttonPilihMesin> createState() => _buttonPilihMesinState();
 }
 
-class _dbPilihState extends State<dbPilih> {
+class _buttonPilihMesinState extends State<buttonPilihMesin> {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(

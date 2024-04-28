@@ -1,4 +1,4 @@
-import 'package:build_app/page/mainPage.dart';
+import 'package:build_app/page/custom/custom_buttom_nav.dart';
 import 'package:build_app/screens/signin_screen.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
@@ -197,85 +197,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             SizedBox(
                               width: double.infinity,
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (_formSignupKey.currentState!.validate() &&
-                                      agreePersonalData) {
-                                    print("Masuk");
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text("Data diproses")));
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const mainPageSatu()));
-                                    // Navigator.pushReplacementNamed(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //       builder: (e) =>
-                                    //           const ForgetPasswordScreen(),
-                                    //     ) as String);
-                                  } else if (!agreePersonalData) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Setujui pemrosesan data pribadi Anda!")));
-                                  }
-                                },
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
                                       minimumSize: Size(328, 50),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       backgroundColor: lightColorScheme.primary,
-                                      textStyle: GoogleFonts.poppins(),
+                                      textStyle: GoogleFonts.poppins()),
+                                  onPressed: () {
+                                    if (_formSignupKey.currentState!
+                                            .validate() &&
+                                        agreePersonalData) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Memproses Data"),
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: Duration(seconds: 2),
+                                      ));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  customButtomNav()));
+                                    } else if (!agreePersonalData) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text(
+                                            "Setujui proses data pribadi Anda"),
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: Duration(seconds: 2),
+                                      ));
+                                    }
+                                  },
+                                  child: const Text(
+                                    "Sign up",
+                                    style: TextStyle(
+                                      color: Colors.white,
                                     ),
-                                    onPressed: null,
-                                    child: const Text(
-                                      "Sign up",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ),
-
-                              // child: ElevatedButton(
-                              //     style: ElevatedButton.styleFrom(
-                              //         minimumSize: Size(328, 50),
-                              //         shape: RoundedRectangleBorder(
-                              //           borderRadius: BorderRadius.circular(10),
-                              //         ),
-                              //         backgroundColor: lightColorScheme.primary,
-                              //         textStyle: GoogleFonts.poppins()),
-                              //     onPressed: () {
-                              //       if (_formSignupKey.currentState!
-                              //               .validate() &&
-                              //           agreePersonalData) {
-                              //         ScaffoldMessenger.of(context)
-                              //             .showSnackBar(const SnackBar(
-                              //           content: Text("Memproses Data"),
-                              //           behavior: SnackBarBehavior.floating,
-                              //           duration: Duration(seconds: 2),
-                              //         ));
-                              //       } else if (!agreePersonalData) {
-                              //         ScaffoldMessenger.of(context)
-                              //             .showSnackBar(const SnackBar(
-                              //           content: Text(
-                              //               "Setujui proses data pribadi Anda"),
-                              //           behavior: SnackBarBehavior.floating,
-                              //           duration: Duration(seconds: 2),
-                              //         ));
-                              //       }
-                              //     },
-                              //     child: const Text(
-                              //       "Sign up",
-                              //       style: TextStyle(
-                              //         color: Colors.white,
-                              //       ),
-                              //     )
-                              //     ),
+                                  )),
                             ),
                             const SizedBox(
                               height: 30.0,

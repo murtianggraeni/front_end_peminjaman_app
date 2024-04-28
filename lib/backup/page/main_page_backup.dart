@@ -1,12 +1,10 @@
-import 'package:build_app/form_peminjaman/form_peminjaman_3dp.dart';
-import 'package:build_app/form_peminjaman/form_peminjaman_cnc.dart';
-import 'package:build_app/form_peminjaman/form_peminjaman_lasercut.dart';
+import 'package:build_app/page/custom/custom_scaffold_page.dart';
+import 'package:build_app/page/form_peminjaman/form_peminjaman_3dp.dart';
+import 'package:build_app/page/form_peminjaman/form_peminjaman_cnc.dart';
+import 'package:build_app/page/form_peminjaman/form_peminjaman_lasercut.dart';
+import 'package:build_app/page/utility/dashboard_choose.dart';
+import 'package:build_app/page/utility/dashboard_peminjaman.dart';
 import 'package:build_app/theme/theme.dart';
-import 'package:build_app/utility/dashboard_choose.dart';
-import 'package:build_app/utility/dashboard_peminjaman.dart';
-import 'package:build_app/backup/custom_calendar.dart';
-import 'package:build_app/widget/custom_form_page.dart';
-import 'package:build_app/widget/custom_scaffold_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -24,27 +22,29 @@ class mainPageSatu extends StatefulWidget {
 }
 
 class _mainPageSatuState extends State<mainPageSatu> {
-  // Color cncCardColor = inactiveDbColor;
-  // Color lasercutCardColor = inactiveDbColor;
-  // Color printingCardColor = inactiveDbColor;
+  /*
+  Color cncCardColor = inactiveDbColor;
+  Color lasercutCardColor = inactiveDbColor;
+  Color printingCardColor = inactiveDbColor;
 
-  // void updateColor(int mesin) {
-  //   setState(() {
-  //     // Matikan semua kartu terlebih dahulu
-  //     cncCardColor = inactiveDbColor;
-  //     lasercutCardColor = inactiveDbColor;
-  //     printingCardColor = inactiveDbColor;
+  void updateColor(int mesin) {
+    setState(() {
+      // Matikan semua kartu terlebih dahulu
+      cncCardColor = inactiveDbColor;
+      lasercutCardColor = inactiveDbColor;
+      printingCardColor = inactiveDbColor;
 
-  //     // Kemudian aktifkan kartu yang dipilih
-  //     if (mesin == 1) {
-  //       cncCardColor = activeDbColor;
-  //     } else if (mesin == 2) {
-  //       lasercutCardColor = activeDbColor;
-  //     } else if (mesin == 3) {
-  //       printingCardColor = activeDbColor;
-  //     }
-  //   });
-  // }
+      // Kemudian aktifkan kartu yang dipilih
+      if (mesin == 1) {
+        cncCardColor = activeDbColor;
+      } else if (mesin == 2) {
+        lasercutCardColor = activeDbColor;
+      } else if (mesin == 3) {
+        printingCardColor = activeDbColor;
+      }
+    });
+  } 
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -120,21 +120,21 @@ class _mainPageSatuState extends State<mainPageSatu> {
                   children: [
                     const Row(
                       children: [
-                        dbPilih(
+                        buttonPilihMesin(
                           pilihanMesin: "Mesin CNC dipilih",
                           namaMesin: "CNC",
                           ukuranLebar: 48.0,
                           ukuranTinggi: 24.0,
                         ),
                         SizedBox(width: 8.0),
-                        dbPilih(
+                        buttonPilihMesin(
                           pilihanMesin: "Mesin Laser Cut dipilih",
                           namaMesin: "Laser Cutting",
                           ukuranLebar: 95.0,
                           ukuranTinggi: 24.0,
                         ),
                         SizedBox(width: 8.0),
-                        dbPilih(
+                        buttonPilihMesin(
                           pilihanMesin: "Mesin 3D Printing dipilih",
                           namaMesin: "3D Printing",
                           ukuranLebar: 81.0,
@@ -175,9 +175,10 @@ class _mainPageSatuState extends State<mainPageSatu> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          dbPeminjaman(
-                            /* page: customFormPeminjaman(
-                              body: formPeminjamanCnc(), showNavBar: false), */
+                          buttonPeminjaman(
+                            // page: customFormPeminjaman(
+                            //     body: formPeminjamanCnc(), showNavBar: false),
+
                             page: formPeminjamanCnc(),
                             objekDipilih: "Memilih CNC Milling",
                             merekMesin: "MTU 200 M",
@@ -189,7 +190,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             topArrow: 2.0,
                           ),
                           SizedBox(width: 11.0),
-                          dbPeminjaman(
+                          buttonPeminjaman(
                             page: formPeminjamanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
                             merekMesin: "TQL-1390",
@@ -201,7 +202,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             topArrow: 11.0,
                           ),
                           SizedBox(width: 11.0),
-                          dbPeminjaman(
+                          buttonPeminjaman(
                             page: formPeminjamanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
                             merekMesin: "Anycubic 4Max Pro",
@@ -239,32 +240,30 @@ class _mainPageSatuState extends State<mainPageSatu> {
                     const SizedBox(
                       height: 13.0,
                     ),
-                    SingleChildScrollView(
-                      child: Container(
-                        height: 400,
-                        decoration: BoxDecoration(
-                            color: pageModeScheme.onPrimary,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20.0),
-                                topRight: Radius.circular(20.0))),
-                        child: TableCalendar(
-                          focusedDay: DateTime.now(),
-                          firstDay: DateTime.utc(2024, 01, 01),
-                          lastDay: DateTime.utc(2050, 01, 01),
-                          // selectedDayPredicate: (day) {
-                          //   return isSameDay(_selectedDay, day);
-                          // },
-                          // onDaySelected: (selectedDay, focusedDay) {
-                          //   setState(() {
-                          //     _selectedDay = selectedDay;
-                          //     _focusedDay =
-                          //         focusedDay; // update `_focusedDay` here as well
-                          //   });
-                          // },
-                          calendarStyle: CalendarStyle(
-                            cellMargin: EdgeInsets.all(8.0),
-                          ),
+                    Container(
+                      height: 400,
+                      decoration: BoxDecoration(
+                          color: pageModeScheme.onPrimary,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20.0),
+                              topRight: Radius.circular(20.0))),
+                      child: TableCalendar(
+                        focusedDay: DateTime.now(),
+                        firstDay: DateTime.utc(2024, 01, 01),
+                        lastDay: DateTime.utc(2050, 01, 01),
+                        // selectedDayPredicate: (day) {
+                        //   return isSameDay(_selectedDay, day);
+                        // },
+                        // onDaySelected: (selectedDay, focusedDay) {
+                        //   setState(() {
+                        //     _selectedDay = selectedDay;
+                        //     _focusedDay =
+                        //         focusedDay; // update `_focusedDay` here as well
+                        //   });
+                        // },
+                        calendarStyle: CalendarStyle(
+                          cellMargin: EdgeInsets.all(8.0),
                         ),
                       ),
                     ),

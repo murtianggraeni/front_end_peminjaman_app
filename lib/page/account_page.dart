@@ -1,4 +1,4 @@
-import 'package:build_app/widget/custom_scaffold_page.dart';
+import 'package:build_app/page/custom/custom_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

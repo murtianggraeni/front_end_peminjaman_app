@@ -1,31 +1,36 @@
+import 'package:build_app/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:build_app/page/mainPage.dart';
-import 'package:build_app/page/monitoring.dart';
-import 'package:build_app/page/account.dart';
+import 'package:build_app/page/main_page.dart';
+import 'package:build_app/page/monitoring_page.dart';
+import 'package:build_app/page/account_page.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-class customButtonNav extends StatefulWidget {
-  const customButtonNav({
-    super.key,
-    /*this.showNavBar = true*/
-  });
+class customButtomNav extends StatefulWidget {
+  const customButtomNav({super.key, this.showNavBar = true});
 
-  // final bool showNavBar;
+  final bool showNavBar;
 
   @override
-  State<customButtonNav> createState() => _customButtonNavState();
+  State<customButtomNav> createState() => _customButtomNavState();
 }
 
-class _customButtonNavState extends State<customButtonNav> {
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: MyApp(), // MyApp adalah widget tertinggi yang menaungi semua halaman
+  ));
+}
+
+class _customButtomNavState extends State<customButtomNav> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: /* widget.showNavBar ? */ BottomNavBar() /* : Container() */,
+      home: widget.showNavBar ? BottomNavBar() : Container(),
     );
   }
 }

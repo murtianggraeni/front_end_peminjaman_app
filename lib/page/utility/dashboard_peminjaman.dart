@@ -1,10 +1,12 @@
 import 'package:build_app/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class dbPeminjaman extends StatefulWidget {
-  const dbPeminjaman({
+class buttonPeminjaman extends StatefulWidget {
+  const buttonPeminjaman({
     super.key,
     required this.page,
     required this.objekDipilih,
@@ -32,19 +34,22 @@ class dbPeminjaman extends StatefulWidget {
   final double cardWidth;
 
   @override
-  State<dbPeminjaman> createState() => _dbPeminjamanState();
+  State<buttonPeminjaman> createState() => _buttonPeminjamanState();
 }
 
-class _dbPeminjamanState extends State<dbPeminjaman> {
+class _buttonPeminjamanState extends State<buttonPeminjaman> {
   @override
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
         onTap: () {
           print(widget.objekDipilih);
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => widget.page,
-          ));
+          // Navigator.of(context).push(MaterialPageRoute(
+          //   builder: (context) => widget.page,
+          // ));
+
+          PersistentNavBarNavigator.pushNewScreen(context,
+              screen: widget.page, withNavBar: false);
         },
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
