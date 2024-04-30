@@ -23,8 +23,7 @@ class mainPageSatu extends StatefulWidget {
   State<mainPageSatu> createState() => _mainPageSatuState();
 }
 
-class _mainPageSatuState extends State<mainPageSatu>
-    with TickerProviderStateMixin {
+class _mainPageSatuState extends State<mainPageSatu> {
   final List<dashboardInformasiPeminjaman> dataList = [
     const dashboardInformasiPeminjaman(
       namaMesin: "CNC Milling",
@@ -48,23 +47,19 @@ class _mainPageSatuState extends State<mainPageSatu>
         alamatInformasiLanjutan: halamanInformasiPrinting()),
   ];
 
-  int _currentPage = 0;
-  PageController _pageController =
-      PageController(initialPage: 0, viewportFraction: 0.9);
-  bool isReverse = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController =
-        PageController(initialPage: _currentPage, viewportFraction: 0.9);
+  Widget carouselView(int index) {
+    final dashboardInformasiPeminjaman data = dataList[index];
+    return carouselCard(data);
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _pageController.dispose();
+  Widget carouselCard(dashboardInformasiPeminjaman data) {
+    return dashboardInformasiPeminjaman(
+      namaMesin: data.namaMesin,
+      dataAcc: data.dataAcc,
+      dataTidakAcc: data.dataTidakAcc,
+      dataDiproses: data.dataDiproses,
+      alamatInformasiLanjutan: data.alamatInformasiLanjutan,
+    );
   }
 
   @override
@@ -179,7 +174,7 @@ class _mainPageSatuState extends State<mainPageSatu>
                       child: Swiper(
                         outer: true,
                         itemCount: dataList.length,
-                        viewportFraction: 0.9,
+                        viewportFraction: 0.85,
                         scale: 0.9,
                         physics: BouncingScrollPhysics(),
                         pagination: SwiperPagination(
@@ -329,18 +324,18 @@ class _mainPageSatuState extends State<mainPageSatu>
     ));
   }
 
-  Widget carouselView(int index) {
-    final dashboardInformasiPeminjaman data = dataList[index];
-    return carouselCard(data);
-  }
+  // Widget carouselView(int index) {
+  //   final dashboardInformasiPeminjaman data = dataList[index];
+  //   return carouselCard(data);
+  // }
 
-  Widget carouselCard(dashboardInformasiPeminjaman data) {
-    return dashboardInformasiPeminjaman(
-      namaMesin: data.namaMesin,
-      dataAcc: data.dataAcc,
-      dataTidakAcc: data.dataTidakAcc,
-      dataDiproses: data.dataDiproses,
-      alamatInformasiLanjutan: data.alamatInformasiLanjutan,
-    );
-  }
+  // Widget carouselCard(dashboardInformasiPeminjaman data) {
+  //   return dashboardInformasiPeminjaman(
+  //     namaMesin: data.namaMesin,
+  //     dataAcc: data.dataAcc,
+  //     dataTidakAcc: data.dataTidakAcc,
+  //     dataDiproses: data.dataDiproses,
+  //     alamatInformasiLanjutan: data.alamatInformasiLanjutan,
+  //   );
+  // }
 }
