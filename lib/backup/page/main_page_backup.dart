@@ -1,9 +1,9 @@
-import 'package:build_app/page/custom/custom_scaffold_page.dart';
-import 'package:build_app/page/form_peminjaman/form_peminjaman_3dp.dart';
-import 'package:build_app/page/form_peminjaman/form_peminjaman_cnc.dart';
-import 'package:build_app/page/form_peminjaman/form_peminjaman_lasercut.dart';
-import 'package:build_app/page/utility/dashboard_choose.dart';
-import 'package:build_app/page/utility/dashboard_peminjaman.dart';
+import 'package:build_app/page/main/custom_main_page.dart';
+import 'package:build_app/page/form_penggunaan/form_penggunaan_3dp.dart';
+import 'package:build_app/page/form_penggunaan/form_penggunaan_cnc.dart';
+import 'package:build_app/page/form_penggunaan/form_penggunaan_lasercut.dart';
+import 'package:build_app/page/main/utility/dashboard_choose.dart';
+import 'package:build_app/page/main/utility/dashboard_peminjaman.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -179,7 +179,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             // page: customFormPeminjaman(
                             //     body: formPeminjamanCnc(), showNavBar: false),
 
-                            page: formPeminjamanCnc(),
+                            page: formPenggunaanCnc(),
                             objekDipilih: "Memilih CNC Milling",
                             merekMesin: "MTU 200 M",
                             namaMesin: "CNC Milling",
@@ -191,7 +191,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                           ),
                           SizedBox(width: 11.0),
                           buttonPeminjaman(
-                            page: formPeminjamanLasercut(),
+                            page: formPenggunaanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
                             merekMesin: "TQL-1390",
                             namaMesin: "Laser Cutting",
@@ -203,7 +203,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                           ),
                           SizedBox(width: 11.0),
                           buttonPeminjaman(
-                            page: formPeminjamanPrinting(),
+                            page: formPenggunaanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
                             merekMesin: "Anycubic 4Max Pro",
                             namaMesin: "3D Printing",
