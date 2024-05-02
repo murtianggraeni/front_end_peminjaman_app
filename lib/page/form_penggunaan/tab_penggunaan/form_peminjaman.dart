@@ -93,7 +93,7 @@ class _formPeminjamanState extends State<formPeminjaman> {
     if (result != null) {
       setState(() {
         if (kIsWeb) {
-          pickedFileNames = result.files.map((file) => file.name!).toList();
+          pickedFileNames = result.files.map((file) => file.name).toList();
         } else {
           pickedFileNames =
               result.paths.map((path) => path!.split('/').last).toList();
