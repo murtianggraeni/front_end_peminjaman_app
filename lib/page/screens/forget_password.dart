@@ -1,4 +1,4 @@
-import 'package:build_app/widget/custom_scaffold.dart';
+import 'package:build_app/page/widget/custom_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {

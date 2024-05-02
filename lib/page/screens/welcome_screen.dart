@@ -1,8 +1,8 @@
-import 'package:build_app/screens/signin_screen.dart';
-import 'package:build_app/screens/signup_screen.dart';
+import 'package:build_app/page/screens/signin_screen.dart';
+import 'package:build_app/page/screens/signup_screen.dart';
 import 'package:build_app/theme/theme.dart';
-import 'package:build_app/widget/custom_scaffold.dart';
-import 'package:build_app/widget/welcome_button.dart';
+import 'package:build_app/page/widget/custom_scaffold.dart';
+import 'package:build_app/page/widget/welcome_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

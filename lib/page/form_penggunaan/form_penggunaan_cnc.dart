@@ -111,6 +111,10 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc>
                                       borderRadius: BorderRadius.circular(5.0),
                                     ),
                                     controller: tabController,
+                                    labelStyle: GoogleFonts.inter(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                     tabs: const [
                                       Tab(
                                         text: 'Peminjaman',

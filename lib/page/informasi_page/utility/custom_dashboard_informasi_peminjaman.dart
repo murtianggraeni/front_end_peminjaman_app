@@ -2,6 +2,7 @@ import 'package:build_app/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +21,7 @@ class dashboardInformasiPeminjaman extends StatefulWidget {
   final String dataAcc;
   final String dataTidakAcc;
   final String dataDiproses;
-  final Widget alamatInformasiLanjutan;
+  final String alamatInformasiLanjutan;
 
   @override
   State<dashboardInformasiPeminjaman> createState() =>
@@ -202,12 +203,7 @@ class _dashboardInformasiPeminjamanState
                     ),
                     OutlinedButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    widget.alamatInformasiLanjutan,
-                              ));
+                          Get.toNamed(widget.alamatInformasiLanjutan);
                         },
                         style: OutlinedButton.styleFrom(
                             shape: const RoundedRectangleBorder(

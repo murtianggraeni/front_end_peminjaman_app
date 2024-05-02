@@ -2,25 +2,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class customFormPeminjaman extends StatefulWidget {
   const customFormPeminjaman({
     super.key,
-    required this.returnText,
     required this.judul,
+    required this.returnText,
+    this.controller,
+    this.onTap,
     required this.hintText,
     this.icon,
     this.keyboardType,
+    this.readOnly = false,
     // required this.body,
   });
 
   // final Widget? body;
-  final String returnText;
   final String judul;
+  final String returnText;
+  final TextEditingController? controller;
+  final OnTap? onTap;
   final String hintText;
   final IconButton? icon;
   final TextInputType? keyboardType;
+  final bool? readOnly;
 
   @override
   State<customFormPeminjaman> createState() => _customFormPeminjamanState();
@@ -45,11 +52,15 @@ class _customFormPeminjamanState extends State<customFormPeminjaman> {
           height: 4.0,
         ),
         TextFormField(
+          controller: widget.controller,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return widget.returnText;
             }
             return null;
+          },
+          onTap: () {
+            widget.onTap;
           },
           decoration: InputDecoration(
               hintText: widget.hintText,
@@ -68,6 +79,7 @@ class _customFormPeminjamanState extends State<customFormPeminjaman> {
               ),
               suffixIcon: widget.icon),
           keyboardType: widget.keyboardType,
+          readOnly: widget.readOnly ?? false,
         ),
         const SizedBox(
           height: 11.0,

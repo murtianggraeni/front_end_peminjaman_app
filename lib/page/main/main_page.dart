@@ -1,13 +1,11 @@
 import 'package:build_app/page/main/custom_main_page.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_3dp.dart';
+import 'package:build_app/page/form_penggunaan/form_penggunaan_printing.dart';
 import 'package:build_app/page/form_penggunaan/form_penggunaan_cnc.dart';
 import 'package:build_app/page/form_penggunaan/form_penggunaan_lasercut.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_cnc.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_lasercut.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_printing.dart';
-import 'package:build_app/page/main/utility/dashboard_choose.dart';
+import 'package:build_app/page/main/utility/custom_dashboard_choose.dart';
 import 'package:build_app/page/informasi_page/utility/custom_dashboard_informasi_peminjaman.dart';
-import 'package:build_app/page/main/utility/dashboard_peminjaman.dart';
+import 'package:build_app/page/main/utility/custom_dashboard_peminjaman.dart';
+import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,21 +28,21 @@ class _mainPageSatuState extends State<mainPageSatu> {
       dataAcc: "12 Data",
       dataTidakAcc: "01 Data",
       dataDiproses: "24 Data",
-      alamatInformasiLanjutan: halamanInformasiCnc(),
+      alamatInformasiLanjutan: RouteName.halaman_informasi_cnc,
     ),
     const dashboardInformasiPeminjaman(
       namaMesin: "Laser Cutting",
       dataAcc: "23 Data",
       dataTidakAcc: "11 Data",
       dataDiproses: "08 Data",
-      alamatInformasiLanjutan: halamanInformasiLasercut(),
+      alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
     ),
     const dashboardInformasiPeminjaman(
         namaMesin: "3D Printing",
         dataAcc: "09 Data",
         dataTidakAcc: "19 Data",
         dataDiproses: "16 Data",
-        alamatInformasiLanjutan: halamanInformasiPrinting()),
+        alamatInformasiLanjutan: RouteName.halaman_informasi_printing),
   ];
 
   Widget carouselView(int index) {

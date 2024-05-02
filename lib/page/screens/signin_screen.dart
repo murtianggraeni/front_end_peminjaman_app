@@ -1,11 +1,10 @@
-import 'package:build_app/page/custom/custom_buttom_nav.dart';
-import 'package:build_app/screens/forget_password.dart';
-import 'package:build_app/screens/signup_screen.dart';
+import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
-import 'package:build_app/widget/custom_scaffold.dart';
+import 'package:build_app/page/widget/custom_scaffold.dart';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -158,13 +157,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: lightColorScheme.primary,
                                   )),
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (e) =>
-                                            const ForgetPasswordScreen()));
-                              },
+                              onTap: () =>
+                                  Get.toNamed(RouteName.forget_password),
                             )
                           ],
                         ),
@@ -263,26 +257,25 @@ class _SignInScreenState extends State<SignInScreen> {
                             onPressed: () {
                               if (_formSignInKey.currentState!.validate() &&
                                   !rememberPassword) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text("Data diproses"),
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: Duration(seconds: 2),
-                                ));
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const customButtomNav(),
-                                    ));
+                                // ScaffoldMessenger.of(context)
+                                //     .showSnackBar(const SnackBar(
+                                //   content: Text("Data diproses"),
+                                //   behavior: SnackBarBehavior.floating,
+                                //   duration: Duration(seconds: 2),
+                                // ));
+                                Get.snackbar("Data Diproses", "Berhasil");
+                                Get.offNamed(RouteName.custom_buttom_nav);
                               } else if (rememberPassword) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text(
-                                      "Menyetujui untuk menyimpan data personal"),
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: Duration(seconds: 2),
-                                ));
+                                // ScaffoldMessenger.of(context)
+                                //     .showSnackBar(const SnackBar(
+                                //   content: Text(
+                                //       "Menyetujui untuk menyimpan data personal"),
+                                //   behavior: SnackBarBehavior.floating,
+                                //   duration: Duration(seconds: 2),
+                                // ));
+                                Get.snackbar("Data Diproses",
+                                    "Menyetujui untuk menyimpan data personal");
+                                Get.offNamed(RouteName.custom_buttom_nav);
                               }
                             },
                             child: const Text(
@@ -348,11 +341,12 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (e) => const SignUpScreen(),
-                                    ));
+                                Get.toNamed(RouteName.signup_screen);
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //       builder: (e) => const SignUpScreen(),
+                                //     ));
                               },
                               child: Text(
                                 "Sign up",

@@ -28,9 +28,8 @@ void main() {
 class _customButtomNavState extends State<customButtomNav> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: widget.showNavBar ? BottomNavBar() : Container(),
+    return Scaffold(
+      body: BottomNavBar(),
     );
   }
 }

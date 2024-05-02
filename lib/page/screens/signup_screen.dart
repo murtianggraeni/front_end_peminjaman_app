@@ -1,9 +1,9 @@
-import 'package:build_app/page/custom/custom_buttom_nav.dart';
-import 'package:build_app/screens/signin_screen.dart';
+import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
-import 'package:build_app/widget/custom_scaffold.dart';
+import 'package:build_app/page/widget/custom_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -163,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             color: Colors.black38),
                                   )),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 25.0,
                             ),
                             // Persetujuan untuk proses data selanjutnya
@@ -199,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                      minimumSize: Size(328, 50),
+                                      minimumSize: const Size(328, 50),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -209,25 +209,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     if (_formSignupKey.currentState!
                                             .validate() &&
                                         agreePersonalData) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text("Memproses Data"),
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: Duration(seconds: 2),
-                                      ));
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  customButtomNav()));
+                                      // ScaffoldMessenger.of(context)
+                                      //     .showSnackBar(const SnackBar(
+                                      //   content: Text("Memproses Data"),
+                                      //   behavior: SnackBarBehavior.floating,
+                                      //   duration: Duration(seconds: 2),
+                                      // ));
+                                      Get.snackbar("Registrasi Berhasil",
+                                          "Memproses data");
+                                      Get.offNamed(RouteName.custom_buttom_nav);
                                     } else if (!agreePersonalData) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text(
-                                            "Setujui proses data pribadi Anda"),
-                                        behavior: SnackBarBehavior.floating,
-                                        duration: Duration(seconds: 2),
-                                      ));
+                                      // ScaffoldMessenger.of(context)
+                                      //     .showSnackBar(const SnackBar(
+                                      //   content: Text(
+                                      //       "Setujui proses data pribadi Anda"),
+                                      //   behavior: SnackBarBehavior.floating,
+                                      //   duration: Duration(seconds: 2),
+                                      // ));
+                                      Get.snackbar("Registrasi Gagal",
+                                          "Setujui proses data pribadi Anda");
                                     }
                                   },
                                   child: const Text(
@@ -271,11 +271,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               height: 30.0,
                             ),
                             // sign up with social media
-                            Row(
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Logo(logoAsset: "assets/images/google.png"),
-                                const SizedBox(width: 22),
+                                SizedBox(width: 22),
                                 Logo(logoAsset: "assets/images/facebook.png"),
                               ],
                             ),
@@ -293,11 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (e) => const SignInScreen(),
-                                        ));
+                                    Get.toNamed(RouteName.signin_screen);
                                   },
                                   child: Text(
                                     "Sign in",

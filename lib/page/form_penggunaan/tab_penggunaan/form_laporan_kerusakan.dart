@@ -12,6 +12,11 @@ class formLaporanKerusakan extends StatefulWidget {
 }
 
 class _formLaporanKerusakanState extends State<formLaporanKerusakan> {
+  // void _showDatePicker() {
+  //   context: context;
+  //   initialDate:
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,17 +26,17 @@ class _formLaporanKerusakanState extends State<formLaporanKerusakan> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customFormPeminjaman(
-            returnText: "Silahkan mengisi ID Order",
+          const customFormPeminjaman(
             judul: "ID Order",
-            hintText: DateFormat('d/MM/yy').format(DateTime.now()),
+            returnText: "Silahkan mengisi ID Order",
+            hintText: "Contoh: 290866",
           ),
           Row(
             children: [
               Expanded(
                 child: customFormPeminjaman(
-                  returnText: "Silahkan mengisi tanggal kerusakan",
                   judul: "Waktu Kerusakan",
+                  returnText: "Silahkan mengisi tanggal kerusakan",
                   hintText: DateFormat('d/MM/yy').format(DateTime.now()),
                   icon: IconButton(
                       onPressed: () {},
@@ -45,8 +50,8 @@ class _formLaporanKerusakanState extends State<formLaporanKerusakan> {
               ),
               Expanded(
                 child: customFormPeminjaman(
-                  returnText: "Silahkan mengisi jam kerusakan",
                   judul: "",
+                  returnText: "Silahkan mengisi jam kerusakan",
                   hintText: DateFormat('hh:mm a').format(DateTime.now()),
                   icon: IconButton(
                     onPressed: () {},
@@ -59,13 +64,13 @@ class _formLaporanKerusakanState extends State<formLaporanKerusakan> {
             ],
           ),
           const customFormPeminjaman(
-            returnText: "Silahkan mengisi deskripsi kerusakan mesin",
             judul: "Deskripsi Kerusakan Mesin",
+            returnText: "Silahkan mengisi deskripsi kerusakan mesin",
             hintText: "Contoh: 2 Part",
           ),
           customFormPeminjaman(
-            returnText: "Silahkan mengisi bukti kerusakan",
             judul: "Bukti Kerusakan",
+            returnText: "Silahkan mengisi bukti kerusakan",
             hintText: "Tambahkan file",
             icon: IconButton(
               onPressed: () {},
