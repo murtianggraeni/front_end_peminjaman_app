@@ -28,7 +28,7 @@ void main() {
 class _customButtomNavState extends State<customButtomNav> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: BottomNavBar(),
     );
   }
@@ -94,25 +94,25 @@ class _BottomNavBarState extends State<BottomNavBar> {
       confineInSafeArea: true,
       backgroundColor: Colors.white, // Default is Colors.white.
       handleAndroidBackButtonPress: true, // Default is true.
-
       resizeToAvoidBottomInset:
           true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
       stateManagement: true, // Default is true.
       hideNavigationBarWhenKeyboardShows:
           true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
       decoration: NavBarDecoration(
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(19.0),
-            topLeft: Radius.circular(19.0),
-          ),
-          colorBehindNavBar: Colors.grey.shade500,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 5.0,
-              spreadRadius: 1.0,
-              color: Colors.grey.shade500,
-            )
-          ]),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(19.0),
+          topLeft: Radius.circular(19.0),
+        ),
+        colorBehindNavBar: Colors.grey.shade500,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 5.0,
+            spreadRadius: 1.0,
+            color: Colors.grey.shade500,
+          )
+        ],
+      ),
       popAllScreensOnTapOfSelectedTab: true,
       popActionScreens: PopActionScreensType.all,
       itemAnimationProperties: const ItemAnimationProperties(

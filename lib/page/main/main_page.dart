@@ -63,72 +63,77 @@ class _mainPageSatuState extends State<mainPageSatu> {
   @override
   Widget build(BuildContext context) {
     return customScaffoldPage(
-        body: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Hi, ",
-                        style: GoogleFonts.inter(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                            color: Colors.white),
-                      ),
-                      Text(
-                        "Nama",
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 22,
-                          color: Colors.white,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "Hi, ",
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              color: Colors.white),
                         ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Selamat datang kembali!",
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: const Color(0xFFE2E2E2),
+                        Text(
+                          "Nama",
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 22,
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
                     ),
-                  )
-                ],
-              ),
-              Container(
-                height: 48,
-                width: 48,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                    color: Color(0xFFDFE7EF)),
-                child: const Icon(
-                  Icons.notifications_active_sharp,
-                  size: 24,
-                  color: Color(0xFF1D5973),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Selamat datang kembali!",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: const Color(0xFFE2E2E2),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
+                Container(
+                  height: 48,
+                  width: 48,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12.0),
+                    ),
+                    color: Color(0xFFDFE7EF),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_active_sharp,
+                    size: 24,
+                    color: Color(0xFF1D5973),
+                  ),
+                )
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 71),
-        Expanded(
-          flex: 6,
-          child: Container(
+          const SizedBox(height: 71),
+          Expanded(
+            flex: 6,
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 19),
               decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(22.0),
-                      topRight: Radius.circular(22.0))),
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(22.0),
+                  topRight: Radius.circular(22.0),
+                ),
+              ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +146,9 @@ class _mainPageSatuState extends State<mainPageSatu> {
                           ukuranLebar: 48.0,
                           ukuranTinggi: 24.0,
                         ),
-                        SizedBox(width: 8.0),
+                        SizedBox(
+                          width: 8.0,
+                        ),
                         buttonPilihMesin(
                           pilihanMesin: "Mesin Laser Cut dipilih",
                           namaMesin: "Laser Cutting",
@@ -176,11 +183,12 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         scale: 0.9,
                         physics: BouncingScrollPhysics(),
                         pagination: SwiperPagination(
-                            builder: DotSwiperPaginationBuilder(
-                          color: pageModeScheme.onSecondary,
-                          activeColor: pageModeScheme.primary,
-                          activeSize: 10,
-                        )),
+                          builder: DotSwiperPaginationBuilder(
+                            color: pageModeScheme.onSecondary,
+                            activeColor: pageModeScheme.primary,
+                            activeSize: 10,
+                          ),
+                        ),
                         itemBuilder: (context, index) {
                           return Container(
                             decoration: BoxDecoration(),
@@ -211,7 +219,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                             style: GoogleFonts.inter(
                               fontSize: 14.0,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF3D8FEF),
+                              color: const Color(0xFF3D8FEF),
                             ),
                           ),
                         )
@@ -223,9 +231,6 @@ class _mainPageSatuState extends State<mainPageSatu> {
                       child: Row(
                         children: [
                           buttonPeminjaman(
-                            // page: customFormPeminjaman(
-                            //     body: formPeminjamanCnc(), showNavBar: false),
-
                             page: formPenggunaanCnc(),
                             objekDipilih: "Memilih CNC Milling",
                             merekMesin: "MTU 200 M",
@@ -290,11 +295,13 @@ class _mainPageSatuState extends State<mainPageSatu> {
                     Container(
                       height: 400,
                       decoration: BoxDecoration(
-                          color: pageModeScheme.onPrimary,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20.0),
-                              topRight: Radius.circular(20.0))),
+                        color: pageModeScheme.onPrimary,
+                        shape: BoxShape.rectangle,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                      ),
                       child: TableCalendar(
                         focusedDay: DateTime.now(),
                         firstDay: DateTime.utc(2024, 01, 01),
@@ -316,10 +323,12 @@ class _mainPageSatuState extends State<mainPageSatu> {
                     ),
                   ],
                 ),
-              )),
-        ),
-      ],
-    ));
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // Widget carouselView(int index) {

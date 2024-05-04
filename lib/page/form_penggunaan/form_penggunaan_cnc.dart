@@ -43,103 +43,125 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc>
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: Form(
-            key: _formPenggunaanCnc,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 23.0, vertical: 55.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Form Penggunaan CNC Milling",
-                    style: GoogleFonts.inter(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6B7888),
-                    ),
+          key: _formPenggunaanCnc,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 23.0, vertical: 55.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Form Penggunaan CNC Milling",
+                  style: GoogleFonts.inter(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF6B7888),
                   ),
-                  const SizedBox(
-                    height: 15.0,
+                ),
+                const SizedBox(
+                  height: 15.0,
+                ),
+                const customFormPeminjaman(
+                  returnText: "Silahkan mengisi email",
+                  judul: "Email",
+                  hintText: "Contoh: ayu@mhs.polman-bandung.ac.id",
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const customFormPeminjaman(
+                  returnText: "Silahkan mengisi nama lengkap",
+                  judul: "Nama Pemohon",
+                  hintText: "contoh: Ayu Asahi",
+                ),
+                Text(
+                  "Keperluan",
+                  style: GoogleFonts.inter(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w300,
+                    color: const Color(0xFF6B7888),
                   ),
-                  const customFormPeminjaman(
-                    returnText: "Silahkan mengisi email",
-                    judul: "Email",
-                    hintText: "Contoh: ayu@mhs.polman-bandung.ac.id",
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const customFormPeminjaman(
-                    returnText: "Silahkan mengisi nama lengkap",
-                    judul: "Nama Pemohon",
-                    hintText: "contoh: Ayu Asahi",
-                  ),
-                  Text(
-                    "Keperluan",
-                    style: GoogleFonts.inter(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w300,
-                      color: const Color(0xFF6B7888),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 4.0,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    child: Column(
-                      children: [
-                        Container(
-                          // height: 52.0,
-                          width: MediaQuery.of(context).size.height,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF1F1F1),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: TabBar(
-                                    labelColor: Colors.black,
-                                    unselectedLabelColor:
-                                        const Color(0xFF6B7888),
-                                    indicatorColor: Colors.white,
-                                    indicatorWeight: 2,
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    indicator: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                    controller: tabController,
-                                    labelStyle: GoogleFonts.inter(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    tabs: const [
-                                      Tab(
-                                        text: 'Peminjaman',
-                                      ),
-                                      Tab(
-                                        text: 'Laporan Kerusakan',
-                                      ),
-                                    ]),
-                              ),
-                            ],
-                          ),
+                ),
+                const SizedBox(
+                  height: 4.0,
+                ),
+                SizedBox(
+                  height: 600.0,
+                  child: Column(
+                    children: [
+                      Container(
+                        // height: 52.0,
+                        width: MediaQuery.of(context).size.height,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF1F1F1),
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
                         ),
-                        Expanded(
-                            child: TabBarView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: TabBar(
+                                labelColor: Colors.black,
+                                unselectedLabelColor: const Color(0xFF6B7888),
+                                indicatorColor: Colors.white,
+                                indicatorWeight: 2,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                indicator: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
                                 controller: tabController,
-                                children: const [
-                              formPeminjaman(),
-                              formLaporanKerusakan(),
-                            ])),
-                      ],
-                    ),
+                                labelStyle: GoogleFonts.inter(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                tabs: const [
+                                  Tab(
+                                    text: 'Peminjaman',
+                                  ),
+                                  Tab(
+                                    text: 'Laporan Kerusakan',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: tabController,
+                          children: const [
+                            formPeminjaman(),
+                            formLaporanKerusakan(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )),
+                ),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       minimumSize: const Size(328, 50),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10),
+                //       ),
+                //     ),
+                //     onPressed: () {},
+                //     child: Text(
+                //       "Submit",
+                //       style: GoogleFonts.inter(
+                //         fontSize: 16.0,
+                //         fontWeight: FontWeight.w500,
+                //         color: Color(0xFF6B7888),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -44,23 +44,26 @@ class _buttonPeminjamanState extends State<buttonPeminjaman> {
       child: InkWell(
         onTap: () {
           print(widget.objekDipilih);
-          // Navigator.of(context).push(MaterialPageRoute(
-          //   builder: (context) => widget.page,
-          // ));
-
-          PersistentNavBarNavigator.pushNewScreen(context,
-              screen: widget.page, withNavBar: false);
+          PersistentNavBarNavigator.pushNewScreen(
+            context,
+            screen: widget.page,
+            withNavBar: false,
+          );
         },
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
-        borderRadius: BorderRadius.all(Radius.circular(12.04)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.04),
+        ),
         child: Ink(
           height: 247.0,
           width: 156.0,
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             color: pageModeScheme.onPrimary,
-            borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(12.0),
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0),
@@ -96,7 +99,9 @@ class _buttonPeminjamanState extends State<buttonPeminjaman> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      left: widget.leftImage, top: widget.topImage),
+                    left: widget.leftImage,
+                    top: widget.topImage,
+                  ),
                   child: Image.asset(widget.gambarMesin),
                 ),
                 Row(
