@@ -1,24 +1,24 @@
 import 'dart:io';
 
-import 'package:build_app/page/form_penggunaan/utility/custom_form_page.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/utility/custom_form_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 
-class formPeminjaman extends StatefulWidget {
-  const formPeminjaman({super.key});
+class formPeminjamanBackupDua extends StatefulWidget {
+  const formPeminjamanBackupDua({super.key});
 
   @override
-  State<formPeminjaman> createState() => _formPeminjamanState();
+  State<formPeminjamanBackupDua> createState() =>
+      _formPeminjamanBackupDuaState();
 }
 
-class _formPeminjamanState extends State<formPeminjaman> {
+class _formPeminjamanBackupDuaState extends State<formPeminjamanBackupDua> {
   // Untuk memilih tanggal peminjaman
   void _showDatePicker() async {
     final DateTime now = DateTime.now();
@@ -52,7 +52,237 @@ class _formPeminjamanState extends State<formPeminjaman> {
     }
   }
 
+  // cara 1,
   // Untuk memilih waktu peminjaman
+  // void _showTimePicker(TextEditingController controller) async {
+  //   final TimeOfDay now = TimeOfDay.now();
+  //   final TimeOfDay? selectedTime = await showTimePicker(
+  //     context: context,
+  //     initialTime: now,
+  //   );
+
+  // Validasi: Pastikan tanggal dan waktu awal sudah diisi sebelum memilih waktu akhir
+  // if (controller == _endTime &&
+  //     (_date.text.isEmpty || _startTime.text.isEmpty)) {
+  //   Get.snackbar(
+  //       "Peringatan", "Silakan pilih tanggal dan waktu awal terlebih dahulu");
+  //   return;
+  // }
+
+  // if (selectedTime != null) {
+  // Validasi untuk jam yang sama hari ini
+  // if (_date.text.isNotEmpty) {
+  //   final DateTime selectedDate =
+  //       DateFormat('EE, d MMM yyyy').parse(_date.text);
+  //   final DateTime now = DateTime.now();
+
+  //   if (selectedDate.year == now.year &&
+  //       selectedDate.month == now.month &&
+  //       selectedDate.day == now.day) {
+  //     if (selectedTime.hour < now.hour ||
+  //         (selectedTime.hour == now.hour &&
+  //             selectedTime.minute < now.minute)) {
+  //       Get.snackbar(
+  //           "Peringatan", "Tidak bisa memilih waktu yang sudah lewat");
+  //       return;
+  //     }
+  //   }
+  // }
+
+  // Validasi endTime harus setelah startTime
+  // cara 1,
+  // if (controller == _endTime) {
+  //   final TimeOfDay startTime = TimeOfDay.fromDateTime(
+  //       DateFormat('hh:mm a').parse(_startTime.text));
+  //   if (selectedTime.hour < startTime.hour ||
+  //       (selectedTime.hour == startTime.hour &&
+  //           selectedTime.minute <= startTime.minute)) {
+  //     Get.snackbar("Peringatan!",
+  //         "Waktu akhir peminjaman harus melewati waktu awal peminjaman");
+  //     return;
+  //   }
+  // }
+
+  // Validasi endTime harus setelah startTime
+  // cara 2,
+  // if (controller == _endTime) {
+  //   if (_startTime.text.isNotEmpty) {
+  //     final TimeOfDay startTime =
+  //         TimeOfDay.fromDateTime(DateFormat('jm').parse(_startTime.text));
+  //     if (selectedTime.hour < startTime.hour ||
+  //         (selectedTime.hour == startTime.hour &&
+  //             selectedTime.minute <= startTime.minute)) {
+  //       Get.snackbar("Peringatan!",
+  //           "Waktu akhir peminjaman harus melewati waktu awal peminjaman");
+  //       return;
+  //     }
+  //   }
+  // }
+
+  // cara 3,
+  // Validasi endTime harus setelah startTime
+  // Validasi endTime harus setelah startTime
+  // if (controller == _endTime) {
+  //   if (_startTime.text.isNotEmpty) {
+  //     final TimeOfDay startTime = TimeOfDay.fromDateTime(DateFormat('jm').parse(_startTime.text));
+  //     final DateTime selectedDateTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, selectedTime.hour, selectedTime.minute);
+  //     final DateTime startDateTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, startTime.hour, startTime.minute);
+  //     if (selectedDateTime.isBefore(startDateTime)) {
+  //       Get.snackbar("Peringatan!", "Waktu akhir peminjaman harus melewati waktu awal peminjaman");
+  //       return;
+  //     }
+  //   }
+  // }
+
+  //     setState(() {
+  //       controller.text = selectedTime.format(context);
+  //     });
+  //   }
+  // }
+
+  // cara 2,
+  // void _showTimePicker(TextEditingController controller) async {
+  //   final TimeOfDay now = TimeOfDay.now();
+  //   final TimeOfDay? selectedTime = await showTimePicker(
+  //     context: context,
+  //     initialTime: now,
+  //   );
+
+  //   // Validasi: Pastikan tanggal dan waktu awal sudah diisi sebelum memilih waktu akhir
+  //   if (controller == _endTime &&
+  //       (_date.text.isEmpty || _startTime.text.isEmpty)) {
+  //     Get.snackbar(
+  //         "Peringatan", "Silakan pilih tanggal dan waktu awal terlebih dahulu");
+  //     return;
+  //   }
+
+  //   // Validasi untuk jam yang sama hari ini
+  //   final DateTime selectedDate = _date.text.isNotEmpty
+  //       ? DateFormat('EE, d MMM yyyy').parse(_date.text)
+  //       : DateTime.now();
+
+  //   if (selectedTime != null) {
+  //     final DateTime currentDateTime = DateTime.now();
+
+  //     if (selectedDate.year == currentDateTime.year &&
+  //         selectedDate.month == currentDateTime.month &&
+  //         selectedDate.day == currentDateTime.day) {
+  //       if (selectedTime.hour < now.hour ||
+  //           (selectedTime.hour == now.hour &&
+  //               selectedTime.minute < now.minute)) {
+  //         Get.snackbar(
+  //             "Peringatan", "Tidak bisa memilih waktu yang sudah lewat");
+  //         return;
+  //       }
+  //     }
+
+  //     // Validasi endTime harus setelah startTime
+  //     if (controller == _endTime) {
+  //       if (_startTime.text.isNotEmpty && _date.text.isNotEmpty) {
+  //         final TimeOfDay startTime =
+  //             TimeOfDay.fromDateTime(DateFormat('jm').parse(_startTime.text));
+  //         final DateTime selectedDateTime = DateTime(
+  //             selectedDate.year,
+  //             selectedDate.month,
+  //             selectedDate.day,
+  //             selectedTime.hour,
+  //             selectedTime.minute);
+  //         final DateTime startDateTime = DateTime(
+  //             selectedDate.year,
+  //             selectedDate.month,
+  //             selectedDate.day,
+  //             startTime.hour,
+  //             startTime.minute);
+  //         if (selectedDateTime.isBefore(startDateTime)) {
+  //           Get.snackbar("Peringatan!",
+  //               "Waktu akhir peminjaman harus melewati waktu awal peminjaman");
+  //           return;
+  //         }
+  //       }
+  //     }
+
+  //     setState(() {
+  //       controller.text = selectedTime.format(context);
+  //     });
+  //   }
+  // }
+
+  // cara 3,
+  //
+
+  // cara 4,
+//   void _showTimePicker(TextEditingController controller) async {
+//   final TimeOfDay now = TimeOfDay.now();
+//   final TimeOfDay? selectedTime = await showTimePicker(
+//     context: context,
+//     initialTime: now,
+//   );
+
+//   if (selectedTime != null) {
+//     // Validasi untuk jam yang sama hari ini
+//     final DateTime selectedDateTime = DateTime(
+//       now.year,
+//       now.month,
+//       now.day,
+//       selectedTime.hour,
+//       selectedTime.minute,
+//     );
+//     if (selectedDateTime.isAtSameMomentAs(now)) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text("Waktu harus berbeda dengan waktu sekarang."),
+//         ),
+//       );
+//       return;
+//     }
+
+//     // Validasi endTime harus setelah startTime
+//     if (controller == _endTime) {
+//       final DateTime? selectedStartDate = _date.text.isNotEmpty
+//           ? DateFormat('EE, d MMM yyyy').parse(_date.text)
+//           : null;
+//       if (selectedStartDate == null) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text("Silakan pilih tanggal terlebih dahulu."),
+//           ),
+//         );
+//         return;
+//       }
+
+//       final TimeOfDay startTime = TimeOfDay.fromDateTime(
+//           DateFormat('hh:mm a').parse(_startTime.text));
+//       final DateTime startDateTime = DateTime(
+//         selectedStartDate.year,
+//         selectedStartDate.month,
+//         selectedStartDate.day,
+//         startTime.hour,
+//         startTime.minute,
+//       );
+//       final DateTime endDateTime = DateTime(
+//         selectedStartDate.year,
+//         selectedStartDate.month,
+//         selectedStartDate.day,
+//         selectedTime.hour,
+//         selectedTime.minute,
+//       );
+//       if (endDateTime.isBefore(startDateTime)) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text("EndTime harus setelah StartTime."),
+//           ),
+//         );
+//         return;
+//       }
+//     }
+
+//     setState(() {
+//       controller.text = selectedTime.format(context);
+//     });
+//   }
+// }
+
+  // cara 5,
   void _showTimePicker(TextEditingController controller) async {
     final TimeOfDay now = TimeOfDay.now();
     final TimeOfDay? selectedTime = await showTimePicker(
@@ -70,14 +300,13 @@ class _formPeminjamanState extends State<formPeminjaman> {
         selectedTime.minute,
       );
       if (selectedDateTime.isAtSameMomentAs(DateTime.now())) {
-        Get.snackbar(
-          "Peringatan!",
-          "Waktu harus berbeda dengan waktu sekarang.",
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Waktu harus berbeda dengan waktu sekarang."),
+          ),
         );
         return;
       }
-
-      
 
       // Validasi endTime harus setelah startTime
       if (controller == _endTime) {
@@ -85,9 +314,10 @@ class _formPeminjamanState extends State<formPeminjaman> {
             ? DateFormat('EE, d MMM yyyy').parse(_date.text)
             : null;
         if (selectedStartDate == null) {
-          Get.snackbar(
-            "Peringatan",
-            "Silakan pilih tanggal terlebih dahulu.",
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Silakan pilih tanggal terlebih dahulu."),
+            ),
           );
           return;
         }
@@ -112,9 +342,10 @@ class _formPeminjamanState extends State<formPeminjaman> {
         // Memeriksa apakah endTime setelah startTime
         if (endDateTime.isBefore(startDateTime) ||
             endDateTime.isAtSameMomentAs(startDateTime)) {
-          Get.snackbar(
-            "Peringatan",
-            "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("EndTime harus setelah StartTime."),
+            ),
           );
           return;
         }
@@ -152,8 +383,6 @@ class _formPeminjamanState extends State<formPeminjaman> {
   void openFile(File file) {
     OpenFile.open(file.path);
   }
-
-  
 
   // Sebagai controller dari masing-masing fungsi
   final TextEditingController _date = TextEditingController();

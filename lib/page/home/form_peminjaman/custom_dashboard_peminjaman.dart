@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class buttonPeminjaman extends StatefulWidget {
   const buttonPeminjaman({
@@ -107,8 +107,10 @@ class _buttonPeminjamanState extends State<buttonPeminjaman> {
                 Row(
                   children: [
                     Padding(
-                      padding:
-                          EdgeInsets.only(left: 110.0, top: widget.topArrow),
+                      padding: EdgeInsets.only(
+                        left: 110.0,
+                        top: widget.topArrow,
+                      ),
                       child: const Icon(
                         Icons.arrow_forward_ios,
                         size: 14,

@@ -1,9 +1,10 @@
-import 'package:build_app/page/form_penggunaan/form_penggunaan_cnc.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_lasercut.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_printing.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_cnc.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_lasercut.dart';
-import 'package:build_app/page/informasi_page/halaman_informasi_printing.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_cnc.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_lasercut.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_printing.dart';
+import 'package:build_app/page/home/informasi_page/halaman_informasi_cnc.dart';
+import 'package:build_app/page/home/informasi_page/halaman_informasi_lasercut.dart';
+import 'package:build_app/page/home/informasi_page/halaman_informasi_printing.dart';
+import 'package:build_app/page/monitoring/page/detail_monitoring_cnc.dart';
 import 'package:build_app/page/screens/forget_password.dart';
 import 'package:build_app/page/screens/signin_screen.dart';
 import 'package:build_app/page/screens/signup_screen.dart';
@@ -53,5 +54,9 @@ class AppPage {
       name: RouteName.form_penggunaan_printing,
       page: () => const formPenggunaanPrinting(),
     ),
+    GetPage(
+      name: RouteName.detail_monitoring_cnc,
+      page: () => const detailPageCnc(),
+    )
   ];
 }

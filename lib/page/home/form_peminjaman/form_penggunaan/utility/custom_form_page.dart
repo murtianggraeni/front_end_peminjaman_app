@@ -63,6 +63,7 @@ class _customFormPeminjamanState extends State<customFormPeminjaman> {
             widget.onTap;
           },
           decoration: InputDecoration(
+            
               hintText: widget.hintText,
               hintStyle: const TextStyle(color: Colors.black26),
               border: OutlineInputBorder(
@@ -80,6 +81,7 @@ class _customFormPeminjamanState extends State<customFormPeminjaman> {
               suffixIcon: widget.icon),
           keyboardType: widget.keyboardType,
           readOnly: widget.readOnly ?? false,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
         ),
         const SizedBox(
           height: 11.0,

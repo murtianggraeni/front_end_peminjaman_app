@@ -1,10 +1,10 @@
 import 'package:build_app/page/main/custom_main_page.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_printing.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_cnc.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_lasercut.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_printing.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_cnc.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_lasercut.dart';
 import 'package:build_app/page/main/utility/custom_dashboard_choose.dart';
-import 'package:build_app/page/informasi_page/utility/custom_dashboard_informasi_peminjaman.dart';
-import 'package:build_app/page/main/utility/custom_dashboard_peminjaman.dart';
+import 'package:build_app/page/home/informasi_page/utility/custom_dashboard_informasi_peminjaman.dart';
+import 'package:build_app/page/home/form_peminjaman/custom_dashboard_peminjaman.dart';
 import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -22,6 +22,7 @@ class mainPageSatu extends StatefulWidget {
 }
 
 class _mainPageSatuState extends State<mainPageSatu> {
+  // List dashboard informasi peminjaman
   final List<dashboardInformasiPeminjaman> dataList = [
     const dashboardInformasiPeminjaman(
       namaMesin: "CNC Milling",
@@ -38,11 +39,12 @@ class _mainPageSatuState extends State<mainPageSatu> {
       alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
     ),
     const dashboardInformasiPeminjaman(
-        namaMesin: "3D Printing",
-        dataAcc: "09 Data",
-        dataTidakAcc: "19 Data",
-        dataDiproses: "16 Data",
-        alamatInformasiLanjutan: RouteName.halaman_informasi_printing),
+      namaMesin: "3D Printing",
+      dataAcc: "09 Data",
+      dataTidakAcc: "19 Data",
+      dataDiproses: "16 Data",
+      alamatInformasiLanjutan: RouteName.halaman_informasi_printing,
+    ),
   ];
 
   Widget carouselView(int index) {
@@ -66,7 +68,10 @@ class _mainPageSatuState extends State<mainPageSatu> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 25,
+              vertical: 25,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -164,7 +169,9 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 19.0),
+                    const SizedBox(
+                      height: 19.0,
+                    ),
                     Text(
                       "Informasi Peminjaman",
                       style: GoogleFonts.inter(
@@ -181,7 +188,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         itemCount: dataList.length,
                         viewportFraction: 0.85,
                         scale: 0.9,
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         pagination: SwiperPagination(
                           builder: DotSwiperPaginationBuilder(
                             color: pageModeScheme.onSecondary,
@@ -191,7 +198,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         ),
                         itemBuilder: (context, index) {
                           return Container(
-                            decoration: BoxDecoration(),
+                            decoration: const BoxDecoration(),
                             child: carouselView(index),
                           );
                         },
@@ -212,7 +219,8 @@ class _mainPageSatuState extends State<mainPageSatu> {
                         GestureDetector(
                           onTap: () {
                             print(
-                                "Tap View All"); // Fungsi yang akan dijalankan saat tombol ditekan
+                              "Tap View All",
+                            ); // Fungsi yang akan dijalankan saat tombol ditekan
                           },
                           child: Text(
                             'View All',
@@ -226,6 +234,7 @@ class _mainPageSatuState extends State<mainPageSatu> {
                       ],
                     ),
                     const SizedBox(height: 10.0),
+                    // Tampilan Awal Form Peminjaman
                     const SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(

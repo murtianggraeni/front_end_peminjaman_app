@@ -1,9 +1,9 @@
 import 'package:build_app/page/main/custom_main_page.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_printing.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_cnc.dart';
-import 'package:build_app/page/form_penggunaan/form_penggunaan_lasercut.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_printing.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_cnc.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_lasercut.dart';
 import 'package:build_app/page/main/utility/custom_dashboard_choose.dart';
-import 'package:build_app/page/main/utility/custom_dashboard_peminjaman.dart';
+import 'package:build_app/page/home/form_peminjaman/custom_dashboard_peminjaman.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
