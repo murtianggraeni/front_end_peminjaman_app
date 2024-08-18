@@ -15,51 +15,57 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
     return CustomScaffold(
-        child: Column(
-      children: [
-        SizedBox(height: 250),
-        Flexible(
+      child: Column(
+        children: [
+          SizedBox(height: 250),
+          Flexible(
             flex: 9,
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 30.0),
               child: Center(
-                  child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(children: [
-                  TextSpan(
-                    text: "Selamat Datang!\n",
-                    style: GoogleFonts.inter(
-                      fontSize: 40.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Selamat Datang!\n",
+                        style: GoogleFonts.inter(
+                          fontSize: 40.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      WidgetSpan(
+                        child: SizedBox(
+                          height: 40,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "Siap untuk pengalaman meminjam mesin yang\n",
+                        style: GoogleFonts.inter(color: Colors.white),
+                      ),
+                      WidgetSpan(
+                        child: SizedBox(
+                          height: 23,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "lebih mudah dan efisien? Mari mulai!",
+                        style: GoogleFonts.inter(color: Colors.white),
+                      )
+                    ],
                   ),
-                  WidgetSpan(
-                    child: SizedBox(
-                      height: 40,
-                    ),
-                  ),
-                  TextSpan(
-                      text: "Siap untuk pengalaman meminjam mesin yang\n",
-                      style: GoogleFonts.inter(color: Colors.white)),
-                  WidgetSpan(
-                    child: SizedBox(
-                      height: 23,
-                    ),
-                  ),
-                  TextSpan(
-                      text: "lebih mudah dan efisien? Mari mulai!",
-                      style: GoogleFonts.inter(color: Colors.white))
-                ]),
-              )),
-            )),
-        Flexible(
+                ),
+              ),
+            ),
+          ),
+          Flexible(
             flex: 2,
             child: Align(
               alignment: Alignment.bottomRight,
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: WelcomeButton(
                       buttonText: "Sign in",
                       onTap: SignInScreen(),
@@ -68,16 +74,19 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                      child: WelcomeButton(
-                    buttonText: "Sign up",
-                    onTap: const SignUpScreen(),
-                    color: Colors.white,
-                    textColor: lightColorScheme.primary,
-                  )),
+                    child: WelcomeButton(
+                      buttonText: "Sign up",
+                      onTap: const SignUpScreen(),
+                      color: Colors.white,
+                      textColor: lightColorScheme.primary,
+                    ),
+                  ),
                 ],
               ),
-            ))
-      ],
-    ));
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

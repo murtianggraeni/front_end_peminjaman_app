@@ -1,10 +1,12 @@
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_cnc.dart';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_lasercut.dart';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan/form_penggunaan_printing.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan_lasercut.dart';
+import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_cnc.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_lasercut.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_printing.dart';
-import 'package:build_app/page/monitoring/page/detail_monitoring_cnc.dart';
+import 'package:build_app/page/main/admin/main_page_admin.dart';
+import 'package:build_app/page/main/user/main_page_user.dart';
+import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_cnc.dart';
 import 'package:build_app/page/screens/forget_password.dart';
 import 'package:build_app/page/screens/signin_screen.dart';
 import 'package:build_app/page/screens/signup_screen.dart';
@@ -28,7 +30,15 @@ class AppPage {
     ),
     GetPage(
       name: RouteName.custom_buttom_nav,
-      page: () => const customButtomNav(),
+      page: () => const BottomNavBar(),
+    ),
+    GetPage(
+      name: RouteName.main_page_user,
+      page: () =>  mainPageUser(),
+    ),
+    GetPage(
+      name: RouteName.main_page_admin,
+      page: () => const mainPageAdmin(),
     ),
     GetPage(
       name: RouteName.halaman_informasi_cnc,
@@ -44,19 +54,19 @@ class AppPage {
     ),
     GetPage(
       name: RouteName.form_penggunaan_cnc,
-      page: () => const formPenggunaanCnc(),
+      page: () => formPenggunaanCnc(),
     ),
     GetPage(
       name: RouteName.form_penggunaan_lasercut,
-      page: () => const formPenggunaanLasercut(),
+      page: () => formPenggunaanLasercut(),
     ),
     GetPage(
       name: RouteName.form_penggunaan_printing,
-      page: () => const formPenggunaanPrinting(),
+      page: () => formPenggunaanPrinting(),
     ),
     GetPage(
       name: RouteName.detail_monitoring_cnc,
-      page: () => const detailPageCnc(),
+      page: () =>  detailPageCnc(),
     )
   ];
 }

@@ -267,30 +267,31 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           onPressed: () {
-                            if (_formSignInKey.currentState!.validate() &&
-                                !rememberPassword) {
-                              // ScaffoldMessenger.of(context)
-                              //     .showSnackBar(const SnackBar(
-                              //   content: Text("Data diproses"),
-                              //   behavior: SnackBarBehavior.floating,
-                              //   duration: Duration(seconds: 2),
-                              // ));
+                            _loginC.loginWithEmail();
+                            print('bebas');
+                            // if (_formSignInKey.currentState!.validate() &&
+                            //     !rememberPassword) {
+                            //   // ScaffoldMessenger.of(context)
+                            //   //     .showSnackBar(const SnackBar(
+                            //   //   content: Text("Data diproses"),
+                            //   //   behavior: SnackBarBehavior.floating,
+                            //   //   duration: Duration(seconds: 2),
+                            //   // ));
 
-                              // Get.snackbar("Data Diproses", "Berhasil");
-                              // Get.offNamed(RouteName.custom_buttom_nav);
-                              _loginC.loginWithEmail();
-                            } else if (rememberPassword) {
-                              // ScaffoldMessenger.of(context)
-                              //     .showSnackBar(const SnackBar(
-                              //   content: Text(
-                              //       "Menyetujui untuk menyimpan data personal"),
-                              //   behavior: SnackBarBehavior.floating,
-                              //   duration: Duration(seconds: 2),
-                              // ));
-                              Get.snackbar("Data Diproses",
-                                  "Menyetujui untuk menyimpan data personal");
-                              Get.offNamed(RouteName.custom_buttom_nav);
-                            }
+                            //   // Get.snackbar("Data Diproses", "Berhasil");
+                            //   // Get.offNamed(RouteName.custom_buttom_nav);
+                            // } else if (rememberPassword) {
+                            //   // ScaffoldMessenger.of(context)
+                            //   //     .showSnackBar(const SnackBar(
+                            //   //   content: Text(
+                            //   //       "Menyetujui untuk menyimpan data personal"),
+                            //   //   behavior: SnackBarBehavior.floating,
+                            //   //   duration: Duration(seconds: 2),
+                            //   // ));
+                            //   Get.snackbar("Data Diproses",
+                            //       "Menyetujui untuk menyimpan data personal");
+                            //   Get.offNamed(RouteName.custom_buttom_nav);
+                            // }
                           },
                           child: const Text(
                             "Sign in",

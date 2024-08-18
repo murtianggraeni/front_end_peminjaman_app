@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan/utility/custom_form_page.dart';
+import 'package:build_app/page/home/form_peminjaman/widget/custom_form_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:open_file/open_file.dart';
 
 class TabForm extends StatefulWidget {
@@ -342,7 +342,10 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                           _showDatePicker();
                                         },
                                         icon: const Icon(
-                                            MingCute.calendar_month_fill),
+                                          MingCuteIcons.mgc_calendar_month_fill,
+
+
+                                            ),
                                         color: const Color(0xFFB9B9B9),
                                       ),
                                       keyboardType: TextInputType.datetime,
@@ -365,7 +368,10 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                                 _showTimePicker(_startTime);
                                               },
                                               icon: const Icon(
-                                                  MingCute.time_fill),
+ MingCuteIcons.mgc_time_fill,
+
+
+                                                  ),
                                               color: const Color(0xFFB9B9B9),
                                             ),
                                             keyboardType:
@@ -391,7 +397,11 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                                 _showTimePicker(_endTime);
                                               },
                                               icon: const Icon(
-                                                  MingCute.time_fill),
+                                                MingCuteIcons.mgc_time_fill,
+
+
+
+                                                 ),
                                               color: const Color(0xFFB9B9B9),
                                             ),
                                             keyboardType:
@@ -425,7 +435,12 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                           _pickFile();
                                         },
                                         icon:
-                                            const Icon(MingCute.upload_2_line),
+                                            const Icon(MingCuteIcons.mgc_upload_2_line,
+                                              
+                                              
+                                              
+                                              
+                                             ),
                                         color: const Color(0xFFB9B9B9),
                                       ),
                                       keyboardType: TextInputType.datetime,
@@ -510,7 +525,10 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                                 _showDatePickerDamage();
                                               },
                                               icon: const Icon(
-                                                  MingCute.calendar_month_fill),
+MingCuteIcons.mgc_calendar_month_fill,
+
+
+                                                  ),
                                               color: const Color(0xFFB9B9B9),
                                             ),
                                             keyboardType:
@@ -534,7 +552,10 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                                 _showTimePickerDamage();
                                               },
                                               icon: const Icon(
-                                                  MingCute.time_fill),
+MingCuteIcons.mgc_time_fill,
+
+
+                                                  ),
                                               color: const Color(0xFFB9B9B9),
                                             ),
                                             keyboardType:
@@ -561,7 +582,11 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
                                           _pickFile();
                                         },
                                         icon:
-                                            const Icon(MingCute.upload_2_line),
+                                            const Icon(MingCuteIcons.mgc_upload_2_line,
+                                              
+                                              
+                                              
+                                              ),
                                         color: const Color(0xFFB9B9B9),
                                       ),
                                       keyboardType: TextInputType.datetime,

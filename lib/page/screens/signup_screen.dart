@@ -1,6 +1,5 @@
 import 'package:build_app/controller/register_controller.dart';
 import 'package:build_app/page/screens/signin_screen.dart';
-import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:build_app/page/widget/custom_scaffold.dart';
@@ -73,17 +72,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           decoration: InputDecoration(
                             label: const Text("Nama Lengkap"),
                             hintText: "Masukkan Nama",
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               color: Colors.black26,
                             ),
                             border: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.black12,
                               ),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.black12,
                               ),
                               borderRadius: BorderRadius.circular(10),
@@ -107,7 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           decoration: InputDecoration(
                             label: const Text("Email"),
                             hintText: "Masukkan Email",
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               color: Colors.black26,
                             ),
                             border: OutlineInputBorder(
@@ -124,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         // --- PASSWORD ---
@@ -142,7 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           decoration: InputDecoration(
                             label: const Text("Password"),
                             hintText: "Masukkan Password",
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               color: Colors.black26,
                             ),
                             border: OutlineInputBorder(
@@ -164,11 +163,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 });
                               },
                               icon: hidden
-                                  ? Icon(
+                                  ? const Icon(
                                       Icons.visibility_off,
                                       color: Colors.black38,
                                     )
-                                  : Icon(Icons.visibility,
+                                  : const Icon(Icons.visibility,
                                       color: Colors.black38),
                             ),
                           ),
@@ -205,14 +204,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.black12,
                               ),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 25.0,
                         ),
                         // Persetujuan untuk proses data selanjutnya

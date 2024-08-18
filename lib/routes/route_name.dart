@@ -5,6 +5,8 @@ abstract class RouteName {
   static const signin_screen = '/signin_screen';
   static const forget_password = '/forget_password';
   static const custom_buttom_nav = '/custom_button_nav';
+  static const main_page_user = '/main_page_user';
+  static const main_page_admin = '/main_page_admin';
   static const halaman_informasi_cnc = '/halaman_informasi_cnc';
   static const halaman_informasi_lasercut = '/halaman_informasi_lasercut';
   static const halaman_informasi_printing = '/halaman_informasi_printing';
