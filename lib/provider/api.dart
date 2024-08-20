@@ -143,4 +143,25 @@ class ApiController {
       throw e;
     }
   }
+
+  Future<http.Response> getPeminjamanById(
+      String type, String peminjamanId) async {
+    final SharedPreferences shared = await SharedPreferences.getInstance();
+    String? getToken = shared.getString("accessToken");
+    try {
+      Uri url = Uri.parse('$URL_API/admin/$type/$peminjamanId');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $getToken',
+        },
+      );
+      print('getPeminjamanById Response: ${response.body}'); // Untuk debugging
+      return response;
+    } catch (e) {
+      print('Error in getPeminjamanById: $e');
+      throw e;
+    }
+  }
 }
