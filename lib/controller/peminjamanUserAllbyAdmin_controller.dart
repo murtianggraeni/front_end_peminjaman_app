@@ -59,6 +59,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:build_app/provider/api.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../models/getPeminjamanAllAdmin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -97,13 +98,43 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     });
   }
 
+  // methode 1 : CNC
+  // Future<void> fetchDataCnc() async {
+  //   try {
+  //     final response = await apiController.PeminjamanUserAllforAdmin("cnc");
+
+  //     if (response.statusCode == 200) {
+  //       final dynamic responseData = json.decode(response.body);
+
+  //       if (responseData is Map<String, dynamic> &&
+  //           responseData['data'] is List) {
+  //         peminjaman.assignAll(
+  //           responseData['data']
+  //               .map<Datum>((data) => Datum.fromJson(data))
+  //               .toList(),
+  //         );
+
+  //         _sensorStreamController.add(peminjaman.toList());
+  //         update();
+  //       } else {
+  //         print('Invalid sensor update type: ${responseData.runtimeType}');
+  //       }
+  //     } else {
+  //       throw Exception(
+  //         'Gagal mengambil data. Status code: ${response.statusCode}',
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Error fetchData: $e');
+  //   }
+  // }
+
+  // Methode 2 : CNC
   Future<void> fetchDataCnc() async {
     try {
       final response = await apiController.PeminjamanUserAllforAdmin("cnc");
-
       if (response.statusCode == 200) {
         final dynamic responseData = json.decode(response.body);
-
         if (responseData is Map<String, dynamic> &&
             responseData['data'] is List) {
           peminjaman.assignAll(
@@ -111,7 +142,6 @@ class PeminjamanUserAllbyAdminController extends GetxController {
                 .map<Datum>((data) => Datum.fromJson(data))
                 .toList(),
           );
-
           _sensorStreamController.add(peminjaman.toList());
           update();
         } else {
@@ -124,6 +154,34 @@ class PeminjamanUserAllbyAdminController extends GetxController {
       }
     } catch (e) {
       print('Error fetchData: $e');
+    }
+  }
+
+  Future<void> showDetails(BuildContext context, Datum peminjaman) async {
+    try {
+      final response =
+          await apiController.getPeminjamanById('cnc', peminjaman.id);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final detailData = Datum.fromJson(responseData['data']);
+          _showDetailDialog(context, detailData);
+        } else {
+          // Log error response
+          print('API Response Error: ${responseData['message']}');
+          Get.snackbar('Error',
+              'Failed to fetch peminjaman details: ${responseData['message'] ?? 'Unknown error'}');
+        }
+      } else {
+        // Log error status code
+        print('API Response Error: Status code ${response.statusCode}');
+        Get.snackbar('Error',
+            'Failed to fetch peminjaman details: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Log exception details
+      print('Error fetching peminjaman details: $e');
+      Get.snackbar('Error', 'An error occurred while fetching details');
     }
   }
 
@@ -350,4 +408,54 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   }
 
   // Fungsi untuk menampilkan detail peminjaman
+  void _showDetailDialog(BuildContext context, Datum detailData) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Detail Peminjaman - ${detailData.namaPemohon}"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Email: ${detailData.email ?? 'Tidak tersedia'}"),
+                Text(
+                    "Tanggal Peminjaman: ${_formatDate(detailData.tanggalPeminjaman)}"),
+                Text(
+                    "Waktu Awal: ${detailData.awalPeminjaman ?? 'Tidak tersedia'}"), // Ganti waktuAwal
+                Text(
+                    "Waktu Akhir: ${detailData.akhirPeminjaman ?? 'Tidak tersedia'}"), // Ganti waktuAkhir
+                Text(
+                    "Jumlah/Satuan: ${detailData.jumlah ?? 'Tidak tersedia'}"), // Ganti jumlahSatuan
+                Text(
+                    "Keperluan: ${detailData.detailKeperluan ?? 'Tidak tersedia'}"), // Ganti keperluan
+                Text(
+                    "Desain Benda: ${detailData.desainBenda ?? 'Tidak tersedia'}"),
+                Text("Status: ${detailData.status}"),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Tutup"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return 'Tidak tersedia';
+
+    try {
+      // Mencoba untuk mengubah String menjadi DateTime
+      DateTime date = DateFormat("EEE, dd MMM yyyy").parse(dateStr);
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      // Jika tidak berhasil di-parse, kembalikan 'Tidak tersedia'
+      return 'Tidak tersedia';
+    }
+  }
 }
