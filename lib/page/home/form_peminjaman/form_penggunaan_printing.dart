@@ -1150,7 +1150,7 @@ class _CustomDialogWidgetState extends State<CustomDialogWidget> {
           CardDialog(
             onConfirmed: () {
               widget.onConfirmed();
-              Get.to(afterSubmit());
+              Get.offNamed('/afterSubmit');
             },
           ),
           Positioned(
