@@ -56,17 +56,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
             topRight: Radius.circular(19.0),
           ),
           child: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
+            items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: const Icon(MingCuteIcons.mgc_home_4_line),
+                icon: Icon(MingCuteIcons.mgc_home_4_line),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: const Icon(MingCuteIcons.mgc_chart_pie_2_line),
+                icon: Icon(MingCuteIcons.mgc_file_upload_line),
+                // mgc_chart_pie_2_line),
                 label: 'Confirm',
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Symbols.deployed_code_update_rounded),
+                icon: Icon(Symbols.deployed_code_update_rounded),
                 label: 'Status',
               ),
             ],
