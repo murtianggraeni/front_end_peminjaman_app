@@ -207,7 +207,8 @@ class detailPageCnc extends StatelessWidget {
                                       ),
                                     ),
                                     IconButton(
-                                      onPressed: () => {},
+                                      onPressed: () => _controller.showDetails(
+                                          context, peminjaman),
                                       icon: const Icon(
                                           MingCuteIcons.mgc_information_line),
                                     )
