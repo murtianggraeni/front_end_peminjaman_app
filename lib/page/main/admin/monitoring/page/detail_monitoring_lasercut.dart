@@ -9,12 +9,11 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 
 import '../../../../../models/getPeminjamanAllAdmin_model.dart';
 
-class detailPageCnc extends StatelessWidget {
+class detailPageLasercut extends StatelessWidget {
   final PeminjamanUserAllbyAdminController _controller =
-      Get.put(PeminjamanUserAllbyAdminController(MachineType.CNC), tag: 'cnc');
+      Get.put(PeminjamanUserAllbyAdminController(MachineType.LaserCutting), tag: 'laser');
 
-  detailPageCnc({Key? key}) : super(key: key);
-
+  detailPageLasercut({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(

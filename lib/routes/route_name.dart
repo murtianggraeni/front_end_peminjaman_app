@@ -14,4 +14,6 @@ abstract class RouteName {
   static const form_penggunaan_lasercut = '/form_penggunaan_lasercut';
   static const form_penggunaan_printing = '/form_penggunaan_printing';
   static const detail_monitoring_cnc = '/detail_monitoring_cnc';
+  static const detail_monitoring_lasercut = '/detail_monitoring_lasercut';
+  static const detail_monitoring_printing = '/detail_monitoring_printing';
 }

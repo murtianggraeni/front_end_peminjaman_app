@@ -1,5 +1,4 @@
 import 'package:build_app/controller/peminjamanUserAllbyAdmin_controller.dart';
-import 'package:build_app/enums/machine_type.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,12 +7,14 @@ import 'package:iconify_flutter/icons/bx.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
 import '../../../../../models/getPeminjamanAllAdmin_model.dart';
+import '../../../../../enums/machine_type.dart';
 
-class detailPageCnc extends StatelessWidget {
-  final PeminjamanUserAllbyAdminController _controller =
-      Get.put(PeminjamanUserAllbyAdminController(MachineType.CNC), tag: 'cnc');
+class detailPagePrinting extends StatelessWidget {
+  final PeminjamanUserAllbyAdminController _controller = Get.put(
+      PeminjamanUserAllbyAdminController(MachineType.Printing),
+      tag: 'printing');
 
-  detailPageCnc({Key? key}) : super(key: key);
+  detailPagePrinting({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

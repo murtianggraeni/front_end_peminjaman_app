@@ -5,6 +5,8 @@ import 'package:build_app/page/home/informasi_page/halaman_informasi_cnc.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_lasercut.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_printing.dart';
 import 'package:build_app/page/main/admin/main_page_admin.dart';
+import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_lasercut.dart';
+import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_printing.dart';
 import 'package:build_app/page/main/user/main_page_user.dart';
 import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_cnc.dart';
 import 'package:build_app/page/screens/forget_password.dart';
@@ -67,6 +69,14 @@ class AppPage {
     GetPage(
       name: RouteName.detail_monitoring_cnc,
       page: () =>  detailPageCnc(),
-    )
+    ),
+        GetPage(
+      name: RouteName.detail_monitoring_lasercut,
+      page: () =>  detailPageLasercut(),
+    ),
+        GetPage(
+      name: RouteName.detail_monitoring_printing,
+      page: () =>  detailPagePrinting(),
+    ),
   ];
 }

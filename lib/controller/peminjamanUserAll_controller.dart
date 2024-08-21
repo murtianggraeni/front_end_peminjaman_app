@@ -87,6 +87,7 @@ class PeminjamanUserAllController extends GetxController {
       print('Error fetchData: $e');
     }
   }
+}
 
   // void applyFiltersAndSearch() {
   //   filteredPeminjaman.value = peminjaman.where((p) {
@@ -117,4 +118,3 @@ class PeminjamanUserAllController extends GetxController {
   //   if (machineType != null) selectedMachineType.value = machineType;
   //   applyFiltersAndSearch();
   // }
-}

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:build_app/routes/route_name.dart';
 
 class monitoringPage extends StatefulWidget {
   const monitoringPage({super.key});
@@ -77,6 +78,7 @@ class _monitoringPageState extends State<monitoringPage>
                           merekMesin: "MTU 200M",
                           jenisMesin: "CNC Milling",
                           laboratoriumMesin: "Lab. Elektro Mekanik",
+                          routeName: RouteName.detail_monitoring_cnc,
                         ),
                         SizedBox(
                           height: 12.0,
@@ -85,6 +87,7 @@ class _monitoringPageState extends State<monitoringPage>
                           merekMesin: "TQL-1390",
                           jenisMesin: "Laser Cutting",
                           laboratoriumMesin: "Lab. Elektro Mekanik",
+                          routeName: RouteName.detail_monitoring_lasercut,
                         ),
                         SizedBox(
                           height: 12.0,
@@ -93,6 +96,7 @@ class _monitoringPageState extends State<monitoringPage>
                           merekMesin: "Anycubic 4MAX Pro",
                           jenisMesin: "3D Printing",
                           laboratoriumMesin: "Lab. PLC & HMI",
+                          routeName: RouteName.detail_monitoring_printing,
                         )
                       ],
                     ),
