@@ -12,14 +12,16 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
-class monitoringPenggunaan extends StatefulWidget {
-  const monitoringPenggunaan({super.key});
+class monitoringPenggunaanLasercut extends StatefulWidget {
+  const monitoringPenggunaanLasercut({super.key});
 
   @override
-  State<monitoringPenggunaan> createState() => _monitoringPenggunaanState();
+  State<monitoringPenggunaanLasercut> createState() =>
+      _monitoringPenggunaanLasercutState();
 }
 
-class _monitoringPenggunaanState extends State<monitoringPenggunaan> {
+class _monitoringPenggunaanLasercutState
+    extends State<monitoringPenggunaanLasercut> {
   final List<Map<String, dynamic>> _userData = [
     {
       "nama": "Raihan Sar Isyraf",

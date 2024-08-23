@@ -62,7 +62,7 @@ class _monitoringPageState extends State<monitoringPage>
                   children: [
                     Center(
                       child: Text(
-                        "Monitoring",
+                        "Konfirmasi Peminjaman",
                         style: GoogleFonts.inter(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -100,6 +100,15 @@ class _monitoringPageState extends State<monitoringPage>
                         )
                       ],
                     ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
                     // Container(
                     //   height: 85.0,
                     //   padding: const EdgeInsets.symmetric(
@@ -210,15 +219,6 @@ class _monitoringPageState extends State<monitoringPage>
                     //     ],
                     //   ),
                     // ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
     // Scaffold(
     //   backgroundColor: pageModeScheme.primary,
     //   body: SafeArea(

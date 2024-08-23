@@ -22,6 +22,7 @@ class mainPageUser extends StatelessWidget {
 
   mainPageUser({Key? key}) : super(key: key);
 
+  // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
     return dashboardInformasiPeminjaman(
       namaMesin: data.namaMesin,
@@ -32,6 +33,7 @@ class mainPageUser extends StatelessWidget {
     );
   }
 
+  // Data penyimpanan informasi peminjaman
   Widget carouselView(Counts counts, int index) {
     if (index == 0) {
       return carouselCard(dashboardInformasiPeminjaman(
@@ -60,9 +62,60 @@ class mainPageUser extends StatelessWidget {
     }
   }
 
+  // Data mesin untuk peminjaman pada ButtonPeminjaman
+  final List<Map<String, dynamic>> listMesin = [
+    {
+      "objekDipilih": "Memilih CNC Milling",
+      "merekMesin": "MTU 200 M",
+      "namaMesin": "CNC Milling",
+      "namaLab": "Lab. Elektro Mekanik",
+      "gambarMesin": "assets/images/foto_cnc.png",
+      "leftImage": 23.0,
+      "topImage": 4.0,
+      "topArrow": 2.0,
+      "page": formPenggunaanCnc(),
+    },
+    {
+      "objekDipilih": "Memilih Laser Cutting",
+      "merekMesin": "TQL-1390",
+      "namaMesin": "Laser Cutting",
+      "namaLab": "Lab. Elektro Mekanik",
+      "gambarMesin": "assets/images/foto_lasercut.png",
+      "leftImage": 3.0,
+      "topImage": 18.0,
+      "topArrow": 11.0,
+      "page": formPenggunaanLasercut(),
+    },
+    {
+      "objekDipilih": "Memilih 3D Printing",
+      "merekMesin": "Anycubic 4Max Pro",
+      "namaMesin": "3D Printing",
+      "namaLab": "Lab. PLC & HMI",
+      "gambarMesin": "assets/images/foto_3dp.png",
+      "leftImage": 6.0,
+      "topImage": 9.0,
+      "topArrow": 4.5,
+      "page": formPenggunaanPrinting(),
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
-    _userController.checkLoggedIn();
+     _userController.checkLoggedIn();
+
+    // // Periksa role pengguna
+    // if (_userController.role.value != 'user') {
+    //   //Jika bukan user, redirect atau tampilkan pesan error
+    //   return Scaffold(
+    //     body: Center(
+    //       child: Text(
+    //         'Anda tidak memiliki akses ke halaman ini',
+    //         style: GoogleFonts.inter(fontSize: 18.0, color: Colors.black),
+    //       ),
+    //     ),
+    //   );
+    // }
+
     return customScaffoldPage(
       body: Column(
         children: [
@@ -250,49 +303,57 @@ class mainPageUser extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 10.0),
-                    // Tampilan Awal Form Peminjaman
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          buttonPeminjaman(
-                            page: formPenggunaanCnc(),
-                            objekDipilih: "Memilih CNC Milling",
-                            merekMesin: "MTU 200 M",
-                            namaMesin: "CNC Milling",
-                            namaLab: "Lab. Elektro Mekanik",
-                            gambarMesin: "assets/images/foto_cnc.png",
-                            leftImage: 23.0,
-                            topImage: 4.0,
-                            topArrow: 2.0,
-                          ),
-                          const SizedBox(width: 11.0),
-                          buttonPeminjaman(
-                            page: formPenggunaanLasercut(),
-                            objekDipilih: "Memilih Laser Cutting",
-                            merekMesin: "TQL-1390",
-                            namaMesin: "Laser Cutting",
-                            namaLab: "Lab. Elektro Mekanik",
-                            gambarMesin: "assets/images/foto_lasercut.png",
-                            leftImage: 3.0,
-                            topImage: 18.0,
-                            topArrow: 11.0,
-                          ),
-                          const SizedBox(width: 11.0),
-                          buttonPeminjaman(
-                            page: formPenggunaanPrinting(),
-                            objekDipilih: "Memilih 3D Printing",
-                            merekMesin: "Anycubic 4Max Pro",
-                            namaMesin: "3D Printing",
-                            namaLab: "Lab. PLC & HMI",
-                            gambarMesin: "assets/images/foto_3dp.png",
-                            leftImage: 6.0,
-                            topImage: 9.0,
-                            topArrow: 4.5,
-                          ),
-                        ],
+
+                    // SizedBox(
+                    //   height: 250, // Sesuaikan tinggi sesuai kebutuhan
+                    //   child: ListView.builder(
+                    //     scrollDirection: Axis.horizontal,
+                    //     itemCount:
+                    //         1000000, // Jumlah besar untuk simulasi infinite scroll
+                    //     itemBuilder: (context, index) {
+                    //       final mesin = listMesin[index % listMesin.length];
+                    //       return Padding(
+                    //         padding: const EdgeInsets.only(right: 11.0),
+                    //         child: buttonPeminjaman(
+                    //           page: mesin["page"],
+                    //           objekDipilih: mesin["objekDipilih"],
+                    //           merekMesin: mesin["merekMesin"],
+                    //           namaMesin: mesin["namaMesin"],
+                    //           namaLab: mesin["namaLab"],
+                    //           gambarMesin: mesin["gambarMesin"],
+                    //           leftImage: mesin["leftImage"],
+                    //           topImage: mesin["topImage"],
+                    //           topArrow: mesin["topArrow"],
+                    //         ),
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+                    SizedBox(
+                      height: 250, // Sesuaikan tinggi sesuai kebutuhan
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        // itemCount: 1000000, // Jumlah besar untuk simulasi infinite scroll
+                        itemBuilder: (context, index) {
+                          final mesin = listMesin[index % listMesin.length];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 11.0),
+                            child: buttonPeminjaman(
+                              page: mesin["page"],
+                              objekDipilih: mesin["objekDipilih"],
+                              merekMesin: mesin["merekMesin"],
+                              namaMesin: mesin["namaMesin"],
+                              namaLab: mesin["namaLab"],
+                              gambarMesin: mesin["gambarMesin"],
+                              leftImage: mesin["leftImage"],
+                              topImage: mesin["topImage"],
+                              topArrow: mesin["topArrow"],
+                            ),
+                          );
+                        },
                       ),
                     ),
+
                     const SizedBox(height: 35.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -346,3 +407,113 @@ class mainPageUser extends StatelessWidget {
     );
   }
 }
+
+                    // Tampilan Awal Form Peminjaman
+                    // --- Methode 2 ---
+                    // SingleChildScrollView(
+                    //   scrollDirection: Axis.horizontal,
+                    // child: Row(
+                    //   children: [
+                    //     buttonPeminjaman(
+                    //       page: formPenggunaanCnc(),
+                    //       objekDipilih: "Memilih CNC Milling",
+                    //       merekMesin: "MTU 200 M",
+                    //       namaMesin: "CNC Milling",
+                    //       namaLab: "Lab. Elektro Mekanik",
+                    //       gambarMesin: "assets/images/foto_cnc.png",
+                    //       leftImage: 23.0,
+                    //       topImage: 4.0,
+                    //       topArrow: 2.0,
+                    //     ),
+                    //     const SizedBox(width: 11.0),
+                    //     buttonPeminjaman(
+                    //       page: formPenggunaanLasercut(),
+                    //       objekDipilih: "Memilih Laser Cutting",
+                    //       merekMesin: "TQL-1390",
+                    //       namaMesin: "Laser Cutting",
+                    //       namaLab: "Lab. Elektro Mekanik",
+                    //       gambarMesin: "assets/images/foto_lasercut.png",
+                    //       leftImage: 3.0,
+                    //       topImage: 18.0,
+                    //       topArrow: 11.0,
+                    //     ),
+                    //     const SizedBox(width: 11.0),
+                    //     buttonPeminjaman(
+                    //       page: formPenggunaanPrinting(),
+                    //       objekDipilih: "Memilih 3D Printing",
+                    //       merekMesin: "Anycubic 4Max Pro",
+                    //       namaMesin: "3D Printing",
+                    //       namaLab: "Lab. PLC & HMI",
+                    //       gambarMesin: "assets/images/foto_3dp.png",
+                    //       leftImage: 6.0,
+                    //       topImage: 9.0,
+                    //       topArrow: 4.5,
+                    //     ),
+                    //   ],
+                    // ),
+                    //),
+                    // SizedBox(
+                    //   height: 250.0, // Sesuaikan tinggi sesuai kebutuhan
+                    //   child: CarouselSlider.builder(
+                    //     itemCount: listMesin.length,
+                    //     itemBuilder:
+                    //         (BuildContext context, int index, int realIndex) {
+                    //       final mesin = listMesin[index];
+                    //       return Padding(
+                    //         padding: const EdgeInsets.only(right: 11.0),
+                    //         child: buttonPeminjaman(
+                    //           page: mesin["page"],
+                    //           objekDipilih: mesin["objekDipilih"],
+                    //           merekMesin: mesin["merekMesin"],
+                    //           namaMesin: mesin["namaMesin"],
+                    //           namaLab: mesin["namaLab"],
+                    //           gambarMesin: mesin["gambarMesin"],
+                    //           leftImage: mesin["leftImage"],
+                    //           topImage: mesin["topImage"],
+                    //           topArrow: mesin["topArrow"],
+                    //         ),
+                    //       );
+                    //     },
+                    //     options: CarouselOptions(
+                    //       // height: 247.0, // Sesuaikan tinggi carousel
+                    //       viewportFraction: 0.4, // Lebar setiap item
+                    //       enableInfiniteScroll:
+                    //           true, // Mengaktifkan infinite scroll
+                    //       // autoPlay: true,  // Mengaktifkan autoplay
+                    //       // autoPlayInterval: Duration(seconds: 3),  // Interval autoplay
+                    //       // enlargeCenterPage: true,  // Item tengah lebih besar
+                    //     ),
+                    //   ),
+                    // ),
+                    // CarouselSlider.builder(
+                    //   itemCount: listMesin.length,
+                    //   options: CarouselOptions(
+                    //     height: 250.0,
+                    //     viewportFraction: 0.8,
+                    //     initialPage: 0,
+                    //     enableInfiniteScroll: true,
+                    //     reverse: false,
+                    //     autoPlay: false,
+                    //     enlargeCenterPage: true,
+                    //     scrollDirection: Axis.horizontal,
+                    //   ),
+                    //   itemBuilder: (context, index, realIndex) {
+                    //     final mesin = listMesin[index %
+                    //         listMesin
+                    //             .length]; // Gunakan modulo untuk infinite loop
+                    //     return Padding(
+                    //       padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    //       child: buttonPeminjaman(
+                    //         page: mesin["page"],
+                    //         objekDipilih: mesin["objekDipilih"],
+                    //         merekMesin: mesin["merekMesin"],
+                    //         namaMesin: mesin["namaMesin"],
+                    //         namaLab: mesin["namaLab"],
+                    //         gambarMesin: mesin["gambarMesin"],
+                    //         leftImage: mesin["leftImage"],
+                    //         topImage: mesin["topImage"],
+                    //         topArrow: mesin["topArrow"],
+                    //       ),
+                    //     );
+                    //   },
+                    // ),

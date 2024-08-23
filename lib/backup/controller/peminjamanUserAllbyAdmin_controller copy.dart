@@ -60,7 +60,7 @@ import 'dart:async';
 import 'package:build_app/provider/api.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../models/getPeminjamanAllAdmin_model.dart';
+import '../../models/getPeminjamanAllAdmin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';

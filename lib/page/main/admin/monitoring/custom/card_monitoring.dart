@@ -33,7 +33,7 @@ class _cardMonitoringState extends State<cardMonitoring> {
       },
       borderRadius: BorderRadius.circular(8.0),
       child: Container(
-        height: 85.0,
+        height: 78.0,
         padding: const EdgeInsets.symmetric(
           horizontal: 11.0,
         ),
@@ -105,27 +105,37 @@ class _cardMonitoringState extends State<cardMonitoring> {
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 11.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  //MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "detail pengajuan",
-                      style: GoogleFonts.inter(
-                        fontSize: 9.0,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        //Color(0XFF09244B),
+                child: Container(
+                  width: 103.0,
+                  height: 19.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: const Color(0xFFD9D9D9),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    //MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "detail pengajuan",
+                        style: GoogleFonts.inter(
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          //Color(0XFF09244B),
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 3.0,
-                    ),
-                    const Icon(
-                      MingCuteIcons.mgc_arrow_right_circle_line,
-                      size: 13.0,
-                    )
-                  ],
+                      // const SizedBox(
+                      //   width: 0.0,
+                      // ),
+                      const Icon(
+                        //MingCuteIcons.mgc_arrow_right_circle_line,
+                        MingCuteIcons.mgc_right_small_fill,
+                        size: 18.0,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),

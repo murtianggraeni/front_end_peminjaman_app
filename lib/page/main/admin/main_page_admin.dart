@@ -1,7 +1,10 @@
+import 'package:build_app/controller/count_controller.dart';
+import 'package:build_app/controller/user_controller.dart';
+import 'package:build_app/models/count_model.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_cnc.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_lasercut.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_printing.dart';
 import 'package:build_app/page/main/custom_main_page.dart';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
-import 'package:build_app/page/home/form_peminjaman/form_penggunaan_lasercut.dart';
 import 'package:build_app/page/main/user/widget_user/custom_dashboard_choose.dart';
 import 'package:build_app/page/home/informasi_page/widget/custom_dashboard_informasi_peminjaman.dart';
 import 'package:build_app/page/main/user/widget_user/custom_dashboard_peminjaman.dart';
@@ -11,20 +14,16 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class mainPageAdmin extends StatefulWidget {
-  const mainPageAdmin({super.key});
+class mainPageAdmin extends StatelessWidget {
+  final UserController _userController = Get.put(UserController());
+  mainPageAdmin({super.key});
 
-  @override
-  State<mainPageAdmin> createState() => _mainPageAdminState();
-}
-
-class _mainPageAdminState extends State<mainPageAdmin> {
   // final UserController userController = Get.find<UserController>();
-  // List dashboard informasi peminjaman
   final List<dashboardInformasiPeminjaman> dataList = [
     const dashboardInformasiPeminjaman(
       namaMesin: "CNC Milling",
@@ -66,6 +65,27 @@ class _mainPageAdminState extends State<mainPageAdmin> {
 
   @override
   Widget build(BuildContext context) {
+    _userController.checkLoggedIn();
+    // final UserController _userController = Get.find<UserController>();
+
+    // return Obx(() {
+    //   if (_userController.role.isEmpty) {
+    //     return Scaffold(
+    //       body: Center(child: CircularProgressIndicator()),
+    //     );
+    //   }
+
+    //   if (_userController.role.value != 'admin') {
+    //     return Scaffold(
+    //       body: Center(
+    //         child: Text(
+    //           'Anda tidak memiliki akses ke halaman ini',
+    //           style: GoogleFonts.inter(fontSize: 18.0, color: Colors.black),
+    //         ),
+    //       ),
+    //     );
+    //   }
+
     return customScaffoldPage(
       body: Column(
         children: [
@@ -243,7 +263,7 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                       child: Row(
                         children: [
                           buttonPeminjaman(
-                            page: formPenggunaanCnc(),
+                            page: monitoringPenggunaanCnc(),
                             objekDipilih: "Memilih CNC Milling",
                             merekMesin: "MTU 200 M",
                             namaMesin: "CNC Milling",
@@ -255,7 +275,7 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                           ),
                           const SizedBox(width: 11.0),
                           buttonPeminjaman(
-                            page: formPenggunaanLasercut(),
+                            page: monitoringPenggunaanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
                             merekMesin: "TQL-1390",
                             namaMesin: "Laser Cutting",
@@ -267,7 +287,7 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                           ),
                           const SizedBox(width: 11.0),
                           buttonPeminjaman(
-                            page: formPenggunaanPrinting(),
+                            page: monitoringPenggunaanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
                             merekMesin: "Anycubic 4Max Pro",
                             namaMesin: "3D Printing",
@@ -341,20 +361,6 @@ class _mainPageAdminState extends State<mainPageAdmin> {
         ],
       ),
     );
+    // });
   }
-
-  // Widget carouselView(int index) {
-  //   final dashboardInformasiPeminjaman data = dataList[index];
-  //   return carouselCard(data);
-  // }
-
-  // Widget carouselCard(dashboardInformasiPeminjaman data) {
-  //   return dashboardInformasiPeminjaman(
-  //     namaMesin: data.namaMesin,
-  //     dataAcc: data.dataAcc,
-  //     dataTidakAcc: data.dataTidakAcc,
-  //     dataDiproses: data.dataDiproses,
-  //     alamatInformasiLanjutan: data.alamatInformasiLanjutan,
-  //   );
-  // }
 }

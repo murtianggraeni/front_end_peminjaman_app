@@ -1,23 +1,31 @@
+import 'package:get/get.dart';
+import 'package:build_app/routes/route_name.dart';
+import 'package:build_app/page/widget/custom_buttom_nav.dart';
+import 'package:build_app/page/screens/welcome_screen.dart';
+import 'package:build_app/page/screens/signup_screen.dart';
+import 'package:build_app/page/screens/signin_screen.dart';
+import 'package:build_app/page/screens/forget_password.dart';
+import 'package:build_app/page/main/admin/main_page_admin.dart';
+import 'package:build_app/page/main/user/main_page_user.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_lasercut.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_cnc.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_lasercut.dart';
 import 'package:build_app/page/home/informasi_page/halaman_informasi_printing.dart';
-import 'package:build_app/page/main/admin/main_page_admin.dart';
+import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_cnc.dart';
 import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_lasercut.dart';
 import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_printing.dart';
-import 'package:build_app/page/main/user/main_page_user.dart';
-import 'package:build_app/page/main/admin/monitoring/page/detail_monitoring_cnc.dart';
-import 'package:build_app/page/screens/forget_password.dart';
-import 'package:build_app/page/screens/signin_screen.dart';
-import 'package:build_app/page/screens/signup_screen.dart';
-import 'package:build_app/page/widget/custom_buttom_nav.dart';
-import 'package:build_app/routes/route_name.dart';
-import 'package:get/get.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_cnc.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_lasercut.dart';
+import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_printing.dart';
 
 class AppPage {
   static final pages = [
+    GetPage(
+      name: RouteName.welcome_screen,
+      page: () => const WelcomeScreen(),
+    ),
     GetPage(
       name: RouteName.signup_screen,
       page: () => const SignUpScreen(),
@@ -36,11 +44,11 @@ class AppPage {
     ),
     GetPage(
       name: RouteName.main_page_user,
-      page: () =>  mainPageUser(),
+      page: () => mainPageUser(),
     ),
     GetPage(
       name: RouteName.main_page_admin,
-      page: () => const mainPageAdmin(),
+      page: () => mainPageAdmin(),
     ),
     GetPage(
       name: RouteName.halaman_informasi_cnc,
@@ -68,15 +76,27 @@ class AppPage {
     ),
     GetPage(
       name: RouteName.detail_monitoring_cnc,
-      page: () =>  detailPageCnc(),
+      page: () => detailPageCnc(),
     ),
-        GetPage(
+    GetPage(
       name: RouteName.detail_monitoring_lasercut,
-      page: () =>  detailPageLasercut(),
+      page: () => detailPageLasercut(),
     ),
-        GetPage(
+    GetPage(
       name: RouteName.detail_monitoring_printing,
-      page: () =>  detailPagePrinting(),
+      page: () => detailPagePrinting(),
+    ),
+    GetPage(
+      name: RouteName.monitoring_penggunaan_cnc,
+      page: () => const monitoringPenggunaanCnc(),
+    ),
+    GetPage(
+      name: RouteName.monitoring_penggunaan_lasercut,
+      page: () => const monitoringPenggunaanLasercut(),
+    ),
+    GetPage(
+      name: RouteName.monitoring_penggunaan_printing,
+      page: () => const monitoringPenggunaanPrinting(),
     ),
   ];
 }

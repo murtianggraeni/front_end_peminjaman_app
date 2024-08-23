@@ -1,6 +1,8 @@
+import 'package:build_app/controller/sensor_Controller.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:build_app/controller/peminjamanUserAll_controller.dart';
@@ -79,16 +81,17 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class accountPage extends StatefulWidget {
-  const accountPage({Key? key}) : super(key: key);
+class statusPage extends StatefulWidget {
+  const statusPage({Key? key}) : super(key: key);
 
   @override
-  State<accountPage> createState() => _accountPageState();
+  State<statusPage> createState() => _statusPageState();
 }
 
-class _accountPageState extends State<accountPage> {
+class _statusPageState extends State<statusPage> {
   final PeminjamanUserAllController controller =
       Get.put(PeminjamanUserAllController());
+  final SensorController sensorController = Get.put(SensorController());
 
   // Fungsi filter dialog
   void _showFilterDialog() {
@@ -478,12 +481,19 @@ class _accountPageState extends State<accountPage> {
                                               ],
                                             ),
                                             ElevatedButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                sensorController
+                                                    .turnOnWithTimeout();
+                                              },
                                               style: ElevatedButton.styleFrom(
                                                 minimumSize:
                                                     const Size(90.0, 17.0),
                                                 backgroundColor:
-                                                    const Color(0xFF00A95B),
+                                                    // const Color(0xFF00A95B),
+                                                    sensorController
+                                                            .buttonState.value
+                                                        ? Color(0xFF00A95B)
+                                                        : Colors.grey,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(

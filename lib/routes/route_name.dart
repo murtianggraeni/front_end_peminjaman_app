@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 abstract class RouteName {
+  static const welcome_screen = '/welcome_screen';
   static const signup_screen = '/signup_screen';
   static const signin_screen = '/signin_screen';
   static const forget_password = '/forget_password';
@@ -16,4 +17,7 @@ abstract class RouteName {
   static const detail_monitoring_cnc = '/detail_monitoring_cnc';
   static const detail_monitoring_lasercut = '/detail_monitoring_lasercut';
   static const detail_monitoring_printing = '/detail_monitoring_printing';
+  static const monitoring_penggunaan_cnc = '/monitoring_penggunaan_cnc';
+  static const monitoring_penggunaan_lasercut = '/monitoring_penggunaan_lasercut';
+  static const monitoring_penggunaan_printing = '/monitoring_penggunaan_printing';
 }

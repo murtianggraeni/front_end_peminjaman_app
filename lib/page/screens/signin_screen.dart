@@ -1,9 +1,9 @@
 import 'package:build_app/controller/login_controller.dart';
+import 'package:build_app/controller/user_controller.dart';
 import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/theme/socialMediaLogo.dart';
 import 'package:build_app/theme/theme.dart';
 import 'package:build_app/page/widget/custom_scaffold.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +20,16 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formSignInKey = GlobalKey<FormState>();
   bool rememberPassword = false;
   bool hidden = true;
+
+void _handleLogin() async {
+    if (_formSignInKey.currentState!.validate()) {
+      final bool loginSuccess = await _loginC.loginWithEmail();
+      if (loginSuccess) {
+        Get.offAllNamed(RouteName.custom_buttom_nav);
+      }
+      // Tidak perlu else di sini karena pesan error sudah ditangani di LoginController
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,9 +276,13 @@ class _SignInScreenState extends State<SignInScreen> {
                               fontSize: 15.0,
                             ),
                           ),
-                          onPressed: () {
-                            _loginC.loginWithEmail();
-                            print('bebas');
+                          // onPressed: () {
+                          //   _loginC.loginWithEmail();
+                            
+                          //   print('bebas');
+                          // },
+                          //-- baru --
+                          onPressed: _handleLogin,
                             // if (_formSignInKey.currentState!.validate() &&
                             //     !rememberPassword) {
                             //   // ScaffoldMessenger.of(context)
@@ -292,7 +306,6 @@ class _SignInScreenState extends State<SignInScreen> {
                             //       "Menyetujui untuk menyimpan data personal");
                             //   Get.offNamed(RouteName.custom_buttom_nav);
                             // }
-                          },
                           child: const Text(
                             "Sign in",
                             style: TextStyle(color: Colors.white),
