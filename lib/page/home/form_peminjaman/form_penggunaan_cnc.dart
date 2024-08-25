@@ -134,8 +134,8 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
           });
         },
         is24HrFormat: false,
-        minHour: 7,
-        maxHour: 20,
+        minHour: 1,
+        maxHour: 23,
         minMinute: 0,
         minuteInterval: TimePickerInterval.THIRTY,
         sunAsset: Image.asset("assets/images/sun.png"),

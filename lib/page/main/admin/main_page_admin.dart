@@ -20,39 +20,51 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class mainPageAdmin extends StatelessWidget {
+  final CountController countC = Get.put(CountController());
   final UserController _userController = Get.put(UserController());
-  mainPageAdmin({super.key});
 
-  // final UserController userController = Get.find<UserController>();
-  final List<dashboardInformasiPeminjaman> dataList = [
-    const dashboardInformasiPeminjaman(
-      namaMesin: "CNC Milling",
-      dataAcc: "12 Data",
-      dataTidakAcc: "01 Data",
-      dataDiproses: "24 Data",
-      alamatInformasiLanjutan: RouteName.halaman_informasi_cnc,
-    ),
-    const dashboardInformasiPeminjaman(
-      namaMesin: "Laser Cutting",
-      dataAcc: "23 Data",
-      dataTidakAcc: "11 Data",
-      dataDiproses: "08 Data",
-      alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
-    ),
-    const dashboardInformasiPeminjaman(
-      namaMesin: "3D Printing",
-      dataAcc: "09 Data",
-      dataTidakAcc: "19 Data",
-      dataDiproses: "16 Data",
-      alamatInformasiLanjutan: RouteName.halaman_informasi_printing,
-    ),
-  ];
+  mainPageAdmin({Key? key}) : super(key: key);
+  // // final UserController userController = Get.find<UserController>();
+  // final List<dashboardInformasiPeminjaman> dataList = [
+  //   const dashboardInformasiPeminjaman(
+  //     namaMesin: "CNC Milling",
+  //     dataAcc: "12 Data",
+  //     dataTidakAcc: "01 Data",
+  //     dataDiproses: "24 Data",
+  //     alamatInformasiLanjutan: RouteName.halaman_informasi_cnc,
+  //   ),
+  //   const dashboardInformasiPeminjaman(
+  //     namaMesin: "Laser Cutting",
+  //     dataAcc: "23 Data",
+  //     dataTidakAcc: "11 Data",
+  //     dataDiproses: "08 Data",
+  //     alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
+  //   ),
+  //   const dashboardInformasiPeminjaman(
+  //     namaMesin: "3D Printing",
+  //     dataAcc: "09 Data",
+  //     dataTidakAcc: "19 Data",
+  //     dataDiproses: "16 Data",
+  //     alamatInformasiLanjutan: RouteName.halaman_informasi_printing,
+  //   ),
+  // ];
 
-  Widget carouselView(int index) {
-    final dashboardInformasiPeminjaman data = dataList[index];
-    return carouselCard(data);
-  }
+  // Widget carouselView(int index) {
+  //   final dashboardInformasiPeminjaman data = dataList[index];
+  //   return carouselCard(data);
+  // }
 
+  // Widget carouselCard(dashboardInformasiPeminjaman data) {
+  //   return dashboardInformasiPeminjaman(
+  //     namaMesin: data.namaMesin,
+  //     dataAcc: data.dataAcc,
+  //     dataTidakAcc: data.dataTidakAcc,
+  //     dataDiproses: data.dataDiproses,
+  //     alamatInformasiLanjutan: data.alamatInformasiLanjutan,
+  //   );
+  // }
+
+  // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
     return dashboardInformasiPeminjaman(
       namaMesin: data.namaMesin,
@@ -63,28 +75,38 @@ class mainPageAdmin extends StatelessWidget {
     );
   }
 
+  // Data penyimpanan informasi peminjaman
+  Widget carouselView(Counts counts, int index) {
+    if (index == 0) {
+      return carouselCard(dashboardInformasiPeminjaman(
+        namaMesin: "CNC Milling",
+        dataAcc: "${counts.data.disetujuiCnc} Data",
+        dataTidakAcc: "${counts.data.ditolakCnc} Data",
+        dataDiproses: "${counts.data.menungguCnc} Data",
+        alamatInformasiLanjutan: RouteName.halaman_informasi_cnc,
+      ));
+    } else if (index == 1) {
+      return carouselCard(dashboardInformasiPeminjaman(
+        namaMesin: "Laser Cutting",
+        dataAcc: "${counts.data.disetujuiLaser} Data",
+        dataTidakAcc: "${counts.data.ditolakLaser} Data",
+        dataDiproses: "${counts.data.menungguLaser} Data",
+        alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
+      ));
+    } else {
+      return carouselCard(dashboardInformasiPeminjaman(
+        namaMesin: "3D Printing",
+        dataAcc: "${counts.data.disetujuiPrinting} Data",
+        dataTidakAcc: "${counts.data.ditolakPrinting} Data",
+        dataDiproses: "${counts.data.menungguPrinting} Data",
+        alamatInformasiLanjutan: RouteName.halaman_informasi_printing,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _userController.checkLoggedIn();
-    // final UserController _userController = Get.find<UserController>();
-
-    // return Obx(() {
-    //   if (_userController.role.isEmpty) {
-    //     return Scaffold(
-    //       body: Center(child: CircularProgressIndicator()),
-    //     );
-    //   }
-
-    //   if (_userController.role.value != 'admin') {
-    //     return Scaffold(
-    //       body: Center(
-    //         child: Text(
-    //           'Anda tidak memiliki akses ke halaman ini',
-    //           style: GoogleFonts.inter(fontSize: 18.0, color: Colors.black),
-    //         ),
-    //       ),
-    //     );
-    //   }
 
     return customScaffoldPage(
       body: Column(
@@ -102,22 +124,15 @@ class mainPageAdmin extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          "Hi, ",
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: Colors.white),
-                        ),
-                        Text(
-                          '',
-                          // userController.user.value.username,
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 22,
-                            color: Colors.white,
+                        Obx(
+                          () => Text(
+                            "Hi, ${_userController.username.value}",
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Colors.white),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -206,24 +221,42 @@ class mainPageAdmin extends StatelessWidget {
                     SizedBox(
                       height: 210.0,
                       width: MediaQuery.of(context).size.width,
-                      child: Swiper(
-                        outer: true,
-                        itemCount: dataList.length,
-                        viewportFraction: 0.85,
-                        scale: 0.9,
-                        physics: const BouncingScrollPhysics(),
-                        pagination: SwiperPagination(
-                          builder: DotSwiperPaginationBuilder(
-                            color: pageModeScheme.onSecondary,
-                            activeColor: pageModeScheme.primary,
-                            activeSize: 10,
-                          ),
-                        ),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            decoration: const BoxDecoration(),
-                            child: carouselView(index),
-                          );
+                      child: StreamBuilder<Counts>(
+                        stream: countC.sensorStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.data.id.isEmpty) {
+                            return Center(
+                              child: Text('No data available'),
+                            );
+                          } else {
+                            Counts counts = snapshot.data!;
+                            return Swiper(
+                              outer: true,
+                              itemCount: 3,
+                              viewportFraction: 0.85,
+                              scale: 0.9,
+                              physics: const BouncingScrollPhysics(),
+                              pagination: SwiperPagination(
+                                builder: DotSwiperPaginationBuilder(
+                                  color: pageModeScheme.onSecondary,
+                                  activeColor: pageModeScheme.primary,
+                                  activeSize: 10,
+                                ),
+                              ),
+                              itemBuilder: (context, index) {
+                                return carouselView(counts, index);
+                              },
+                            );
+                          }
                         },
                       ),
                     ),
@@ -258,7 +291,7 @@ class mainPageAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 10.0),
                     // Tampilan Awal Form Peminjaman
-                    SingleChildScrollView(
+                    const SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
@@ -273,7 +306,7 @@ class mainPageAdmin extends StatelessWidget {
                             topImage: 4.0,
                             topArrow: 2.0,
                           ),
-                          const SizedBox(width: 11.0),
+                          SizedBox(width: 11.0),
                           buttonPeminjaman(
                             page: monitoringPenggunaanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
@@ -285,7 +318,7 @@ class mainPageAdmin extends StatelessWidget {
                             topImage: 18.0,
                             topArrow: 11.0,
                           ),
-                          const SizedBox(width: 11.0),
+                          SizedBox(width: 11.0),
                           buttonPeminjaman(
                             page: monitoringPenggunaanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
@@ -315,9 +348,10 @@ class mainPageAdmin extends StatelessWidget {
                         Text(
                           "View All",
                           style: GoogleFonts.inter(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF3D8FEF)),
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF3D8FEF),
+                          ),
                         )
                       ],
                     ),
@@ -338,16 +372,6 @@ class mainPageAdmin extends StatelessWidget {
                         focusedDay: DateTime.now(),
                         firstDay: DateTime.utc(2024, 01, 01),
                         lastDay: DateTime.utc(2050, 01, 01),
-                        // selectedDayPredicate: (day) {
-                        //   return isSameDay(_selectedDay, day);
-                        // },
-                        // onDaySelected: (selectedDay, focusedDay) {
-                        //   setState(() {
-                        //     _selectedDay = selectedDay;
-                        //     _focusedDay =
-                        //         focusedDay; // update `_focusedDay` here as well
-                        //   });
-                        // },
                         calendarStyle: const CalendarStyle(
                           cellMargin: EdgeInsets.all(8.0),
                         ),

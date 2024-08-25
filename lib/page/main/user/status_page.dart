@@ -1,4 +1,6 @@
-import 'package:build_app/controller/sensor_Controller.dart';
+// status_page.dart
+
+import 'package:build_app/controller/sensor_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:build_app/controller/peminjamanUserAll_controller.dart';
+import 'package:build_app/models/peminjamanUserAll_model.dart';
 import 'package:build_app/page/main/custom_main_page.dart';
 
 // Fungsi helper untuk warna status
@@ -92,6 +95,38 @@ class _statusPageState extends State<statusPage> {
   final PeminjamanUserAllController controller =
       Get.put(PeminjamanUserAllController());
   final SensorController sensorController = Get.put(SensorController());
+
+  // Fungsi untuk button peminjaman
+bool _canActivateButton(Datum peminjaman) {
+  print("Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
+  print("Status: ${peminjaman.status}");
+  print("Tanggal Peminjaman: ${peminjaman.tanggalPeminjaman}");
+  print("Awal Peminjaman (raw): ${peminjaman.awalPeminjaman}");
+  print("Akhir Peminjaman (raw): ${peminjaman.akhirPeminjaman}");
+
+  if (peminjaman.status != Status.Disetujui) {
+    print("Status bukan Disetujui, button tidak dapat diaktifkan.");
+    return false;
+  }
+
+  DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
+  DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
+
+  print("Awal Peminjaman (parsed): $awalPeminjamanDate");
+  print("Akhir Peminjaman (parsed): $akhirPeminjamanDate");
+
+  if (awalPeminjamanDate == null || akhirPeminjamanDate == null) {
+    print("Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
+    return false;
+  }
+
+  final now = DateTime.now();
+  bool canActivate = now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
+  print("Current time: $now");
+  print("Can Activate: $canActivate");
+  return canActivate;
+}
+
 
   // Fungsi filter dialog
   void _showFilterDialog() {
@@ -481,10 +516,18 @@ class _statusPageState extends State<statusPage> {
                                               ],
                                             ),
                                             ElevatedButton(
-                                              onPressed: () {
-                                                sensorController
-                                                    .turnOnWithTimeout();
-                                              },
+                                              onPressed: _canActivateButton(
+                                                      peminjaman) // Aktifkan jika syarat terpenuhi
+                                                  ? () {
+                                                      sensorController
+                                                          .turnOnWithTimeout(
+                                                              peminjaman
+                                                                  .alamatEsp); // Menggunakan espAddress
+                                                    }
+                                                  : null, // Nonaktifkan tombol jika tidak memenuhi syarat
+                                              // Aktifkan jika syarat terpenuhi () {
+                                              //sensorController.turnOnWithTimeout();
+
                                               style: ElevatedButton.styleFrom(
                                                 minimumSize:
                                                     const Size(90.0, 17.0),

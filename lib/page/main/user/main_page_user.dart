@@ -138,14 +138,6 @@ class mainPageUser extends StatelessWidget {
                                 color: Colors.white),
                           ),
                         ),
-                        Text(
-                          '', // Tambahkan username di sini jika diperlukan
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 22,
-                            color: Colors.white,
-                          ),
-                        )
                       ],
                     ),
                     const SizedBox(height: 4),

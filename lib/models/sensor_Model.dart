@@ -64,6 +64,8 @@
 //     };
 // }
 
+// sensor_model.dart
+
 class SensorData {
   bool button;
 
