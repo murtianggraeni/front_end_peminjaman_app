@@ -1,63 +1,4 @@
-// To parse this JSON data, do
-//
-//     final adminPeminjamanAll = adminPeminjamanAllFromJson(jsonString);
-
-// --Metode 1--
-// import 'dart:convert';
-
-// AdminPeminjamanAll adminPeminjamanAllFromJson(String str) => AdminPeminjamanAll.fromJson(json.decode(str));
-
-// String adminPeminjamanAllToJson(AdminPeminjamanAll data) => json.encode(data.toJson());
-
-// class AdminPeminjamanAll {
-//     bool success;
-//     int statusCode;
-//     List<Datum> data;
-
-//     AdminPeminjamanAll({
-//         required this.success,
-//         required this.statusCode,
-//         required this.data,
-//     });
-
-//     factory AdminPeminjamanAll.fromJson(Map<String, dynamic> json) => AdminPeminjamanAll(
-//         success: json["success"],
-//         statusCode: json["statusCode"],
-//         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-//     );
-
-//     Map<String, dynamic> toJson() => {
-//         "success": success,
-//         "statusCode": statusCode,
-//         "data": List<dynamic>.from(data.map((x) => x.toJson())),
-//     };
-// }
-
-// class Datum {
-//     String id;
-//     String namaPemohon;
-//     String status;
-
-//     Datum({
-//         required this.id,
-//         required this.namaPemohon,
-//         required this.status,
-//     });
-
-//     factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-//         id: json["id"],
-//         namaPemohon: json["nama_pemohon"],
-//         status: json["status"],
-//     );
-
-//     Map<String, dynamic> toJson() => {
-//         "id": id,
-//         "nama_pemohon": namaPemohon,
-//         "status": status,
-//     };
-// }
-
-// --Metode 2--
+// --getPeminjamanAllAdmin_model.dart Metode 2--
 import 'dart:convert';
 
 AdminPeminjamanAll adminPeminjamanAllFromJson(String str) =>
@@ -158,4 +99,97 @@ class Datum {
       "waktu": waktu,
     };
   }
+
+    Datum copyWith({
+    String? id,
+    String? email,
+    String? namaPemohon,
+    String? tanggalPeminjaman,
+    String? awalPeminjaman,
+    String? akhirPeminjaman,
+    String? jumlah,
+    String? programStudi,
+    String? kategori,
+    String? detailKeperluan,
+    String? desainBenda,
+    String? status,
+    String? waktu,
+  }) {
+    return Datum(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      namaPemohon: namaPemohon ?? this.namaPemohon,
+      tanggalPeminjaman: tanggalPeminjaman ?? this.tanggalPeminjaman,
+      awalPeminjaman: awalPeminjaman ?? this.awalPeminjaman,
+      akhirPeminjaman: akhirPeminjaman ?? this.akhirPeminjaman,
+      jumlah: jumlah ?? this.jumlah,
+      programStudi: programStudi ?? this.programStudi,
+      kategori: kategori ?? this.kategori,
+      detailKeperluan: detailKeperluan ?? this.detailKeperluan,
+      desainBenda: desainBenda ?? this.desainBenda,
+      status: status ?? this.status,
+      waktu: waktu ?? this.waktu,
+    );
+  }
+  
 }
+
+// To parse this JSON data, do
+//
+//     final adminPeminjamanAll = adminPeminjamanAllFromJson(jsonString);
+
+// --Metode 1--
+// import 'dart:convert';
+
+// AdminPeminjamanAll adminPeminjamanAllFromJson(String str) => AdminPeminjamanAll.fromJson(json.decode(str));
+
+// String adminPeminjamanAllToJson(AdminPeminjamanAll data) => json.encode(data.toJson());
+
+// class AdminPeminjamanAll {
+//     bool success;
+//     int statusCode;
+//     List<Datum> data;
+
+//     AdminPeminjamanAll({
+//         required this.success,
+//         required this.statusCode,
+//         required this.data,
+//     });
+
+//     factory AdminPeminjamanAll.fromJson(Map<String, dynamic> json) => AdminPeminjamanAll(
+//         success: json["success"],
+//         statusCode: json["statusCode"],
+//         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+//     );
+
+//     Map<String, dynamic> toJson() => {
+//         "success": success,
+//         "statusCode": statusCode,
+//         "data": List<dynamic>.from(data.map((x) => x.toJson())),
+//     };
+// }
+
+// class Datum {
+//     String id;
+//     String namaPemohon;
+//     String status;
+
+//     Datum({
+//         required this.id,
+//         required this.namaPemohon,
+//         required this.status,
+//     });
+
+//     factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+//         id: json["id"],
+//         namaPemohon: json["nama_pemohon"],
+//         status: json["status"],
+//     );
+
+//     Map<String, dynamic> toJson() => {
+//         "id": id,
+//         "nama_pemohon": namaPemohon,
+//         "status": status,
+//     };
+// }
+

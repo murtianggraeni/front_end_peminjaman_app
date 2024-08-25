@@ -36,7 +36,7 @@ class detailPageLasercut extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Data Permintaan Peminjaman",
+                "Data Permintaan Peminjaman Laser Cutting",
                 style: GoogleFonts.inter(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -44,7 +44,7 @@ class detailPageLasercut extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20.0),
-              _buildFilterRow(),
+              _buildFilterRow(context),
               const SizedBox(height: 20.0),
               Expanded(
                 child: _buildDataTable(),
@@ -56,17 +56,36 @@ class detailPageLasercut extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterRow() {
+  Widget _buildFilterRow(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-          onPressed: _controller.selectedCheckboxes.isNotEmpty
-              ? () {
-                  _controller
-                      .deletePeminjaman(_controller.selectedCheckboxes.first);
-                }
-              : null,
-          icon: const Icon(MingCuteIcons.mgc_delete_2_line),
+        // IconButton(
+        //   onPressed: _controller.selectedCheckboxes.isNotEmpty
+        //       ? () {
+        //           _controller
+        //               .deletePeminjaman(_controller.selectedCheckboxes.first);
+        //         }
+        //       : null,
+        //   icon: const Icon(MingCuteIcons.mgc_delete_2_line),
+        // ),
+        Obx(
+          () => IconButton(
+            onPressed: _controller.selectedCheckboxes.isNotEmpty
+                ? () {
+                    // Ambil ID dari peminjaman yang dipilih
+                    String selectedId = _controller.selectedCheckboxes.first;
+                    // Panggil fungsi showDeleteConfirmationDialog dengan ID
+                    _controller.showDeleteConfirmationDialog(
+                        context, selectedId);
+                  }
+                : null,
+            icon: Icon(
+              MingCuteIcons.mgc_delete_2_line,
+              color: _controller.selectedCheckboxes.isNotEmpty
+                  ? Colors.red
+                  : Colors.grey,
+            ),
+          ),
         ),
         const SizedBox(width: 10.0),
         Container(
@@ -79,10 +98,17 @@ class detailPageLasercut extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
           child: Obx(
             () => DropdownButton<String>(
-              hint: const Text("Filter"),
+              hint: Text(
+                "Filter",
+                style: GoogleFonts.inter(),
+              ),
               value: _controller.statusFilter.value,
               isExpanded: true,
-              icon: const Iconify(Bx.bx_slider_alt),
+              underline: Container(),
+              icon: const Iconify(
+                Bx.bx_slider_alt,
+                size: 18.0,
+              ),
               items: _controller.filterItem.map((status) {
                 return DropdownMenuItem<String>(
                   value: status,
@@ -131,32 +157,67 @@ class detailPageLasercut extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 25.0),
       child: Obx(
         () => DataTable2(
-          columns: const [
+          columns: [
             DataColumn2(
-              label: Text('Nama Pemohon'),
+              label: Text(
+                'Nama Pemohon',
+                style: GoogleFonts.inter(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               size: ColumnSize.L,
             ),
             DataColumn2(
-              label: Text('Status Verifikasi'),
+              label: Text(
+                'Status Verifikasi',
+                style: GoogleFonts.inter(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               size: ColumnSize.M,
             ),
             DataColumn2(
-              label: Text('Aksi'),
+              label: Text(
+                'Aksi',
+                style: GoogleFonts.inter(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               size: ColumnSize.L,
             ),
           ],
           rows: _controller.peminjaman.map((peminjaman) {
             return DataRow2(
               cells: [
-                DataCell(Text(peminjaman.namaPemohon)),
+                DataCell(
+                  Text(
+                    peminjaman.namaPemohon,
+                    style: GoogleFonts.inter(),
+                  ),
+                ),
                 DataCell(_buildStatusCell(peminjaman)),
                 DataCell(_buildActionButtons(Get.context!, peminjaman)),
               ],
               selected: _controller.selectedCheckboxes
-                  .contains(peminjaman.namaPemohon),
+                  .contains(peminjaman.id), // Pastikan menggunakan ID
               onSelectChanged: (selected) {
-                _controller.onSelectedRow(selected!, peminjaman);
+                if (selected != null && selected) {
+                  _controller.selectedCheckboxes
+                      .add(peminjaman.id); // Tambahkan ID ke list
+                } else if (selected != null && !selected) {
+                  _controller.selectedCheckboxes
+                      .remove(peminjaman.id); // Hapus ID dari list
+                }
+                _controller.update(); // Update UI setelah perubahan
               },
+              // selected: _controller.selectedCheckboxes
+              //     .contains(peminjaman.namaPemohon),
+              // onSelectChanged: (selected) {
+              //   _controller.onSelectedRow(selected!, peminjaman);
+              // },
             );
           }).toList(),
           horizontalMargin: 12,

@@ -8,14 +8,14 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:build_app/routes/route_name.dart';
 
-class monitoringPage extends StatefulWidget {
-  const monitoringPage({super.key});
+class confirmPage extends StatefulWidget {
+  const confirmPage({super.key});
 
   @override
-  State<monitoringPage> createState() => _monitoringPageState();
+  State<confirmPage> createState() => _confirmPageState();
 }
 
-class _monitoringPageState extends State<monitoringPage>
+class _confirmPageState extends State<confirmPage>
     with SingleTickerProviderStateMixin {
   late TabController monitoringTabController;
 

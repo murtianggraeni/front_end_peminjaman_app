@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:build_app/page/main/user/main_page_user.dart';
-import 'package:build_app/page/main/admin/monitoring_page.dart';
+import 'package:build_app/page/main/admin/confirm_page.dart';
 import 'package:build_app/page/main/user/status_page.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -22,7 +22,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   List<Widget> get _screens {
     return _userController.role.value == 'admin'
-        ? [mainPageAdmin(), const monitoringPage()]
+        ? [mainPageAdmin(), const confirmPage()]
         : [mainPageUser(), const statusPage()];
   }
 

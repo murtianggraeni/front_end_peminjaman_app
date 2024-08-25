@@ -97,35 +97,35 @@ class _statusPageState extends State<statusPage> {
   final SensorController sensorController = Get.put(SensorController());
 
   // Fungsi untuk button peminjaman
-bool _canActivateButton(Datum peminjaman) {
-  print("Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
-  print("Status: ${peminjaman.status}");
-  print("Tanggal Peminjaman: ${peminjaman.tanggalPeminjaman}");
-  print("Awal Peminjaman (raw): ${peminjaman.awalPeminjaman}");
-  print("Akhir Peminjaman (raw): ${peminjaman.akhirPeminjaman}");
+  bool _canActivateButton(Datum peminjaman) {
+    print("Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
+    print("Status: ${peminjaman.status}");
+    print("Tanggal Peminjaman: ${peminjaman.tanggalPeminjaman}");
+    print("Awal Peminjaman (raw): ${peminjaman.awalPeminjaman}");
+    print("Akhir Peminjaman (raw): ${peminjaman.akhirPeminjaman}");
 
-  if (peminjaman.status != Status.Disetujui) {
-    print("Status bukan Disetujui, button tidak dapat diaktifkan.");
-    return false;
+    if (peminjaman.status != Status.Disetujui) {
+      print("Status bukan Disetujui, button tidak dapat diaktifkan.");
+      return false;
+    }
+
+    DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
+    DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
+
+    print("Awal Peminjaman (parsed): $awalPeminjamanDate");
+    print("Akhir Peminjaman (parsed): $akhirPeminjamanDate");
+
+    if (awalPeminjamanDate == null || akhirPeminjamanDate == null) {
+      print("Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
+      return false;
+    }
+
+    final now = DateTime.now();
+    bool canActivate = now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
+    print("Current time: $now");
+    print("Can Activate: $canActivate");
+    return canActivate;
   }
-
-  DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
-  DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
-
-  print("Awal Peminjaman (parsed): $awalPeminjamanDate");
-  print("Akhir Peminjaman (parsed): $akhirPeminjamanDate");
-
-  if (awalPeminjamanDate == null || akhirPeminjamanDate == null) {
-    print("Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
-    return false;
-  }
-
-  final now = DateTime.now();
-  bool canActivate = now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
-  print("Current time: $now");
-  print("Can Activate: $canActivate");
-  return canActivate;
-}
 
 
   // Fungsi filter dialog

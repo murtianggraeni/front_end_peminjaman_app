@@ -65,7 +65,7 @@ class ApiController {
         return response;
       } else {
         throw Exception(
-            'Failed to fetch data. Status code: ${response.statusCode}');
+            'Failed to fetch data CountData. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error during fetchData: $e');
@@ -89,7 +89,7 @@ class ApiController {
             'Failed to fetch data. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error during fetchData: $e');
+      print('Error during fetchData PeminjamanUserAll: $e');
       throw e;
     }
   }
@@ -99,6 +99,7 @@ class ApiController {
     String? getToken = shared.getString("accessToken");
     try {
       Uri url = Uri.parse('$URL_API/admin/${type}');
+      print('Request URL: $url');
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $getToken',
@@ -110,7 +111,7 @@ class ApiController {
             'Failed to fetch data. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error during fetchData: $e');
+      print('Error during fetchData PeminjamanUserAllforAdmin: $e');
       throw e;
     }
   }
@@ -164,6 +165,26 @@ class ApiController {
     } catch (e) {
       print('Error in getPeminjamanById: $e');
       throw e;
+    }
+  }
+
+  Future<http.Response> deletePeminjamanById(
+      String type, String peminjamanId) async {
+    final SharedPreferences shared = await SharedPreferences.getInstance();
+    String? getToken = shared.getString("accessToken");
+    try {
+      Uri url = Uri.parse('$URL_API/admin/$type/$peminjamanId');
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $getToken',
+        },
+      );
+      return response; // Mengembalikan response
+    } catch (e) {
+      print('Error during deletePeminjamanById: $e');
+      throw e; // Jika ada error, lempar errornya.
     }
   }
 }
