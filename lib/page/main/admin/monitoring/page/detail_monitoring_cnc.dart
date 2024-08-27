@@ -95,13 +95,13 @@ class detailPageCnc extends StatelessWidget {
                 "Filter",
                 style: GoogleFonts.inter(),
               ),
-              value: _controller.statusFilter.value,
               isExpanded: true,
               icon: const Iconify(
                 Bx.bx_slider_alt,
                 size: 18.0,
               ),
               underline: Container(),
+              value: _controller.statusFilter.value,
               items: _controller.filterItem.map((status) {
                 return DropdownMenuItem<String>(
                   value: status,
@@ -123,15 +123,19 @@ class detailPageCnc extends StatelessWidget {
           child: Container(
             height: 40.0,
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE0E0E0)),
+              border: Border.all(
+                color: const Color(0xFFE0E0E0),
+              ),
               borderRadius: BorderRadius.circular(8.0),
             ),
             child: TextField(
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: "Cari",
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 8.0,
+                ),
                 prefixIcon: Icon(MingCuteIcons.mgc_search_3_line),
               ),
               onChanged: (value) {
@@ -182,13 +186,16 @@ class detailPageCnc extends StatelessWidget {
               size: ColumnSize.L,
             ),
           ],
-          rows: _controller.peminjaman.map((peminjaman) {
+          rows: _controller.filteredPeminjaman.map((peminjaman) {
+            // _controller.peminjaman.map((peminjaman) {
             return DataRow2(
               cells: [
-                DataCell(Text(
-                  peminjaman.namaPemohon,
-                  style: GoogleFonts.inter(),
-                )),
+                DataCell(
+                  Text(
+                    peminjaman.namaPemohon,
+                    style: GoogleFonts.inter(),
+                  ),
+                ),
                 DataCell(_buildStatusCell(peminjaman)),
                 DataCell(_buildActionButtons(Get.context!, peminjaman)),
               ],

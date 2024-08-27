@@ -25,15 +25,15 @@ if (flutterVersionName == null) {
 android {
     namespace "com.example.build_app"
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393" // Pastikan versi NDK ini yang tertinggi
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 
     sourceSets {
@@ -41,22 +41,23 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.build_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true // Tambahkan ini untuk mengaktifkan MultiDex
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+    }
+    
+    // Menambahkan ini untuk mengatasi masalah DEX
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 }
 
@@ -64,4 +65,7 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.android.support:multidex:2.0.1' // Tambahkan ini untuk dukungan MultiDex
+}

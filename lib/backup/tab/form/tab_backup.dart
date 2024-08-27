@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 
 class TabForm extends StatefulWidget {
   const TabForm({
@@ -207,9 +207,9 @@ class _TabFormState extends State<TabForm> with SingleTickerProviderStateMixin {
   }
 
   // Fungsi untuk membuka file
-  void openFile(File file) {
-    OpenFile.open(file.path);
-  }
+  // void openFile(File file) {
+  //   OpenFile.open(file.path);
+  // }
 
   // Sebagai controller dari masing-masing fungsi
   final TextEditingController _date = TextEditingController();

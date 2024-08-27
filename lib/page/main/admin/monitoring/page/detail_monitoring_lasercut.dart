@@ -189,7 +189,8 @@ class detailPageLasercut extends StatelessWidget {
               size: ColumnSize.L,
             ),
           ],
-          rows: _controller.peminjaman.map((peminjaman) {
+          rows: _controller.filteredPeminjaman.map((peminjaman) {
+          // _controller.peminjaman.map((peminjaman) {
             return DataRow2(
               cells: [
                 DataCell(

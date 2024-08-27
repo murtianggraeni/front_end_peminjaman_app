@@ -14,6 +14,17 @@ class RegisterController extends GetxController {
   final ApiController apiController = ApiController();
 
   Future<void> registerWithEmail() async {
+    if (usernameC.text.isEmpty ||
+        emailC.text.isEmpty ||
+        passwordC.text.isEmpty ||
+        roleC.text.isEmpty) {
+      Get.snackbar('Failed', 'All fields are required!',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+      return;
+    }
+    
     try {
       Map<String, dynamic> body = {
         'username': usernameC.text,

@@ -30,6 +30,9 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   // Variabel observable untuk menyimpan data peminjaman
   RxList<Datum> peminjaman = <Datum>[].obs;
 
+  // Tambahkan variabel baru untuk menyimpan hasil filter
+  RxList<Datum> filteredPeminjaman = <Datum>[].obs;
+
   // Variabel untuk mengatur status, filter, dan pengurutan
   var status = false.obs;
   var statusFilter = 'All'.obs;
@@ -56,6 +59,8 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   void onInit() {
     super.onInit();
     print('Fetching data for: ${currentMachineType.value.toApiString()}');
+    filteredPeminjaman.assignAll(peminjaman);
+    print('Fetching data for: ${currentMachineType.value.toApiString()}');
     fetchData();
   }
 
@@ -67,10 +72,7 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   // Metode untuk mengambil data peminjaman dari API
   Future<void> fetchData() async {
     try {
-      // print(
-      //     'Machine Type sent to API: ${currentMachineType.value.toApiString()}');
-      // final response = await apiController.PeminjamanUserAllforAdmin(
-      //     machineType.toApiString());
+      // final response = await apiController.PeminjamanUserAllforAdmin(machineType.toApiString());
       print(
           'Machine Type sent to API: ${currentMachineType.value.toApiString()}');
       final response = await apiController.PeminjamanUserAllforAdmin(
@@ -87,11 +89,25 @@ class PeminjamanUserAllbyAdminController extends GetxController {
                 .map<Datum>((data) => Datum.fromJson(data))
                 .toList(),
           );
-          _sensorStreamController.add(peminjaman.toList());
+          filteredPeminjaman.assignAll(peminjaman); // Inisialisasi filteredPeminjaman
           update();
         } else {
           print('Invalid data format: ${responseData.runtimeType}');
         }
+        // if (response.statusCode == 200) {
+        //   final dynamic responseData = json.decode(response.body);
+        //   if (responseData is Map<String, dynamic> &&
+        //       responseData['data'] is List) {
+        //     peminjaman.assignAll(
+        //       responseData['data']
+        //           .map<Datum>((data) => Datum.fromJson(data))
+        //           .toList(),
+        //     );
+        //     _sensorStreamController.add(peminjaman.toList());
+        //     update();
+        //   } else {
+        //     print('Invalid data format: ${responseData.runtimeType}');
+        //   }
       } else {
         throw Exception(
             'Failed to fetch data PeminjamanUserAllbyAdminController. Status code: ${response.statusCode}');
@@ -128,21 +144,20 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     }
   }
 
-  // Metode untuk menyaring data berdasarkan filter
+  // Modifikasi metode filterPeminjaman
   void filterPeminjaman() {
-    final List<Datum> filtered = peminjaman.where((peminjaman) {
+    filteredPeminjaman.value = peminjaman.where((peminjaman) {
       bool matchesFilter = peminjaman.namaPemohon
           .toLowerCase()
           .contains(filter.value.toLowerCase());
       bool matchesStatus = statusFilter.value == 'All' ||
-          peminjaman.status
-              .toLowerCase()
-              .contains(statusFilter.value.toLowerCase());
+          peminjaman.status.toLowerCase() == statusFilter.value.toLowerCase();
       return matchesFilter && matchesStatus;
     }).toList();
 
-    _sensorStreamController.add(filtered);
+    update(); // Memicu pembaruan UI
   }
+
   // Fungsi untuk menyortir data berdasarkan tanggal
 
   // Metode untuk menyortir data berdasarkan status
@@ -194,37 +209,6 @@ class PeminjamanUserAllbyAdminController extends GetxController {
       Get.snackbar("Error", "Terjadi kesalahan: $e");
     }
   }
-  // void deletePeminjaman(String id) async {
-  //   try {
-  //     // Memanggil API untuk menghapus peminjaman berdasarkan ID
-  //     final response = await apiController.deletePeminjamanById(
-  //       currentMachineType.value.toApiString(), id);
-
-  //     if (response.statusCode == 200) {
-  //       // Hapus item dari list peminjaman berdasarkan ID
-  //       peminjaman.removeWhere((item) => item.id == id);
-  //       // Perbarui filter untuk memperbarui tampilan data
-  //       filterPeminjaman();
-  //       // Update UI untuk mencerminkan perubahan
-  //       update();
-  //       // Menampilkan notifikasi bahwa peminjaman berhasil dihapus
-  //       Get.snackbar("Berhasil", "Peminjaman berhasil dihapus");
-  //     } else {
-  //       // Menampilkan notifikasi error jika penghapusan gagal
-  //       Get.snackbar("Error", "Gagal menghapus peminjaman. Silakan coba lagi.");
-  //     }
-  //   } catch (e) {
-  //     // Menangani error yang terjadi saat mencoba menghapus peminjaman
-  //     Get.snackbar("Error", "Terjadi kesalahan: $e");
-  //   }
-  // }
-
-  // Fungsi untuk menghapus data peminjaman
-  // void deletePeminjaman(String namaPemohon) {
-  //   peminjaman.removeWhere((item) => item.namaPemohon == namaPemohon);
-  //   filterPeminjaman();
-  //   selectedCheckboxes.remove(namaPemohon);
-  // }
 
   // Fungsi untuk checkbox pada tabel
   void onSelectedRow(bool selected, Datum peminjaman) {

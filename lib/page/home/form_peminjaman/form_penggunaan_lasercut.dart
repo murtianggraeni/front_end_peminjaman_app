@@ -12,7 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -171,9 +171,9 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
   }
 
   // Fungsi untuk membuka file
-  void openFile(File file) {
-    OpenFile.open(file.path);
-  }
+  // void openFile(File file) {
+  //   OpenFile.open(file.path);
+  // }
 
   // Sebagai controller dari masing-masing fungsi
   // final TextEditingController _date = TextEditingController();

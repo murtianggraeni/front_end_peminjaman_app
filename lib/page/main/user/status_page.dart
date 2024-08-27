@@ -98,7 +98,8 @@ class _statusPageState extends State<statusPage> {
 
   // Fungsi untuk button peminjaman
   bool _canActivateButton(Datum peminjaman) {
-    print("Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
+    print(
+        "Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
     print("Status: ${peminjaman.status}");
     print("Tanggal Peminjaman: ${peminjaman.tanggalPeminjaman}");
     print("Awal Peminjaman (raw): ${peminjaman.awalPeminjaman}");
@@ -116,17 +117,18 @@ class _statusPageState extends State<statusPage> {
     print("Akhir Peminjaman (parsed): $akhirPeminjamanDate");
 
     if (awalPeminjamanDate == null || akhirPeminjamanDate == null) {
-      print("Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
+      print(
+          "Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
       return false;
     }
 
     final now = DateTime.now();
-    bool canActivate = now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
+    bool canActivate =
+        now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
     print("Current time: $now");
     print("Can Activate: $canActivate");
     return canActivate;
   }
-
 
   // Fungsi filter dialog
   void _showFilterDialog() {
@@ -517,14 +519,27 @@ class _statusPageState extends State<statusPage> {
                                             ),
                                             ElevatedButton(
                                               onPressed: _canActivateButton(
-                                                      peminjaman) // Aktifkan jika syarat terpenuhi
+                                                      peminjaman)
                                                   ? () {
                                                       sensorController
                                                           .turnOnWithTimeout(
-                                                              peminjaman
-                                                                  .alamatEsp); // Menggunakan espAddress
+                                                        peminjaman
+                                                            .alamatEsp, // Gunakan alamat ESP dari data peminjaman
+                                                        peminjaman
+                                                            .akhirPeminjamanTime!,
+                                                      );
                                                     }
                                                   : null, // Nonaktifkan tombol jika tidak memenuhi syarat
+
+                                              // _canActivateButton(
+                                              //         peminjaman) // Aktifkan jika syarat terpenuhi
+                                              //     ? () {
+                                              //         sensorController
+                                              //             .turnOnWithTimeout(
+                                              //                 peminjaman
+                                              //                     .alamatEsp); // Menggunakan espAddress
+                                              //       }
+                                              //     : null, // Nonaktifkan tombol jika tidak memenuhi syarat
                                               // Aktifkan jika syarat terpenuhi () {
                                               //sensorController.turnOnWithTimeout();
 

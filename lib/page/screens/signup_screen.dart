@@ -179,7 +179,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         DropdownButtonFormField<String>(
                           value: _selectedRole,
                           hint: const Text("Pilih Role"),
-                          items: <String>['Admin', 'User'].map((String value) {
+                          items: <String>['admin', 'user'].map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Text(value),

@@ -45,8 +45,6 @@
 //   }
 // }
 
-import 'package:build_app/controller/peminjamanUserAllbyAdmin_controller.dart';
-import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_cnc.dart';
 import 'package:build_app/controller/user_controller.dart';
 import 'package:build_app/page/screens/welcome_screen.dart';
 import 'package:build_app/page/widget/custom_buttom_nav.dart';
@@ -89,8 +87,8 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
       home: _decideHomePage(), // Gunakan fungsi untuk memutuskan halaman utama
+      // SideMenu(),
       // monitoringPenggunaan(),
-      // WelcomeScreen(),
       // WelcomeScreen(),
 
       getPages: AppPage.pages,
