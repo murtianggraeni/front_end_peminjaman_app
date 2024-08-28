@@ -179,7 +179,7 @@
 
 //   void turnOnWithTimeout(String espAddress, Duration duration) {
 //     turnOn(espAddress);
-    
+
 //     _timer?.cancel();
 //     _timer = Timer(duration, () {
 //       print("Peminjaman time ended. Turning off button.");
@@ -205,36 +205,235 @@
 // --------------------------------- //
 
 // Methode 4: sensorController.dart
+// import 'package:build_app/provider/api.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
+// import 'dart:async';
 
+// final ApiController _apiController = ApiController();
+
+// class SensorController extends GetxController {
+//   var isLoading = false.obs;
+//   var buttonState = false.obs;
+//   Timer? _timer;
+//   Timer? _notificationTimer;
+
+//   // Method ini menerima alamatEsp sebagai parameter
+//   Future<void> toggleButton(String alamatEsp,
+//       {bool? newState, DateTime? newEndTime}) async {
+//     isLoading(true);
+//     print(
+//         "Sending request to $alamatEsp with button state: ${buttonState.value}");
+
+//     try {
+//       var sensorData = {
+//         "button": buttonState.value,
+//         "newEndTime": newEndTime
+//             ?.toIso8601String(), // Tambahkan newEndTime ke payload jika ada
+//       };
+//       var response = await http.post(
+//         Uri.parse(alamatEsp), // Menggunakan alamatEsp dinamis
+//         headers: {"Content-Type": "application/json"},
+//         body: json.encode(sensorData),
+//       );
+
+//       if (response.statusCode == 201) {
+//         print(
+//             "Button state uploaded successfully! Current state: ${buttonState.value}");
+//       } else {
+//         print(
+//             "Failed to upload button state. Status code: ${response.statusCode}. Response body: ${response.body}");
+//       }
+//     } catch (e) {
+//       print("Error occurred while toggling button: $e");
+//     } finally {
+//       isLoading(false);
+//       print("Finished request to $alamatEsp");
+//     }
+//   }
+
+//   // Fungsi untuk memperpanjang waktu peminjaman
+//   Future<void> extendRentalTime(
+//       String peminjamanId, DateTime newEndTime, String alamatEsp) async {
+//     try {
+//       var response =
+//           await _apiController.extendRentalTime(peminjamanId, newEndTime);
+
+//       if (response.statusCode == 200) {
+//         print("Rental time extended successfully.");
+//         // Kirimkan perubahan ke ESP32
+//         toggleButton(alamatEsp,
+//             newEndTime: newEndTime); // Panggil toggleButton dengan newEndTime
+//       } else {
+//         print(
+//             "Failed to extend rental time. Status code: ${response.statusCode}");
+//       }
+//     } catch (e) {
+//       print("Error occurred while extending rental time: $e");
+//     }
+//   }
+
+//   void turnOnWithTimeout(String alamatEsp, DateTime akhirPeminjaman) {
+//     // Pastikan tombol hanya bisa ditekan sekali
+//     if (buttonState.value == true) {
+//       print("Button has already been activated. Skipping toggle.");
+//       return;
+//     }
+
+//     buttonState(true);
+//     print(
+//         "Button state set to ON for ESP Address: $alamatEsp. Initiating toggleButton call.");
+//     toggleButton(alamatEsp);
+
+//     // Log sisa waktu sebelum peminjaman berakhir
+//     final now = DateTime.now();
+//     final remainingTime = akhirPeminjaman.difference(now);
+//     print("Remaining time until end of rental for $alamatEsp: $remainingTime");
+
+//     // Log pengiriman notifikasi 10 menit sebelum peminjaman berakhir
+//     if (remainingTime > Duration(minutes: 10)) {
+//       _notificationTimer = Timer(remainingTime - Duration(minutes: 10), () {
+//         print(
+//             "10 minutes before rental ends for $alamatEsp. Sending notification.");
+//         showNotification("Peminjaman akan habis dalam 10 menit",
+//             "Pastikan mesin berada dalam posisi home.");
+
+//         // Tampilkan dialog perpanjangan peminjaman
+//         _showExtendRentalDialog(alamatEsp, akhirPeminjaman);
+//       });
+//     }
+
+//     // Timer untuk mematikan mesin setelah peminjaman habis
+//     _timer?.cancel();
+//     _timer = Timer(remainingTime, () {
+//       print("Peminjaman has ended for $alamatEsp. Turning off button.");
+//       buttonState(false);
+//       toggleButton(alamatEsp);
+//     });
+//   }
+
+//   // void turnOnWithTimeout(String alamatEsp, DateTime akhirPeminjaman) {
+//   //   buttonState(true);
+//   //   print("Button state set to ON for ESP Address: $alamatEsp. Initiating toggleButton call.");
+//   //   toggleButton(alamatEsp);
+
+//   //   // Log sisa waktu sebelum peminjaman berakhir
+//   //   final now = DateTime.now();
+//   //   final remainingTime = akhirPeminjaman.difference(now);
+//   //   print("Remaining time until end of rental for $alamatEsp: $remainingTime");
+
+//   //   // Log pengiriman notifikasi 10 menit sebelum peminjaman berakhir
+//   //   if (remainingTime > Duration(minutes: 10)) {
+//   //     _notificationTimer = Timer(remainingTime - Duration(minutes: 10), () {
+//   //       print("10 minutes before rental ends for $alamatEsp. Sending notification.");
+//   //       showNotification("Peminjaman akan habis dalam 10 menit", "Pastikan mesin berada dalam posisi home.");
+
+//   //       // Tampilkan dialog perpanjangan peminjaman
+//   //       _showExtendRentalDialog(alamatEsp, akhirPeminjaman);
+//   //     });
+//   //   }
+
+//   //   // Timer untuk mematikan mesin setelah peminjaman habis
+//   //   _timer?.cancel();
+//   //   _timer = Timer(remainingTime, () {
+//   //     print("Peminjaman has ended for $alamatEsp. Turning off button.");
+//   //     buttonState(false);
+//   //     toggleButton(alamatEsp);
+//   //   });
+//   // }
+
+//   // Fungsi untuk menampilkan notifikasi (simulasi saja)
+//   void showNotification(String title, String message) {
+//     // Anda dapat menggunakan plugin notifikasi lokal atau memanfaatkan mekanisme lain sesuai kebutuhan Anda
+//     print("Notification: $title - $message");
+//   }
+
+//   void _showExtendRentalDialog(String alamatEsp, DateTime currentEndTime) {
+//     Get.dialog(
+//       AlertDialog(
+//         title: Text("Perpanjang Peminjaman"),
+//         content: Text(
+//             "Waktu peminjaman akan habis dalam 10 menit. Apakah Anda ingin memperpanjang peminjaman?"),
+//         actions: [
+//           TextButton(
+//             onPressed: () {
+//               // Jika pengguna tidak ingin memperpanjang
+//               Get.back();
+//             },
+//             child: Text("Tidak"),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               // Jika pengguna ingin memperpanjang peminjaman
+//               Get.back(); // Tutup dialog
+//               DateTime newEndTime =
+//                   currentEndTime.add(Duration(minutes: 30)); // Tambah 30 menit
+//               print(
+//                   "Extending rental time by 30 minutes. New end time: $newEndTime");
+//               turnOnWithTimeout(alamatEsp,
+//                   newEndTime); // Restart timer dengan waktu akhir baru
+//             },
+//             child: Text("Perpanjang 30 menit"),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   @override
+//   void onClose() {
+//     print("SensorController is being closed. Cancelling timer if exists.");
+//     _timer?.cancel(); // Batalkan timer jika controller ditutup
+//     _notificationTimer?.cancel(); // Batalkan notifikasi jika controller ditutup
+//     super.onClose();
+//   }
+// }
+
+import 'package:build_app/provider/api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:intl/intl.dart';
+
+final ApiController _apiController = ApiController();
+
 class SensorController extends GetxController {
   var isLoading = false.obs;
   var buttonState = false.obs;
   Timer? _timer;
   Timer? _notificationTimer;
+  Timer? _countdownTimer;
+  int countdownValue = 20; // Durasi 20 detik untuk dialog perpanjangan
 
   // Method ini menerima alamatEsp sebagai parameter
-  Future<void> toggleButton(String alamatEsp) async {
+  Future<void> toggleButton(String alamatEsp,
+      {bool? newState, DateTime? newEndTime}) async {
     isLoading(true);
-    print("Sending request to $alamatEsp with button state: ${buttonState.value}");
+    print(
+        "Sending request to $alamatEsp with button state: ${buttonState.value}");
 
     try {
-      var sensorData = {"button": buttonState.value};
+      var sensorData = {
+        "button": buttonState.value,
+        "newEndTime": newEndTime?.toIso8601String(),
+      };
       var response = await http.post(
-        Uri.parse(alamatEsp), // Menggunakan alamatEsp dinamis
+        Uri.parse(alamatEsp),
         headers: {"Content-Type": "application/json"},
         body: json.encode(sensorData),
       );
 
       if (response.statusCode == 201) {
-        print("Button state uploaded successfully! Current state: ${buttonState.value}");
+        print(
+            "Button state uploaded successfully! Current state: ${buttonState.value}");
       } else {
-        print("Failed to upload button state. Status code: ${response.statusCode}. Response body: ${response.body}");
+        print(
+            "Failed to upload button state. Status code: ${response.statusCode}. Response body: ${response.body}");
       }
     } catch (e) {
       print("Error occurred while toggling button: $e");
@@ -244,75 +443,176 @@ class SensorController extends GetxController {
     }
   }
 
-  void turnOnWithTimeout(String alamatEsp, DateTime akhirPeminjaman) {
+  // Fungsi untuk memperpanjang waktu peminjaman
+  Future<void> extendRentalTime(
+      String peminjamanId, DateTime newEndTime, String alamatEsp) async {
+    try {
+      var response =
+          await _apiController.extendRentalTime(peminjamanId, newEndTime);
+
+      if (response.statusCode == 200) {
+        print("Rental time extended successfully.");
+        toggleButton(alamatEsp, newEndTime: newEndTime);
+
+        // Reset timer dengan waktu baru
+        _timer?.cancel();
+        _timer = Timer(newEndTime.difference(DateTime.now()), () {
+          print(
+              "Extended peminjaman has ended for $alamatEsp. Turning off button.");
+          buttonState(false);
+          toggleButton(alamatEsp);
+        });
+
+        // Tambahkan notifikasi sukses
+        Get.snackbar(
+          "Perpanjangan Berhasil",
+          "Waktu peminjaman berhasil diperpanjang hingga ${DateFormat('HH:mm').format(newEndTime)}",
+          snackPosition: SnackPosition.TOP,
+          duration: Duration(seconds: 3),
+        );
+      } else {
+        print(
+            "Failed to extend rental time. Status code: ${response.statusCode}");
+        // Tambahkan notifikasi gagal
+        Get.snackbar(
+          "Perpanjangan Gagal",
+          "Gagal memperpanjang waktu peminjaman. Silakan coba lagi.",
+          snackPosition: SnackPosition.TOP,
+          duration: Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      print("Error occurred while extending rental time: $e");
+      // Tambahkan notifikasi error
+      Get.snackbar(
+        "Error",
+        "Terjadi kesalahan saat memperpanjang waktu peminjaman.",
+        snackPosition: SnackPosition.TOP,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
+  void turnOnWithTimeout(String alamatEsp, DateTime akhirPeminjaman,
+      String peminjamanId, Function onTimeout) {
+    if (buttonState.value == true) {
+      print("Button has already been activated. Skipping toggle.");
+      return;
+    }
+
     buttonState(true);
-    print("Button state set to ON for ESP Address: $alamatEsp. Initiating toggleButton call.");
+    print(
+        "Button state set to ON for ESP Address: $alamatEsp. Initiating toggleButton call.");
     toggleButton(alamatEsp);
 
-    // Log sisa waktu sebelum peminjaman berakhir
     final now = DateTime.now();
     final remainingTime = akhirPeminjaman.difference(now);
     print("Remaining time until end of rental for $alamatEsp: $remainingTime");
 
-    // Log pengiriman notifikasi 10 menit sebelum peminjaman berakhir
     if (remainingTime > Duration(minutes: 10)) {
       _notificationTimer = Timer(remainingTime - Duration(minutes: 10), () {
-        print("10 minutes before rental ends for $alamatEsp. Sending notification.");
-        showNotification("Peminjaman akan habis dalam 10 menit", "Pastikan mesin berada dalam posisi home.");
-        
-        // Tampilkan dialog perpanjangan peminjaman
-        _showExtendRentalDialog(alamatEsp, akhirPeminjaman);
+        print(
+            "10 minutes before rental ends for $alamatEsp. Sending notification.");
+        showNotification("Peminjaman akan habis dalam 10 menit",
+            "Pastikan mesin berada dalam posisi home.");
+        _showExtendRentalDialog(alamatEsp, akhirPeminjaman, peminjamanId);
       });
     }
 
-    // Timer untuk mematikan mesin setelah peminjaman habis
     _timer?.cancel();
     _timer = Timer(remainingTime, () {
       print("Peminjaman has ended for $alamatEsp. Turning off button.");
       buttonState(false);
       toggleButton(alamatEsp);
+      onTimeout(); // Panggil callback ketika waktu habis
     });
+  }
+
+  void _showExtendRentalDialog(
+      String alamatEsp, DateTime currentEndTime, String peminjamanId) {
+    countdownValue = 20;
+    _startCountdownTimer(alamatEsp, currentEndTime);
+
+    Get.dialog(
+      Obx(() => Stack(
+            alignment: Alignment.center,
+            children: [
+              AlertDialog(
+                title: Text("Perpanjang Peminjaman"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                        "Waktu peminjaman akan habis dalam 10 menit. Apakah Anda ingin memperpanjang peminjaman?"),
+                    SizedBox(height: 10),
+                    Text(
+                      "Waktu tersisa: $countdownValue detik",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        _cancelCountdownTimer();
+                        Get.back();
+                        DateTime newEndTime =
+                            currentEndTime.add(Duration(minutes: 30));
+                        print(
+                            "Extending rental time by 30 minutes. New end time: $newEndTime");
+                        extendRentalTime(peminjamanId, newEndTime, alamatEsp);
+                      },
+                      child: Text("Perpanjang 30 menit"),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      _cancelCountdownTimer();
+                      Get.back();
+                    },
+                    child: Text("Tidak"),
+                  ),
+                ],
+              ),
+              Positioned(
+                child: CircularProgressIndicator(
+                  value: countdownValue / 20,
+                  strokeWidth: 6,
+                ),
+              ),
+            ],
+          )),
+      barrierDismissible: false,
+    ).then((_) => _cancelCountdownTimer());
+  }
+
+  void _startCountdownTimer(String alamatEsp, DateTime currentEndTime) {
+    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (countdownValue > 0) {
+        countdownValue--;
+        update(); // Perbarui UI dengan waktu yang tersisa
+      } else {
+        _cancelCountdownTimer();
+        Get.back(); // Tutup dialog ketika waktu habis
+      }
+    });
+  }
+
+  void _cancelCountdownTimer() {
+    _countdownTimer?.cancel();
   }
 
   // Fungsi untuk menampilkan notifikasi (simulasi saja)
   void showNotification(String title, String message) {
-    // Anda dapat menggunakan plugin notifikasi lokal atau memanfaatkan mekanisme lain sesuai kebutuhan Anda
     print("Notification: $title - $message");
-  }
-
-  void _showExtendRentalDialog(String alamatEsp, DateTime currentEndTime) {
-    Get.dialog(
-      AlertDialog(
-        title: Text("Perpanjang Peminjaman"),
-        content: Text("Waktu peminjaman akan habis dalam 10 menit. Apakah Anda ingin memperpanjang peminjaman?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Jika pengguna tidak ingin memperpanjang
-              Get.back();
-            },
-            child: Text("Tidak"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Jika pengguna ingin memperpanjang peminjaman
-              Get.back(); // Tutup dialog
-              DateTime newEndTime = currentEndTime.add(Duration(minutes: 30)); // Tambah 30 menit
-              print("Extending rental time by 30 minutes. New end time: $newEndTime");
-              turnOnWithTimeout(alamatEsp, newEndTime); // Restart timer dengan waktu akhir baru
-            },
-            child: Text("Perpanjang 30 menit"),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   void onClose() {
     print("SensorController is being closed. Cancelling timer if exists.");
-    _timer?.cancel(); // Batalkan timer jika controller ditutup
-    _notificationTimer?.cancel(); // Batalkan notifikasi jika controller ditutup
+    _timer?.cancel();
+    _notificationTimer?.cancel();
+    _cancelCountdownTimer();
     super.onClose();
   }
 }

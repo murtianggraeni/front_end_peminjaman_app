@@ -74,20 +74,25 @@ class PeminjamanUserAllController extends GetxController {
 
           // Logging untuk mengecek nilai setelah konversi
           for (var data in peminjaman) {
-            print('Peminjaman ID: ${data.id}');
-            print('Nama Pemohon: ${data.namaPemohon}');
-            print('Nama Mesin: ${data.namaMesin}');
+            final now = DateTime.now();
+            print('Jam: ${now}');
+            // print('Peminjaman ID: ${data.id}');
+            // print('Nama Pemohon: ${data.namaPemohon}');
+            // print('Nama Mesin: ${data.namaMesin}');
             print('Tanggal Peminjaman (raw): ${data.tanggalPeminjaman}');
-            print('Tanggal Peminjaman (formatted): ${data.formattedTanggalPeminjaman}');
+            print(
+                'Tanggal Peminjaman (formatted): ${data.formattedTanggalPeminjaman}');
             print('Akhir Peminjaman (time): ${data.akhirPeminjamanTime}');
             print('Awal Peminjaman (raw): ${data.awalPeminjaman}');
-            print('Awal Peminjaman (formatted): ${data.formattedAwalPeminjaman}');
+            print(
+                'Awal Peminjaman (formatted): ${data.formattedAwalPeminjaman}');
             print('Awal Peminjaman (time): ${data.awalPeminjamanTime}');
             print('Akhir Peminjaman (raw): ${data.akhirPeminjaman}');
-            print('Akhir Peminjaman (formatted): ${data.formattedAkhirPeminjaman}');
+            print(
+                'Akhir Peminjaman (formatted): ${data.formattedAkhirPeminjaman}');
             print('Akhir Peminjaman (time): ${data.akhirPeminjamanTime}');
-            print('Status: ${data.status}');
-            print('Esp: ${data.alamatEsp}');
+            // print('Status: ${data.status}');
+            // print('Esp: ${data.alamatEsp}');
           }
 
           // Urutkan data berdasarkan waktu terbaru

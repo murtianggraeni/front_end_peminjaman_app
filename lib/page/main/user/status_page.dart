@@ -10,6 +10,7 @@ import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:build_app/controller/peminjamanUserAll_controller.dart';
 import 'package:build_app/models/peminjamanUserAll_model.dart';
 import 'package:build_app/page/main/custom_main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Fungsi helper untuk warna status
 Color dapatkanWarnaStatus(String status) {
@@ -96,6 +97,63 @@ class _statusPageState extends State<statusPage> {
       Get.put(PeminjamanUserAllController());
   final SensorController sensorController = Get.put(SensorController());
 
+  // Tambahkan ini untuk melacak tombol yang sudah ditekan
+  Set<String> activatedButtons = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadActivatedButtons();
+  }
+
+  Future<void> _loadActivatedButtons() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      activatedButtons = prefs.getStringList('activatedButtons')?.toSet() ?? {};
+    });
+  }
+
+  Future<void> _saveActivatedButtons() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('activatedButtons', activatedButtons.toList());
+  }
+
+  // Fungsi untuk membedakan button Peminjaman
+  Color _getButtonColor(Datum peminjaman) {
+    if (peminjaman.status == Status.Diproses) return Colors.grey;
+    if (peminjaman.status != Status.Disetujui) return Colors.grey;
+
+    DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
+    DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
+    if (awalPeminjamanDate == null || akhirPeminjamanDate == null)
+      return Colors.grey;
+
+    final now = DateTime.now();
+    if (now.isBefore(awalPeminjamanDate)) return Colors.grey;
+    if (now.isAfter(akhirPeminjamanDate)) return Colors.grey;
+
+    if (activatedButtons.contains(peminjaman.id)) return Colors.blue;
+    return const Color(0xFF00A95B); // Hijau
+  }
+
+  // Fungsi untuk mengetahui teks dalam button Peminjaman
+  String _getButtonText(Datum peminjaman) {
+    if (peminjaman.status == Status.Diproses) return "Belum Tersedia";
+    if (peminjaman.status != Status.Disetujui) return "Tidak Tersedia";
+
+    DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
+    DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
+    if (awalPeminjamanDate == null || akhirPeminjamanDate == null)
+      return "Tidak Tersedia";
+
+    final now = DateTime.now();
+    if (now.isBefore(awalPeminjamanDate)) return "Mulai Peminjaman";
+    if (now.isAfter(akhirPeminjamanDate)) return "Tidak Tersedia";
+
+    if (activatedButtons.contains(peminjaman.id)) return "Peminjaman Aktif";
+    return "Mulai Peminjaman";
+  }
+
   // Fungsi untuk button peminjaman
   bool _canActivateButton(Datum peminjaman) {
     print(
@@ -107,6 +165,11 @@ class _statusPageState extends State<statusPage> {
 
     if (peminjaman.status != Status.Disetujui) {
       print("Status bukan Disetujui, button tidak dapat diaktifkan.");
+      return false;
+    }
+
+    if (activatedButtons.contains(peminjaman.id)) {
+      print("Button sudah ditekan sebelumnya, tidak dapat diaktifkan lagi.");
       return false;
     }
 
@@ -400,7 +463,8 @@ class _statusPageState extends State<statusPage> {
                                                               FontWeight.bold),
                                                     ),
                                                     Text(
-                                                      "Diajukan: ${DateFormat('dd MMM yyyy').format(peminjaman.waktu)}",
+                                                      "Diajukan: ${peminjaman.formattedWaktu}",
+                                                      //"Diajukan: ${DateFormat('dd MMM yyyy').format(peminjaman.waktu)}",
                                                       style: GoogleFonts.inter(
                                                         fontSize: 10.0,
                                                         fontWeight:
@@ -520,38 +584,58 @@ class _statusPageState extends State<statusPage> {
                                             ElevatedButton(
                                               onPressed: _canActivateButton(
                                                       peminjaman)
-                                                  ? () {
-                                                      sensorController
-                                                          .turnOnWithTimeout(
-                                                        peminjaman
-                                                            .alamatEsp, // Gunakan alamat ESP dari data peminjaman
-                                                        peminjaman
-                                                            .akhirPeminjamanTime!,
-                                                      );
+                                                  ? () async {
+                                                      if (!activatedButtons
+                                                          .contains(
+                                                              peminjaman.id)) {
+                                                        setState(() {
+                                                          activatedButtons.add(
+                                                              peminjaman.id);
+                                                        });
+                                                        await _saveActivatedButtons(); // Simpan status tombol
+
+                                                        sensorController
+                                                            .turnOnWithTimeout(
+                                                          peminjaman.alamatEsp,
+                                                          peminjaman
+                                                              .akhirPeminjamanTime!,
+                                                          peminjaman.id,
+                                                          () {
+                                                            setState(() {
+                                                              activatedButtons
+                                                                  .remove(
+                                                                      peminjaman
+                                                                          .id);
+                                                            });
+                                                            _saveActivatedButtons();
+                                                          },
+                                                        );
+
+                                                        Get.snackbar(
+                                                          "Peminjaman Dimulai",
+                                                          "Mesin ${peminjaman.namaMesin} telah diaktifkan.",
+                                                          snackPosition:
+                                                              SnackPosition.TOP,
+                                                          duration: Duration(
+                                                              seconds: 3),
+                                                        );
+                                                      } else {
+                                                        Get.snackbar(
+                                                          "Peminjaman Sudah Aktif",
+                                                          "Mesin ${peminjaman.namaMesin} sudah diaktifkan sebelumnya.",
+                                                          snackPosition:
+                                                              SnackPosition.TOP,
+                                                          duration: Duration(
+                                                              seconds: 3),
+                                                        );
+                                                      }
                                                     }
-                                                  : null, // Nonaktifkan tombol jika tidak memenuhi syarat
-
-                                              // _canActivateButton(
-                                              //         peminjaman) // Aktifkan jika syarat terpenuhi
-                                              //     ? () {
-                                              //         sensorController
-                                              //             .turnOnWithTimeout(
-                                              //                 peminjaman
-                                              //                     .alamatEsp); // Menggunakan espAddress
-                                              //       }
-                                              //     : null, // Nonaktifkan tombol jika tidak memenuhi syarat
-                                              // Aktifkan jika syarat terpenuhi () {
-                                              //sensorController.turnOnWithTimeout();
-
+                                                  : null,
                                               style: ElevatedButton.styleFrom(
                                                 minimumSize:
                                                     const Size(90.0, 17.0),
                                                 backgroundColor:
-                                                    // const Color(0xFF00A95B),
-                                                    sensorController
-                                                            .buttonState.value
-                                                        ? Color(0xFF00A95B)
-                                                        : Colors.grey,
+                                                    _getButtonColor(peminjaman),
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -563,7 +647,7 @@ class _statusPageState extends State<statusPage> {
                                                         vertical: 5.0),
                                               ),
                                               child: Text(
-                                                "Mulai Peminjaman",
+                                                _getButtonText(peminjaman),
                                                 style: GoogleFonts.inter(
                                                   fontSize: 12.0,
                                                   fontWeight: FontWeight.w800,
@@ -580,8 +664,6 @@ class _statusPageState extends State<statusPage> {
                               );
                             },
                             childCount: filteredPeminjaman.length,
-                            // childCount: controller.filteredPeminjaman.length,
-                            // childCount: controller.peminjaman.length,
                           ),
                         );
                       }),

@@ -1,499 +1,826 @@
-import 'package:build_app/page/main/custom_main_page.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/bx.dart';
-import 'package:iconify_flutter/icons/mingcute.dart';
-import 'package:intl/intl.dart';
+// // status_page.dart
 
-// Kelas untuk menyimpan detail form yang telah diisi
-class FormSubmission {
-  final String jenisMesin;
-  final DateTime tanggalPengajuan;
-  final TimeOfDay waktuMulai;
-  final TimeOfDay waktuAkhir;
-  final String status;
+// import 'package:build_app/controller/sensor_controller.dart';
+// import 'package:flutter/material.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:get/get.dart';
+// import 'package:http/http.dart';
+// import 'package:intl/intl.dart';
+// import 'package:ming_cute_icons/ming_cute_icons.dart';
+// import 'package:build_app/controller/peminjamanUserAll_controller.dart';
+// import 'package:build_app/models/peminjamanUserAll_model.dart';
+// import 'package:build_app/page/main/custom_main_page.dart';
 
-  FormSubmission({
-    required this.jenisMesin,
-    required this.tanggalPengajuan,
-    required this.waktuMulai,
-    required this.waktuAkhir,
-    required this.status,
-  });
+// // Fungsi helper untuk warna status
+// Color dapatkanWarnaStatus(String status) {
+//   switch (status) {
+//     case 'Disetujui':
+//       return Colors.green.shade100;
+//     case 'Diproses':
+//       return Colors.orange.shade100;
+//     case 'Ditolak':
+//       return Colors.red.shade100;
+//     default:
+//       return Colors.grey.shade300;
+//   }
+// }
 
-  // Menghitung total waktu peminjaman dalam jam
-  double hitungTotalWaktuPeminjaman() {
-    final start = DateTime(
-      tanggalPengajuan.year,
-      tanggalPengajuan.month,
-      tanggalPengajuan.day,
-      waktuMulai.hour,
-      waktuMulai.minute,
-    );
-    final end = DateTime(
-      tanggalPengajuan.year,
-      tanggalPengajuan.month,
-      tanggalPengajuan.day,
-      waktuAkhir.hour,
-      waktuAkhir.minute,
-    );
-    return end.difference(start).inHours.toDouble() +
-        (end.difference(start).inMinutes.remainder(60) / 60);
-  }
-}
+// // Fungsi helper untuk warna teks status
+// Color dapatkanWarnaTeksStatus(String status) {
+//   switch (status) {
+//     case 'Disetujui':
+//       return Colors.green[800]!;
+//     case 'Diproses':
+//       return Colors.orange[800]!;
+//     case 'Ditolak':
+//       return Colors.red[800]!;
+//     default:
+//       return Colors.grey[800]!;
+//   }
+// }
 
-class accountPage extends StatefulWidget {
-  const accountPage({super.key});
+// // Fungsi untuk mendapatkan gambar mesin
+// String getImageForMachine(String namaMesin) {
+//   switch (namaMesin) {
+//     case 'CNC Milling':
+//       return "assets/images/foto_cnc.png";
+//     case '3D Printing':
+//       return 'assets/images/foto_3dp.png';
+//     case 'Laser Cutting':
+//       return 'assets/images/foto_lasercut.png';
+//     default:
+//       return "assets/images/default_machine.png";
+//   }
+// }
 
-  @override
-  State<accountPage> createState() => _accountPageState();
-}
+// // Fungsi agar bagian search bar dan filter bar tidak ikut scroll
+// class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+//   _SliverAppBarDelegate({
+//     required this.minHeight,
+//     required this.maxHeight,
+//     required this.child,
+//   });
 
-// untuk mendapatkan warna berdasarkan status
-Color dapatkanWarnaStatus(String status) {
-  switch (status) {
-    case 'diproses':
-      return Colors.orange.shade100;
-    case 'diterima':
-      return const Color(0XFFBEF4CF);
-    case 'ditolak':
-      return Colors.red.shade100;
+//   final double minHeight;
+//   final double maxHeight;
+//   final Widget child;
 
-    default:
-      return Colors.grey.shade300;
-  }
-}
+//   @override
+//   double get minExtent => minHeight;
+//   @override
+//   double get maxExtent => maxHeight;
 
-// Untuk menentukan warna teks berdasarkan status
-Color dapatkanWarnaTeksStatus(String status) {
-  switch (status) {
-    case 'diproses':
-      return Colors.orange[800]!;
-    case 'diterima':
-      return const Color(0xFF129128);
-    case 'ditolak':
-      return Colors.red[800]!;
-    default:
-      return Colors.grey[800]!;
-  }
-}
+//   @override
+//   Widget build(
+//       BuildContext context, double shrinkOffset, bool overlapsContent) {
+//     return SizedBox.expand(child: child);
+//   }
 
-class _accountPageState extends State<accountPage> {
-  // Contoh data form submission
-  FormSubmission submission = FormSubmission(
-    jenisMesin: "Laser Cutting",
-    tanggalPengajuan: DateTime.now(),
-    waktuMulai: TimeOfDay(hour: 9, minute: 0),
-    waktuAkhir: TimeOfDay(hour: 17, minute: 0),
-    status: "diterima",
-  );
+//   @override
+//   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+//     return maxHeight != oldDelegate.maxHeight ||
+//         minHeight != oldDelegate.minHeight ||
+//         child != oldDelegate.child;
+//   }
+// }
 
-  // Fungsi untuk menghandle penekanan tombol
-  void _handleButtonPress() {
-    final DateTime currentDateTime = DateTime.now();
-    final bool isApproved = submission.status == 'diterima';
-    final bool isWithinTime = currentDateTime.isAfter(DateTime(
-      submission.tanggalPengajuan.year,
-      submission.tanggalPengajuan.month,
-      submission.tanggalPengajuan.day,
-      submission.waktuMulai.hour,
-      submission.waktuAkhir.minute,
-    ));
+// class statusPage extends StatefulWidget {
+//   const statusPage({Key? key}) : super(key: key);
 
-    if (isApproved && isWithinTime) {
-      //Logika untuk memulai peminjaman
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Peminjaman Dimulai"),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } else {
-      // Logika untuk menunjukkan peringatan
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Peminjaman belum dapat dimulai"),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
+//   @override
+//   State<statusPage> createState() => _statusPageState();
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return customScaffoldPage(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 36.0,
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22.0),
-                  topRight: Radius.circular(22.0),
-                ),
-                color: Colors.white,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 24.0,
-                    ),
-                    Center(
-                      child: Text(
-                        'Status Peminjaman',
-                        style: GoogleFonts.inter(
-                            fontSize: 18.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 15.0,
-                    ),
+// class _statusPageState extends State<statusPage> {
+//   final PeminjamanUserAllController controller =
+//       Get.put(PeminjamanUserAllController());
+//   final SensorController sensorController = Get.put(SensorController());
 
-                    // --- header --
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // --- Searchbar ---
-                        Expanded(
-                          flex: 5,
-                          child: searchbar(),
-                        ),
+//   // Tambahkan ini untuk melacak tombol yang sudah ditekan
+//   final Set<String> activatedButtons = {};
 
-                        SizedBox(
-                          width: 8.0,
-                        ),
-                        // --- Filter ---
-                        Expanded(
-                          flex: 3,
-                          child: filterbar(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15.0,
-                    ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Container(
-                          width: constraints.maxWidth,
-                          height: 140.0,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: const Color(0xFFE3E3E3),
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(8.0),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0,
-                              vertical: 8.0,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        const Iconify(
-                                          Mingcute.schedule_line,
-                                          size: 30.0,
-                                        ),
-                                        const SizedBox(
-                                          width: 12.0,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Keperluan Peminjaman",
-                                              style: GoogleFonts.inter(
-                                                fontSize: 10.0,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              DateFormat('dd MMM yyy').format(
-                                                submission.tanggalPengajuan,
-                                              ),
-                                              style: GoogleFonts.inter(
-                                                fontSize: 10.0,
-                                                fontWeight: FontWeight.w500,
-                                                color: const Color(0XFF6B6B6B),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      width: 56.0,
-                                      height: 17.0,
-                                      decoration: BoxDecoration(
-                                        color: dapatkanWarnaStatus(
-                                            submission.status),
-                                        borderRadius:
-                                            BorderRadius.circular(3.0),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          submission.status,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.w600,
-                                            color: dapatkanWarnaTeksStatus(
-                                                submission.status),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 5.0,
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 1.0,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFE3E3E3),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 5.0,
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 35.0,
-                                      height: 35.0,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFCED9DF),
-                                        borderRadius:
-                                            BorderRadius.circular(4.0),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: Image.asset(
-                                          "assets/images/foto_lasercut.png",
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 12.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 3.0,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Peminjaman Mesin",
-                                            style: GoogleFonts.inter(
-                                              fontSize: 14.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            "Laser Cutting",
-                                            style: GoogleFonts.inter(
-                                              fontSize: 14.0,
-                                              fontWeight: FontWeight.w400,
-                                              color: const Color(0xFF5C5C5C),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 4.0,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Total Jam Peminjaman",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 10.0,
-                                            fontWeight: FontWeight.w400,
-                                            color: const Color(0xFF5C5C5C),
-                                          ),
-                                        ),
-                                        Text(
-                                          "10 jam",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF1E1E1E),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                        minimumSize: const Size(90.0, 17.0),
-                                        backgroundColor:
-                                            const Color(0xFF00A95B),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(4.0),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 5.0,
-                                          horizontal: 7.0,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        "Mulai Peminjaman",
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.w800,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   // Fungsi untuk button peminjaman
+//   bool _canActivateButton(Datum peminjaman) {
+//     print(
+//         "Checking if button can be activated for Peminjaman ID: ${peminjaman.id}");
+//     print("Status: ${peminjaman.status}");
+//     print("Tanggal Peminjaman: ${peminjaman.tanggalPeminjaman}");
+//     print("Awal Peminjaman (raw): ${peminjaman.awalPeminjaman}");
+//     print("Akhir Peminjaman (raw): ${peminjaman.akhirPeminjaman}");
 
-// --- Kelas Filter ---
-class filterbar extends StatefulWidget {
-  const filterbar({
-    super.key,
-  });
+//     if (peminjaman.status != Status.Disetujui) {
+//       print("Status bukan Disetujui, button tidak dapat diaktifkan.");
+//       return false;
+//     }
 
-  @override
-  State<filterbar> createState() => _filterbarState();
-}
+//     if (activatedButtons.contains(peminjaman.id)) {
+//       print("Button sudah ditekan sebelumnya, tidak dapat diaktifkan lagi.");
+//       return false;
+//     }
 
-class _filterbarState extends State<filterbar> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: 40.0,
-        // width: 90.0,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(4.0),
-          border: Border.all(
-            color: const Color(0xFFDDDEE3),
-          ),
-        ),
-        child: TextField(
-          readOnly: true,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "Filter",
-            hintStyle: GoogleFonts.inter(
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF999999),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 8.0,
-            ),
-            prefixIcon: const Iconify(
-              Bx.bx_slider_alt,
-              color: Color(0xFF09244B),
-            ),
-          ),
-          onTap: () {},
-        ));
-  }
-}
+//     DateTime? awalPeminjamanDate = peminjaman.awalPeminjamanTime;
+//     DateTime? akhirPeminjamanDate = peminjaman.akhirPeminjamanTime;
 
-// --- Kelas Searchbar ---
-class searchbar extends StatefulWidget {
-  const searchbar({
-    super.key,
-  });
+//     print("Awal Peminjaman (parsed): $awalPeminjamanDate");
+//     print("Akhir Peminjaman (parsed): $akhirPeminjamanDate");
 
-  @override
-  State<searchbar> createState() => _searchbarState();
-}
+//     if (awalPeminjamanDate == null || akhirPeminjamanDate == null) {
+//       print(
+//           "Awal atau Akhir Peminjaman DateTime is null, button cannot be activated.");
+//       return false;
+//     }
 
-class _searchbarState extends State<searchbar> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        // width: 235.0,
-        height: 40.0,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(4.0),
-          ),
-          border: Border.all(
-            color: const Color(0xFFDDDEE3),
-          ),
-        ),
-        child: TextField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "Cari Keperluan",
-            hintStyle: GoogleFonts.inter(
-              //fontSize: 16.0,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF999999),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 8.0,
-            ),
-            prefixIcon: const Iconify(
-              Mingcute.search_line,
+//     final now = DateTime.now();
+//     bool canActivate =
+//         now.isAfter(awalPeminjamanDate) && now.isBefore(akhirPeminjamanDate);
+//     print("Current time: $now");
+//     print("Can Activate: $canActivate");
+//     return canActivate;
+//   }
 
-              color: Color(0xFF09244B),
-              //size: 18.0,
-            ),
-          ),
-          onChanged: (value) {},
-        ));
-  }
-}
+//   // Fungsi filter dialog
+//   void _showFilterDialog() {
+//     final filterOpts = filterOptions();
+//     String localSelectedStatus = controller.selectedStatus.value;
+//     String localSelectedMachineType = controller.selectedMachineType.value;
+
+//     Get.dialog(
+//       StatefulBuilder(
+//         builder: (BuildContext context, StateSetter setState) {
+//           return AlertDialog(
+//             title: Text(
+//               "Filter Peminjaman",
+//               style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+//             ),
+//             content: SingleChildScrollView(
+//               child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     'Status',
+//                     style: GoogleFonts.inter(
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                   DropdownButton<String>(
+//                     value: localSelectedStatus,
+//                     isExpanded: true,
+//                     items: filterOpts.statusOptions.map((String value) {
+//                       return DropdownMenuItem<String>(
+//                         value: value,
+//                         child: Text(value),
+//                       );
+//                     }).toList(),
+//                     onChanged: (String? newValue) {
+//                       if (newValue != null) {
+//                         setState(() {
+//                           localSelectedStatus = newValue;
+//                         });
+//                       }
+//                     },
+//                   ),
+//                   const SizedBox(height: 16.0),
+//                   Text(
+//                     'Jenis Mesin',
+//                     style: GoogleFonts.inter(
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                   DropdownButton<String>(
+//                     value: localSelectedMachineType,
+//                     isExpanded: true,
+//                     items: filterOpts.machineTypes.map((String value) {
+//                       return DropdownMenuItem<String>(
+//                         value: value,
+//                         child: Text(value),
+//                       );
+//                     }).toList(),
+//                     onChanged: (String? newValue) {
+//                       if (newValue != null) {
+//                         setState(() {
+//                           localSelectedMachineType = newValue;
+//                         });
+//                       }
+//                     },
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             actions: [
+//               TextButton(
+//                 onPressed: () => Get.back(),
+//                 child: Text(
+//                   "Batal",
+//                   style: GoogleFonts.inter(),
+//                 ),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   controller.setFilters(
+//                     status: localSelectedStatus,
+//                     machineType: localSelectedMachineType,
+//                   );
+//                   Get.back();
+//                 },
+//                 child: Text(
+//                   "Terapkan",
+//                   style: GoogleFonts.inter(color: Colors.black),
+//                 ),
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: const Color.fromARGB(255, 232, 225, 247),
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(4.0),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+//   Widget _buildFilterSection(String title, String selectedValue,
+//       List<String> options, Function(String) onChanged) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           title,
+//           style: GoogleFonts.inter(
+//             fontWeight: FontWeight.w600,
+//           ),
+//         ),
+//         DropdownButton<String>(
+//           value: selectedValue,
+//           isExpanded: true,
+//           items: options.map((String value) {
+//             return DropdownMenuItem<String>(
+//               value: value,
+//               child: Text(value),
+//             );
+//           }).toList(),
+//           onChanged: (String? newValue) {
+//             if (newValue != null) {
+//               onChanged(newValue);
+//             }
+//           },
+//         ),
+//         const SizedBox(height: 16.0),
+//       ],
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return customScaffoldPage(
+//       body: Column(
+//         children: [
+//           const SizedBox(height: 36.0), // Spasi atas
+//           Expanded(
+//             child: Container(
+//               decoration: const BoxDecoration(
+//                 borderRadius: BorderRadius.only(
+//                   topLeft: Radius.circular(22.0),
+//                   topRight: Radius.circular(22.0),
+//                 ),
+//                 color: Colors.white,
+//               ),
+//               child: ClipRRect(
+//                 borderRadius: const BorderRadius.only(
+//                   topLeft: Radius.circular(22.0),
+//                   topRight: Radius.circular(22.0),
+//                 ),
+//                 child: CustomScrollView(
+//                   slivers: [
+//                     // Header
+//                     SliverPersistentHeader(
+//                       pinned: true,
+//                       delegate: _SliverAppBarDelegate(
+//                         minHeight: 120.0,
+//                         maxHeight: 120.0,
+//                         child: Container(
+//                           color: Colors.white,
+//                           padding:
+//                               const EdgeInsets.fromLTRB(25.0, 20.0, 25.0, 10.0),
+//                           child: Column(
+//                             children: [
+//                               Text(
+//                                 'Status Peminjaman',
+//                                 style: GoogleFonts.inter(
+//                                     fontSize: 18.0,
+//                                     fontWeight: FontWeight.bold),
+//                               ),
+//                               const SizedBox(height: 15.0),
+//                               Row(
+//                                 mainAxisAlignment:
+//                                     MainAxisAlignment.spaceBetween,
+//                                 children: [
+//                                   Expanded(
+//                                     flex: 5,
+//                                     child: searchbar(
+//                                       onSearch: (value) {
+//                                         controller.setSearchQuery(value);
+//                                       },
+//                                     ),
+//                                   ),
+//                                   const SizedBox(width: 8.0),
+//                                   Expanded(
+//                                     flex: 3,
+//                                     child:
+//                                         filterbar(onPressed: _showFilterDialog),
+//                                   ),
+//                                 ],
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     // Daftar Peminjaman
+//                     SliverPadding(
+//                       padding: const EdgeInsets.fromLTRB(25.0, 0.0, 25.0, 10.0),
+//                       sliver:
+//                           //Obx
+//                           GetBuilder<PeminjamanUserAllController>(
+//                               builder: (controller) {
+//                         // if (controller.peminjaman.isEmpty)
+//                         final filteredPeminjaman =
+//                             controller.filteredPeminjaman;
+//                         //if (controller.filteredPeminjaman.isEmpty)
+//                         if (filteredPeminjaman.isEmpty) {
+//                           return SliverFillRemaining(
+//                             child: Center(
+//                               child: Text(
+//                                 'Tidak ada data peminjaman',
+//                                 style: GoogleFonts.inter(
+//                                     fontSize: 16.0,
+//                                     fontWeight: FontWeight.w600),
+//                               ),
+//                             ),
+//                           );
+//                         }
+//                         return SliverList(
+//                           delegate: SliverChildBuilderDelegate(
+//                             (context, index) {
+//                               // final peminjaman = controller.peminjaman[index];
+//                               //final peminjaman = controller.filteredPeminjaman[index];
+//                               final peminjaman = filteredPeminjaman[index];
+//                               return Padding(
+//                                 padding: const EdgeInsets.only(bottom: 10.0),
+//                                 child: Container(
+//                                   width: MediaQuery.of(context).size.width,
+//                                   decoration: BoxDecoration(
+//                                     color: Colors.white,
+//                                     border: Border.all(
+//                                       color: const Color(0xFFE3E3E3),
+//                                     ),
+//                                     borderRadius: BorderRadius.circular(8.0),
+//                                   ),
+//                                   child: Padding(
+//                                     padding: const EdgeInsets.all(10.0),
+//                                     child: Column(
+//                                       crossAxisAlignment:
+//                                           CrossAxisAlignment.start,
+//                                       children: [
+//                                         // Baris atas: Keperluan Peminjaman dan Status
+//                                         Row(
+//                                           mainAxisAlignment:
+//                                               MainAxisAlignment.spaceBetween,
+//                                           children: [
+//                                             Row(
+//                                               children: [
+//                                                 const Icon(
+//                                                     MingCuteIcons
+//                                                         .mgc_schedule_line,
+//                                                     size: 30.0),
+//                                                 const SizedBox(width: 9.0),
+//                                                 Column(
+//                                                   crossAxisAlignment:
+//                                                       CrossAxisAlignment.start,
+//                                                   children: [
+//                                                     Text(
+//                                                       "Keperluan Peminjaman",
+//                                                       style: GoogleFonts.inter(
+//                                                           fontSize: 10.0,
+//                                                           fontWeight:
+//                                                               FontWeight.bold),
+//                                                     ),
+//                                                     Text(
+//                                                       "Diajukan: ${DateFormat('dd MMM yyyy').format(peminjaman.waktu)}",
+//                                                       style: GoogleFonts.inter(
+//                                                         fontSize: 10.0,
+//                                                         fontWeight:
+//                                                             FontWeight.w500,
+//                                                         color: const Color(
+//                                                             0XFF6B6B6B),
+//                                                       ),
+//                                                     ),
+//                                                   ],
+//                                                 ),
+//                                               ],
+//                                             ),
+//                                             Container(
+//                                               width: 58.0,
+//                                               height: 19.0,
+//                                               // padding: const EdgeInsets.symmetric(
+//                                               //     horizontal: 3, vertical: 3),
+//                                               decoration: BoxDecoration(
+//                                                 color: dapatkanWarnaStatus(
+//                                                     peminjaman.status.name),
+//                                                 borderRadius:
+//                                                     BorderRadius.circular(3.0),
+//                                               ),
+//                                               child: Center(
+//                                                 child: Text(
+//                                                   peminjaman.status.name,
+//                                                   style: GoogleFonts.inter(
+//                                                     fontSize: 10.0,
+//                                                     fontWeight: FontWeight.w600,
+//                                                     color:
+//                                                         dapatkanWarnaTeksStatus(
+//                                                             peminjaman
+//                                                                 .status.name),
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           ],
+//                                         ),
+//                                         const Divider(
+//                                           color: Color(0xFFE3E3E3),
+//                                         ),
+//                                         // Informasi Mesin
+//                                         Row(
+//                                           children: [
+//                                             Container(
+//                                               width: 35.0,
+//                                               height: 35.0,
+//                                               decoration: BoxDecoration(
+//                                                 color: const Color(0xFFCED9DF),
+//                                                 borderRadius:
+//                                                     BorderRadius.circular(4.0),
+//                                               ),
+//                                               child: Padding(
+//                                                 padding:
+//                                                     const EdgeInsets.all(3.0),
+//                                                 child: Image.asset(
+//                                                   getImageForMachine(
+//                                                       peminjaman.namaMesin),
+//                                                   fit: BoxFit.contain,
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                             const SizedBox(width: 12.0),
+//                                             Column(
+//                                               crossAxisAlignment:
+//                                                   CrossAxisAlignment.start,
+//                                               children: [
+//                                                 Text(
+//                                                   "Peminjaman Mesin",
+//                                                   style: GoogleFonts.inter(
+//                                                       fontSize: 14.0,
+//                                                       fontWeight:
+//                                                           FontWeight.bold),
+//                                                 ),
+//                                                 Text(
+//                                                   peminjaman.namaMesin,
+//                                                   style: GoogleFonts.inter(
+//                                                     fontSize: 13.0,
+//                                                     color:
+//                                                         const Color(0xFF5C5C5C),
+//                                                   ),
+//                                                 ),
+//                                               ],
+//                                             ),
+//                                           ],
+//                                         ),
+//                                         const SizedBox(height: 8.0),
+//                                         // Baris bawah: Total Jam dan Tombol
+//                                         Row(
+//                                           mainAxisAlignment:
+//                                               MainAxisAlignment.spaceBetween,
+//                                           children: [
+//                                             Column(
+//                                               crossAxisAlignment:
+//                                                   CrossAxisAlignment.start,
+//                                               children: [
+//                                                 Text(
+//                                                   "Total Jam Peminjaman",
+//                                                   style: GoogleFonts.inter(
+//                                                     fontSize: 10.0,
+//                                                     color:
+//                                                         const Color(0xFF5C5C5C),
+//                                                   ),
+//                                                 ),
+//                                                 Text(
+//                                                   "10 jam",
+//                                                   style: GoogleFonts.inter(
+//                                                     fontSize: 12.0,
+//                                                     fontWeight: FontWeight.bold,
+//                                                     color:
+//                                                         const Color(0xFF1E1E1E),
+//                                                   ),
+//                                                 ),
+//                                               ],
+//                                             ),
+//                                             ElevatedButton(
+//                                               onPressed: _canActivateButton(
+//                                                       peminjaman)
+//                                                   ? () {
+//                                                       if (!activatedButtons
+//                                                           .contains(
+//                                                               peminjaman.id)) {
+//                                                         setState(() {
+//                                                           activatedButtons.add(
+//                                                               peminjaman.id);
+//                                                           sensorController
+//                                                               .buttonState
+//                                                               .value = true;
+//                                                         });
+
+//                                                         sensorController
+//                                                             .turnOnWithTimeout(
+//                                                           peminjaman.alamatEsp,
+//                                                           peminjaman
+//                                                               .akhirPeminjamanTime!,
+//                                                         );
+
+//                                                         Get.snackbar(
+//                                                           "Peminjaman Dimulai",
+//                                                           "Mesin ${peminjaman.namaMesin} telah diaktifkan.",
+//                                                           snackPosition:
+//                                                               SnackPosition.TOP,
+//                                                           duration: Duration(
+//                                                               seconds: 3),
+//                                                         );
+//                                                       } else {
+//                                                         Get.snackbar(
+//                                                           "Peminjaman Sudah Aktif",
+//                                                           "Mesin ${peminjaman.namaMesin} sudah diaktifkan sebelumnya.",
+//                                                           snackPosition:
+//                                                               SnackPosition.TOP,
+//                                                           duration: Duration(
+//                                                               seconds: 3),
+//                                                         );
+//                                                       }
+//                                                     }
+//                                                   : null,
+//                                               // _canActivateButton(
+//                                               //         peminjaman)
+//                                               //     ? () {
+//                                               //         setState(() {
+//                                               //           sensorController
+//                                               //               .buttonState
+//                                               //               .value = true;
+//                                               //         });
+
+//                                               //         sensorController
+//                                               //             .turnOnWithTimeout(
+//                                               //           peminjaman.alamatEsp,
+//                                               //           peminjaman
+//                                               //               .akhirPeminjamanTime!,
+//                                               //         );
+
+//                                               //         Get.snackbar(
+//                                               //           "Peminjaman Dimulai",
+//                                               //           "Mesin ${peminjaman.namaMesin} telah diaktifkan.",
+//                                               //           snackPosition:
+//                                               //               SnackPosition.TOP,
+//                                               //           duration: Duration(
+//                                               //               seconds: 3),
+//                                               //         );
+//                                               //       }
+//                                               //     : null,
+//                                               // _canActivateButton(peminjaman)
+//                                               //     ? () {
+//                                               //         // Pastikan tombol menjadi tidak aktif setelah ditekan
+//                                               //         setState(() {
+//                                               //           sensorController
+//                                               //               .buttonState
+//                                               //               .value = true;
+//                                               //         });
+
+//                                               //         // Kirimkan sinyal ke ESP
+//                                               //         sensorController
+//                                               //             .turnOnWithTimeout(
+//                                               //           peminjaman
+//                                               //               .alamatEsp, // Gunakan alamat ESP dari data peminjaman
+//                                               //           peminjaman
+//                                               //               .akhirPeminjamanTime!,
+//                                               //         );
+
+//                                               //         // Tampilkan Snackbar setelah tombol ditekan
+//                                               //         Get.snackbar(
+//                                               //           "Peminjaman Dimulai",
+//                                               //           "Mesin ${peminjaman.namaMesin} telah diaktifkan.",
+//                                               //           snackPosition:
+//                                               //               SnackPosition
+//                                               //                   .BOTTOM,
+//                                               //           duration: Duration(
+//                                               //               seconds: 3),
+//                                               //         );
+//                                               //       }
+//                                               //     : null,
+
+//                                               // _canActivateButton(
+//                                               //         peminjaman)
+//                                               //     ? () {
+//                                               //         sensorController
+//                                               //             .turnOnWithTimeout(
+//                                               //           peminjaman
+//                                               //               .alamatEsp, // Gunakan alamat ESP dari data peminjaman
+//                                               //           peminjaman
+//                                               //               .akhirPeminjamanTime!,
+//                                               //         );
+//                                               //       }
+//                                               //     : null, // Nonaktifkan tombol jika tidak memenuhi syarat
+
+//                                               // _canActivateButton(
+//                                               //         peminjaman) // Aktifkan jika syarat terpenuhi
+//                                               //     ? () {
+//                                               //         sensorController
+//                                               //             .turnOnWithTimeout(
+//                                               //                 peminjaman
+//                                               //                     .alamatEsp); // Menggunakan espAddress
+//                                               //       }
+//                                               //     : null, // Nonaktifkan tombol jika tidak memenuhi syarat
+//                                               // Aktifkan jika syarat terpenuhi () {
+//                                               //sensorController.turnOnWithTimeout();
+
+//                                               style: ElevatedButton.styleFrom(
+//                                                 minimumSize:
+//                                                     const Size(90.0, 17.0),
+//                                                 backgroundColor:
+//                                                     _canActivateButton(
+//                                                             peminjaman)
+//                                                         ? (activatedButtons
+//                                                                 .contains(
+//                                                                     peminjaman
+//                                                                         .id)
+//                                                             ? Colors.grey
+//                                                             : const Color(
+//                                                                 0xFF00A95B))
+//                                                         : Colors.grey,
+//                                                 // const Color(0xFF00A95B),
+
+//                                                 // sensorController
+//                                                 //         .buttonState.value
+//                                                 //     ? Color(0xFF00A95B)
+//                                                 //     : Colors.grey,
+//                                                 shape: RoundedRectangleBorder(
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(
+//                                                           4.0),
+//                                                 ),
+//                                                 padding:
+//                                                     const EdgeInsets.symmetric(
+//                                                         horizontal: 7.0,
+//                                                         vertical: 5.0),
+//                                               ),
+//                                               child: Text(
+//                                                 activatedButtons
+//                                                         .contains(peminjaman.id)
+//                                                     ? "Peminjaman Aktif"
+//                                                     : "Mulai Peminjaman",
+//                                                 style: GoogleFonts.inter(
+//                                                   fontSize: 12.0,
+//                                                   fontWeight: FontWeight.w800,
+//                                                   color: Colors.white,
+//                                                 ),
+//                                               ),
+//                                             )
+//                                           ],
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ),
+//                                 ),
+//                               );
+//                             },
+//                             childCount: filteredPeminjaman.length,
+//                             // childCount: controller.filteredPeminjaman.length,
+//                             // childCount: controller.peminjaman.length,
+//                           ),
+//                         );
+//                       }),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class searchbar extends StatelessWidget {
+//   final Function(String) onSearch;
+
+//   const searchbar({Key? key, required this.onSearch}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       height: 40.0,
+//       decoration: BoxDecoration(
+//         color: Colors.transparent,
+//         borderRadius: BorderRadius.circular(4.0),
+//         border: Border.all(color: const Color(0xFFDDDEE3)),
+//       ),
+//       child: TextField(
+//         decoration: InputDecoration(
+//           border: InputBorder.none,
+//           hintText: "Cari Keperluan",
+//           hintStyle: GoogleFonts.inter(
+//             fontWeight: FontWeight.w500,
+//             color: const Color(0xFF999999),
+//           ),
+//           contentPadding:
+//               const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+//           prefixIcon: const Icon(
+//             MingCuteIcons.mgc_search_2_line,
+//             color: Color(0xFF09244B),
+//           ),
+//         ),
+//         onChanged: onSearch,
+//       ),
+//     );
+//   }
+// }
+
+// class filterbar extends StatelessWidget {
+//   final Function() onPressed;
+
+//   const filterbar({Key? key, required this.onPressed}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       height: 40.0,
+//       decoration: BoxDecoration(
+//         color: Colors.transparent,
+//         borderRadius: BorderRadius.circular(4.0),
+//         border: Border.all(color: const Color(0xFFDDDEE3)),
+//       ),
+//       child: InkWell(
+//         onTap: onPressed,
+//         child: Padding(
+//           padding: EdgeInsets.symmetric(
+//             horizontal: 12.0,
+//           ),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               const Icon(
+//                 MingCuteIcons.mgc_filter_line,
+//                 color: Color(0xFF09244B),
+//               ),
+//               const SizedBox(
+//                 width: 8.0,
+//               ),
+//               Text(
+//                 "Filter",
+//                 style: GoogleFonts.inter(
+//                   fontWeight: FontWeight.w500,
+//                   color: const Color(0xFF09244B),
+//                 ),
+//               )
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class filterOptions {
+//   final List<String> statusOptions = [
+//     'Semua',
+//     'Diproses',
+//     'Disetujui',
+//     'Ditolak',
+//     'Selesai'
+//   ];
+//   final List<String> machineTypes = [
+//     'Semua',
+//     'CNC Milling',
+//     '3D Printing',
+//     'Laser Cutting'
+//   ];
+//   final List<String> timeRanges = [
+//     'Semua',
+//     'Minggu Ini',
+//     'Bulan Ini',
+//     '3 Bulan Terakhir'
+//   ];
+//   final List<String> durationRanges = [
+//     'Semua',
+//     '< 5 jam',
+//     '5 - 10 jam',
+//     '> 10 jam'
+//   ];
+// }

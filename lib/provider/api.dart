@@ -187,4 +187,26 @@ class ApiController {
       throw e; // Jika ada error, lempar errornya.
     }
   }
+
+  // Fungsi untuk memperpanjang waktu peminjaman
+  Future<http.Response> extendRentalTime(String peminjamanId, DateTime newEndTime) async {
+    final SharedPreferences shared = await SharedPreferences.getInstance();
+    String? getToken = shared.getString("accessToken");
+
+    try {
+      Uri url = Uri.parse('$URL_API/user/peminjaman/$peminjamanId/extend');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $getToken',
+      };
+      final body = jsonEncode({"newEndTime": newEndTime.toIso8601String()});
+
+      final response = await http.put(url, headers: headers, body: body);
+      return response;
+    } catch (e) {
+      print('Error during extendRentalTime: $e');
+      throw e;
+    }
+  }
+
 }

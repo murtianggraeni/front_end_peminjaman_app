@@ -73,7 +73,8 @@ class Datum {
         awalPeminjaman: json["awal_peminjaman"] ?? "",
         akhirPeminjaman: json["akhir_peminjaman"] ?? "",
         status: statusValues.map[json["status"]]!,
-        waktu: DateTime.parse(json["waktu"]),
+        waktu:
+            DateTime.parse(json["waktu"]).toLocal(), // Konversi ke waktu lokal
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,6 +88,11 @@ class Datum {
         "status": statusValues.reverse[status],
         "waktu": waktu,
       };
+
+  // Tambahkan getter untuk mendapatkan tanggal yang diformat
+  String get formattedWaktu {
+    return DateFormat('dd MMM yyyy').format(waktu);
+  }
 
   // Getter Methode 2
   DateTime? get tanggalPeminjamanDate {
@@ -102,8 +108,27 @@ class Datum {
     try {
       final date = tanggalPeminjamanDate;
       if (date == null) return null;
-      final time = DateFormat("HH:mm").parse(awalPeminjaman);
-      return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+
+      // Parse time using a custom format
+      final timeParts = awalPeminjaman.toLowerCase().split(':');
+      int hours = int.parse(timeParts[0]);
+      int minutes = int.parse(timeParts[1]);
+      int seconds = int.parse(timeParts[2].split(' ')[0]);
+
+      if (awalPeminjaman.toLowerCase().contains('pm') && hours != 12) {
+        hours += 12;
+      } else if (awalPeminjaman.toLowerCase().contains('am') && hours == 12) {
+        hours = 0;
+      }
+
+      return DateTime(
+        date.year,
+        date.month,
+        date.day,
+        hours,
+        minutes,
+        seconds,
+      );
     } catch (e) {
       print("Error parsing awalPeminjaman: $e");
       return null;
@@ -114,8 +139,27 @@ class Datum {
     try {
       final date = tanggalPeminjamanDate;
       if (date == null) return null;
-      final time = DateFormat("HH:mm").parse(akhirPeminjaman);
-      return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+
+      // Parse time using a custom format
+      final timeParts = akhirPeminjaman.toLowerCase().split(':');
+      int hours = int.parse(timeParts[0]);
+      int minutes = int.parse(timeParts[1]);
+      int seconds = int.parse(timeParts[2].split(' ')[0]);
+
+      if (akhirPeminjaman.toLowerCase().contains('pm') && hours != 12) {
+        hours += 12;
+      } else if (akhirPeminjaman.toLowerCase().contains('am') && hours == 12) {
+        hours = 0;
+      }
+
+      return DateTime(
+        date.year,
+        date.month,
+        date.day,
+        hours,
+        minutes,
+        seconds,
+      );
     } catch (e) {
       print("Error parsing akhirPeminjaman: $e");
       return null;
@@ -289,4 +333,54 @@ class EnumValues<T> {
 //         "status": statusValues.reverse[status],
 //         "espAddress": espAddress, // Pastikan espAddress ada di sini
 //       };
+// }
+
+// DateTime? get tanggalPeminjamanDate {
+//   try {
+//     return DateFormat("EEE, dd MMM yyyy").parse(tanggalPeminjaman);
+//   } catch (e) {
+//     print("Error parsing tanggalPeminjaman: $e");
+//     return null;
+//   }
+// }
+
+// DateTime? get awalPeminjamanTime {
+//   try {
+//     final date = tanggalPeminjamanDate;
+//     if (date == null) return null;
+//     final time = DateFormat("HH:mm").parse(awalPeminjaman);
+//     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+//   } catch (e) {
+//     print("Error parsing awalPeminjaman: $e");
+//     return null;
+//   }
+// }
+
+// DateTime? get akhirPeminjamanTime {
+//   try {
+//     final date = tanggalPeminjamanDate;
+//     if (date == null) return null;
+//     final time = DateFormat("HH:mm").parse(akhirPeminjaman);
+//     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+//   } catch (e) {
+//     print("Error parsing akhirPeminjaman: $e");
+//     return null;
+//   }
+// }
+
+// String get formattedTanggalPeminjaman {
+//   final date = tanggalPeminjamanDate;
+//   return date != null
+//       ? DateFormat('EEE, dd MMM yyyy').format(date)
+//       : tanggalPeminjaman;
+// }
+
+// String get formattedAwalPeminjaman {
+//   final time = awalPeminjamanTime;
+//   return time != null ? DateFormat('hh:mm a').format(time) : awalPeminjaman;
+// }
+
+// String get formattedAkhirPeminjaman {
+//   final time = akhirPeminjamanTime;
+//   return time != null ? DateFormat('hh:mm a').format(time) : akhirPeminjaman;
 // }
