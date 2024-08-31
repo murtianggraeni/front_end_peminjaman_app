@@ -391,6 +391,8 @@
 //   }
 // }
 
+// SensorController.dart
+
 import 'package:build_app/provider/api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -408,7 +410,7 @@ class SensorController extends GetxController {
   Timer? _timer;
   Timer? _notificationTimer;
   Timer? _countdownTimer;
-  int countdownValue = 20; // Durasi 20 detik untuk dialog perpanjangan
+  var countdownValue = 20.obs; // Durasi 20 detik untuk dialog perpanjangan
 
   // Method ini menerima alamatEsp sebagai parameter
   Future<void> toggleButton(String alamatEsp,
@@ -444,54 +446,51 @@ class SensorController extends GetxController {
   }
 
   // Fungsi untuk memperpanjang waktu peminjaman
-  Future<void> extendRentalTime(
-      String peminjamanId, DateTime newEndTime, String alamatEsp) async {
-    try {
-      var response =
-          await _apiController.extendRentalTime(peminjamanId, newEndTime);
+Future<void> extendRentalTime(String peminjamanId, DateTime newEndTime, String alamatEsp) async {
+  try {
+    var response = await _apiController.extendRentalTime(peminjamanId, newEndTime);
+    
+    if (response.statusCode == 200) {
+      print("Rental time extended successfully.");
+      toggleButton(alamatEsp, newState: true, newEndTime: newEndTime);
 
-      if (response.statusCode == 200) {
-        print("Rental time extended successfully.");
-        toggleButton(alamatEsp, newEndTime: newEndTime);
+      // Reset timer dengan waktu baru
+      _timer?.cancel();
+      _notificationTimer?.cancel();
+      
+      final remainingTime = newEndTime.difference(DateTime.now());
+      _timer = Timer(remainingTime, () {
+        buttonState(false);
+        toggleButton(alamatEsp, newState: false);
+      });
 
-        // Reset timer dengan waktu baru
-        _timer?.cancel();
-        _timer = Timer(newEndTime.difference(DateTime.now()), () {
-          print(
-              "Extended peminjaman has ended for $alamatEsp. Turning off button.");
-          buttonState(false);
-          toggleButton(alamatEsp);
+      // Set notifikasi baru 10 menit sebelum waktu berakhir yang baru
+      if (remainingTime > Duration(minutes: 10)) {
+        _notificationTimer = Timer(remainingTime - Duration(minutes: 10), () {
+          showNotification("Peminjaman akan habis dalam 10 menit", "Pastikan mesin berada dalam posisi home.");
+          _showExtendRentalDialog(alamatEsp, newEndTime, peminjamanId);
         });
-
-        // Tambahkan notifikasi sukses
-        Get.snackbar(
-          "Perpanjangan Berhasil",
-          "Waktu peminjaman berhasil diperpanjang hingga ${DateFormat('HH:mm').format(newEndTime)}",
-          snackPosition: SnackPosition.TOP,
-          duration: Duration(seconds: 3),
-        );
-      } else {
-        print(
-            "Failed to extend rental time. Status code: ${response.statusCode}");
-        // Tambahkan notifikasi gagal
-        Get.snackbar(
-          "Perpanjangan Gagal",
-          "Gagal memperpanjang waktu peminjaman. Silakan coba lagi.",
-          snackPosition: SnackPosition.TOP,
-          duration: Duration(seconds: 3),
-        );
       }
-    } catch (e) {
-      print("Error occurred while extending rental time: $e");
-      // Tambahkan notifikasi error
+
       Get.snackbar(
-        "Error",
-        "Terjadi kesalahan saat memperpanjang waktu peminjaman.",
+        "Perpanjangan Berhasil",
+        "Waktu peminjaman berhasil diperpanjang hingga ${DateFormat('HH:mm').format(newEndTime)}",
         snackPosition: SnackPosition.TOP,
         duration: Duration(seconds: 3),
       );
+    } else {
+      throw Exception('Failed to extend rental time');
     }
+  } catch (e) {
+    print("Error occurred while extending rental time: $e");
+    Get.snackbar(
+      "Error",
+      "Terjadi kesalahan saat memperpanjang waktu peminjaman.",
+      snackPosition: SnackPosition.TOP,
+      duration: Duration(seconds: 3),
+    );
   }
+}
 
   void turnOnWithTimeout(String alamatEsp, DateTime akhirPeminjaman,
       String peminjamanId, Function onTimeout) {
@@ -530,8 +529,8 @@ class SensorController extends GetxController {
 
   void _showExtendRentalDialog(
       String alamatEsp, DateTime currentEndTime, String peminjamanId) {
-    countdownValue = 20;
-    _startCountdownTimer(alamatEsp, currentEndTime);
+    countdownValue.value = 20;
+    _startCountdownTimer();
 
     Get.dialog(
       Obx(() => Stack(
@@ -546,21 +545,36 @@ class SensorController extends GetxController {
                         "Waktu peminjaman akan habis dalam 10 menit. Apakah Anda ingin memperpanjang peminjaman?"),
                     SizedBox(height: 10),
                     Text(
-                      "Waktu tersisa: $countdownValue detik",
+                      "Waktu tersisa: ${countdownValue.value} detik",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        _cancelCountdownTimer();
-                        Get.back();
-                        DateTime newEndTime =
-                            currentEndTime.add(Duration(minutes: 30));
-                        print(
-                            "Extending rental time by 30 minutes. New end time: $newEndTime");
-                        extendRentalTime(peminjamanId, newEndTime, alamatEsp);
-                      },
-                      child: Text("Perpanjang 30 menit"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            _cancelCountdownTimer();
+                            Get.back();
+                            DateTime newEndTime =
+                                currentEndTime.add(Duration(minutes: 15));
+                            extendRentalTime(
+                                peminjamanId, newEndTime, alamatEsp);
+                          },
+                          child: Text("15 menit"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _cancelCountdownTimer();
+                            Get.back();
+                            DateTime newEndTime =
+                                currentEndTime.add(Duration(minutes: 30));
+                            extendRentalTime(
+                                peminjamanId, newEndTime, alamatEsp);
+                          },
+                          child: Text("30 menit"),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -576,7 +590,7 @@ class SensorController extends GetxController {
               ),
               Positioned(
                 child: CircularProgressIndicator(
-                  value: countdownValue / 20,
+                  value: countdownValue.value / 20,
                   strokeWidth: 6,
                 ),
               ),
@@ -586,14 +600,13 @@ class SensorController extends GetxController {
     ).then((_) => _cancelCountdownTimer());
   }
 
-  void _startCountdownTimer(String alamatEsp, DateTime currentEndTime) {
+  void _startCountdownTimer() {
     _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (countdownValue > 0) {
-        countdownValue--;
-        update(); // Perbarui UI dengan waktu yang tersisa
+      if (countdownValue.value > 0) {
+        countdownValue.value--;
       } else {
         _cancelCountdownTimer();
-        Get.back(); // Tutup dialog ketika waktu habis
+        Get.back();
       }
     });
   }

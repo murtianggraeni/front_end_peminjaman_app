@@ -3,15 +3,15 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:build_app/provider/api.dart';
+import 'package:build_app/models/getPeminjamanAllAdmin_model.dart';
+import 'package:build_app/enums/machine_type.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../models/getPeminjamanAllAdmin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../enums/machine_type.dart';
 
 // Kelas controller untuk mengelola peminjaman user oleh admin
 class PeminjamanUserAllbyAdminController extends GetxController {
@@ -54,6 +54,11 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     'Ditolak',
   ];
 
+  void onMachineSelected(MachineType machineType) {
+    currentMachineType.value = machineType;
+    fetchData();
+  }
+  
   // Metode yang dipanggil saat controller diinisialisasi
   @override
   void onInit() {
@@ -64,10 +69,6 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     fetchData();
   }
 
-  void onMachineSelected(MachineType machineType) {
-    currentMachineType.value = machineType;
-    fetchData();
-  }
 
   // Metode untuk mengambil data peminjaman dari API
   Future<void> fetchData() async {

@@ -1,4 +1,8 @@
+// library backend
+import 'package:build_app/models/getPeminjamanAllAdmin_model.dart';
 import 'package:build_app/controller/peminjamanUserAllbyAdmin_controller.dart';
+import 'package:build_app/enums/machine_type.dart';
+// library frontend
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,8 +11,6 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bx.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
-import '../../../../../models/getPeminjamanAllAdmin_model.dart';
-import '../../../../../enums/machine_type.dart';
 
 class detailPagePrinting extends StatelessWidget {
   final PeminjamanUserAllbyAdminController _controller = Get.put(

@@ -291,7 +291,7 @@ class mainPageAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 10.0),
                     // Tampilan Awal Form Peminjaman
-                    const SingleChildScrollView(
+                    SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [

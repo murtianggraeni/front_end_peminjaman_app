@@ -1,6 +1,9 @@
 // --- Methode 2: detailMonitoringCnc.dart --
+// library backend
 import 'package:build_app/controller/peminjamanUserAllbyAdmin_controller.dart';
+import 'package:build_app/models/getPeminjamanAllAdmin_model.dart';
 import 'package:build_app/enums/machine_type.dart';
+// library frontend
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +12,7 @@ import 'package:iconify_flutter/icons/bx.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 
-import '../../../../../models/getPeminjamanAllAdmin_model.dart';
+
 
 class detailPageCnc extends StatelessWidget {
   final PeminjamanUserAllbyAdminController _controller =

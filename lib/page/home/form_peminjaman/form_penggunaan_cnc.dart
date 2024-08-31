@@ -137,7 +137,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
         minHour: 1,
         maxHour: 23,
         minMinute: 0,
-        minuteInterval: TimePickerInterval.THIRTY,
+        // minuteInterval: TimePickerInterval.THIRTY,
         sunAsset: Image.asset("assets/images/sun.png"),
         moonAsset: Image.asset("assets/images/moon.png"),
         barrierDismissible: false,

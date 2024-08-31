@@ -94,6 +94,28 @@ class ApiController {
     }
   }
 
+  // Fungsi untuk memperpanjang waktu peminjaman
+  Future<http.Response> extendRentalTime(
+      String peminjamanId, DateTime newEndTime) async {
+    final SharedPreferences shared = await SharedPreferences.getInstance();
+    String? getToken = shared.getString("accessToken");
+
+    try {
+      Uri url = Uri.parse('$URL_API/user/peminjaman/$peminjamanId/extend');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $getToken',
+      };
+      final body = jsonEncode({"newEndTime": newEndTime.toIso8601String()});
+
+      final response = await http.put(url, headers: headers, body: body);
+      return response;
+    } catch (e) {
+      print('Error during extendRentalTime: $e');
+      throw e;
+    }
+  }
+
   Future<http.Response> PeminjamanUserAllforAdmin(type) async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
     String? getToken = shared.getString("accessToken");
@@ -188,25 +210,27 @@ class ApiController {
     }
   }
 
-  // Fungsi untuk memperpanjang waktu peminjaman
-  Future<http.Response> extendRentalTime(String peminjamanId, DateTime newEndTime) async {
+  Future<http.Response> getMonitoringData(String type) async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
     String? getToken = shared.getString("accessToken");
-
     try {
-      Uri url = Uri.parse('$URL_API/user/peminjaman/$peminjamanId/extend');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $getToken',
-      };
-      final body = jsonEncode({"newEndTime": newEndTime.toIso8601String()});
-
-      final response = await http.put(url, headers: headers, body: body);
-      return response;
+      Uri url = Uri.parse('$URL_API/admin/$type/monitoring');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $getToken',
+        },
+      );
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception(
+            'Failed to fetch monitoring data. Status code: ${response.statusCode}');
+      }
     } catch (e) {
-      print('Error during extendRentalTime: $e');
+      print('Error during fetchMonitoringData: $e');
       throw e;
     }
   }
-
 }

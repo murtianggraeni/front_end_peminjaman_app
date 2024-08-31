@@ -88,15 +88,15 @@ class AppPage {
     ),
     GetPage(
       name: RouteName.monitoring_penggunaan_cnc,
-      page: () => const monitoringPenggunaanCnc(),
+      page: () => monitoringPenggunaanCnc(),
     ),
     GetPage(
       name: RouteName.monitoring_penggunaan_lasercut,
-      page: () => const monitoringPenggunaanLasercut(),
+      page: () => monitoringPenggunaanLasercut(),
     ),
     GetPage(
       name: RouteName.monitoring_penggunaan_printing,
-      page: () => const monitoringPenggunaanPrinting(),
+      page: () => monitoringPenggunaanPrinting(),
     ),
   ];
 }

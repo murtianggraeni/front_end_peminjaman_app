@@ -608,6 +608,7 @@ class _statusPageState extends State<statusPage> {
                                                                           .id);
                                                             });
                                                             _saveActivatedButtons();
+                                                            controller.update();
                                                           },
                                                         );
 
