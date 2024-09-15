@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:build_app/controller/peminjaman_controller.dart';
 import 'package:build_app/page/home/form_peminjaman/widget/custom_form_page.dart';
 import 'package:build_app/page/widget/custom_buttom_nav.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -148,27 +147,27 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
 
   /* 2. FUNGSI UNTUK MEMILIH DESAIN BENDA */
   // Fungsi untuk memilih file dari PC
-  List<String> pickedFileNames = [];
+  // List<String> pickedFileNames = [];
 
-  Future<void> _pickFile() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
+  // Future<void> _pickFile() async {
+  //   FilePickerResult? result =
+  //       await FilePicker.platform.pickFiles(allowMultiple: true);
 
-    if (result != null) {
-      setState(
-        () {
-          if (kIsWeb) {
-            pickedFileNames = result.files.map((file) => file.name).toList();
-          } else {
-            pickedFileNames =
-                result.paths.map((path) => path!.split('/').last).toList();
-          }
-          // Menggabungkan nama file menjadi satu string
-          _fileText.text = pickedFileNames.join(", ");
-        },
-      );
-    }
-  }
+  //   if (result != null) {
+  //     setState(
+  //       () {
+  //         if (kIsWeb) {
+  //           pickedFileNames = result.files.map((file) => file.name).toList();
+  //         } else {
+  //           pickedFileNames =
+  //               result.paths.map((path) => path!.split('/').last).toList();
+  //         }
+  //         // Menggabungkan nama file menjadi satu string
+  //         _fileText.text = pickedFileNames.join(", ");
+  //       },
+  //     );
+  //   }
+  // }
 
   // Fungsi untuk membuka file
   // void openFile(File file) {
@@ -179,7 +178,7 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
   // final TextEditingController _date = TextEditingController();
   // final TextEditingController _startTime = TextEditingController();
   // final TextEditingController _endTime = TextEditingController();
-  final TextEditingController _fileText = TextEditingController();
+  // final TextEditingController _fileText = TextEditingController();
 
   // Fungsi untuk mereset form
   void _resetForm() {
@@ -754,7 +753,7 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
                 height: 55.0,
               ),
               Text(
-                "Form Peminjaman CNC Milling",
+                "Form Peminjaman Laser Cutting",
                 style: GoogleFonts.inter(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -1074,22 +1073,25 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
                     const SizedBox(
                       height: 8.0,
                     ),
-                    customFormPeminjaman(
-                      controller: _fileText,
-                      judul: "Desain Benda",
-                      returnText: "Silahkan mengisi masukan desain benda",
-                      hintText: "Tambahkan file",
-                      icon: IconButton(
-                        onPressed: () {
-                          _pickFile();
-                        },
-                        icon: const Icon(
-                          MingCuteIcons.mgc_upload_2_line,
+                    Obx(
+                      () => customFormPeminjaman(
+                        controller: TextEditingController(
+                            text: _peminjamanC.fileNames.value),
+                        judul: "Desain Benda",
+                        returnText: "Silahkan mengisi masukan desain benda",
+                        hintText: "Tambahkan file",
+                        icon: IconButton(
+                          onPressed: () {
+                            _peminjamanC.pickFile();
+                          },
+                          icon: const Icon(
+                            MingCuteIcons.mgc_upload_2_line,
+                          ),
+                          color: const Color(0xFFB9B9B9),
                         ),
-                        color: const Color(0xFFB9B9B9),
+                        keyboardType: TextInputType.datetime,
+                        readOnly: true,
                       ),
-                      keyboardType: TextInputType.datetime,
-                      readOnly: true,
                     ),
                     const SizedBox(
                       height: 11.0,

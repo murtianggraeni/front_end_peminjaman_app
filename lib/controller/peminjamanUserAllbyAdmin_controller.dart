@@ -2,9 +2,13 @@
 
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui';
+import 'dart:html' as html; // Untuk Flutter web
 import 'package:build_app/provider/api.dart';
 import 'package:build_app/models/getPeminjamanAllAdmin_model.dart';
 import 'package:build_app/enums/machine_type.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +16,9 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Kelas controller untuk mengelola peminjaman user oleh admin
 class PeminjamanUserAllbyAdminController extends GetxController {
@@ -58,7 +65,7 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     currentMachineType.value = machineType;
     fetchData();
   }
-  
+
   // Metode yang dipanggil saat controller diinisialisasi
   @override
   void onInit() {
@@ -68,7 +75,6 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     print('Fetching data for: ${currentMachineType.value.toApiString()}');
     fetchData();
   }
-
 
   // Metode untuk mengambil data peminjaman dari API
   Future<void> fetchData() async {
@@ -90,7 +96,8 @@ class PeminjamanUserAllbyAdminController extends GetxController {
                 .map<Datum>((data) => Datum.fromJson(data))
                 .toList(),
           );
-          filteredPeminjaman.assignAll(peminjaman); // Inisialisasi filteredPeminjaman
+          filteredPeminjaman
+              .assignAll(peminjaman); // Inisialisasi filteredPeminjaman
           update();
         } else {
           print('Invalid data format: ${responseData.runtimeType}');
@@ -178,9 +185,7 @@ class PeminjamanUserAllbyAdminController extends GetxController {
       animType: AnimType.bottomSlide,
       title: 'Konfirmasi Penghapusan',
       desc: 'Apakah Anda yakin ingin menghapus peminjaman ini?',
-      btnCancelOnPress: () {
-        Get.back();
-      },
+      btnCancelOnPress: () {},
       btnOkOnPress: () {
         deletePeminjaman(id);
       },
@@ -426,21 +431,77 @@ class PeminjamanUserAllbyAdminController extends GetxController {
           title: Text("Detail Peminjaman - ${detailData.namaPemohon}"),
           content: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Email: ${detailData.email ?? 'Tidak tersedia'}"),
-                Text(
-                    "Tanggal Peminjaman: ${_formatDate(detailData.tanggalPeminjaman)}"),
-                Text(
-                    "Waktu Awal: ${detailData.awalPeminjaman ?? 'Tidak tersedia'}"),
-                Text(
-                    "Waktu Akhir: ${detailData.akhirPeminjaman ?? 'Tidak tersedia'}"),
-                Text("Jumlah/Satuan: ${detailData.jumlah ?? 'Tidak tersedia'}"),
-                Text(
-                    "Keperluan: ${detailData.detailKeperluan ?? 'Tidak tersedia'}"),
-                Text(
-                    "Desain Benda: ${detailData.desainBenda ?? 'Tidak tersedia'}"),
-                Text("Status: ${detailData.status}"),
+                ListTile(
+                  title: const Text("Email"),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitle: Text(detailData.email ?? 'Tidak tersedia'),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Tanggal Peminjaman"),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitle:
+                      Text(detailData.tanggalPeminjaman ?? 'Tidak tersedia'),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Waktu Awal"),
+                  subtitle: Text(_formatTime(
+                      detailData.awalPeminjaman ?? 'Tidak tersedia')),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Waktu Akhir"),
+                  subtitle: Text(_formatTime(
+                      detailData.akhirPeminjaman ?? 'Tidak tersedia')),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Jumlah/Satuan"),
+                  subtitle: Text(detailData.jumlah ?? 'Tidak tersedia'),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Keperluan"),
+                  subtitle:
+                      Text(detailData.detailKeperluan ?? 'Tidak tersedia'),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: const Text("Desain Benda"),
+                  subtitle: InkWell(
+                    onTap: () => _launchURL(detailData.desainBenda),
+                    child: Text(
+                      detailData.desainBenda ?? 'Tidak tersedia',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
+                ListTile(
+                  title: Text("Status"),
+                  subtitle: Text(detailData.status),
+                  titleTextStyle:
+                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: GoogleFonts.inter(),
+                ),
               ],
             ),
           ),
@@ -455,16 +516,197 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     );
   }
 
+  Future<void> _launchURL(String? urlString) async {
+    if (urlString != null && urlString.isNotEmpty) {
+      try {
+        final Uri url = Uri.parse(urlString);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          _showURLDialog(urlString);
+        }
+      } catch (e) {
+        print('Error launching URL: $e');
+        _showURLDialog(urlString);
+      }
+    }
+  }
+
+  void _showURLDialog(String url) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Tidak dapat membuka URL'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+                'URL tidak dapat dibuka secara otomatis. Silakan pilih opsi berikut:'),
+            SizedBox(height: 10),
+            SelectableText(url),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Salin URL'),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: url));
+              Get.snackbar('Berhasil', 'URL telah disalin ke clipboard');
+            },
+          ),
+          TextButton(
+            child: const Text('Buka di Browser'),
+            onPressed: () async {
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                Get.snackbar('Error', 'Tidak dapat membuka browser');
+              }
+            },
+          ),
+          TextButton(
+            child: Text('Tutup'),
+            onPressed: () => Get.back(),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _formatDate(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) return 'Tidak tersedia';
 
     try {
-      // Mencoba untuk mengubah String menjadi DateTime
-      DateTime date = DateFormat("EEE, dd MMM yyyy").parse(dateStr);
+      // Adjust the format string to match the incoming date string
+      DateFormat inputFormat = DateFormat("EEE, d MMM yyyy");
+
+      // Debugging: Print the date string before parsing
+      print('Attempting to parse date: $dateStr');
+
+      DateTime date = inputFormat.parse(dateStr);
+
+      // Debugging: Print the parsed date to verify
+      print('Parsed date: $date');
+
+      // Format the date to the desired output format
       return DateFormat('dd MMM yyyy').format(date);
     } catch (e) {
-      // Jika tidak berhasil di-parse, kembalikan 'Tidak tersedia'
-      return 'Tidak tersedia';
+      // Debugging: Return the error message to help understand the issue
+      print('Error parsing date: $e');
+      return 'Unparseable: $dateStr (Error: $e)';
+    }
+  }
+
+  String _formatTime(String? timeStr) {
+    if (timeStr == null || timeStr.isEmpty) return 'Tidak tersedia';
+    try {
+      DateFormat inputFormat = DateFormat("HH:mm:ss");
+      DateTime time = inputFormat.parse(timeStr);
+      return DateFormat('hh:mm:ss a').format(time);
+    } catch (e) {
+      print('Error parsing time: $e');
+      return 'Unparseable: $timeStr';
+    }
+  }
+
+  Future<void> exportToExcel() async {
+    var excel = Excel.createExcel(); // Create Excel object
+    Sheet sheetObject = excel['Sheet1']; // Access first sheet
+
+    // Get machine name for the filename
+    String machineName = currentMachineType.value.toApiString().capitalize!;
+
+    // Add headers
+    List<String> headers = [
+      'Nama Pemohon',
+      'Email',
+      'Tanggal Peminjaman',
+      'Waktu Awal',
+      'Waktu Akhir',
+      'Jumlah',
+      'Program Studi',
+      'Kategori',
+      'Detail Keperluan',
+      'Desain Benda',
+      'Status'
+    ];
+
+    for (var i = 0; i < headers.length; i++) {
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
+          .value = TextCellValue(headers[i]);
+    }
+
+    // Add data
+    for (var i = 0; i < filteredPeminjaman.length; i++) {
+      var peminjaman = filteredPeminjaman[i];
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.namaPemohon);
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.email ?? 'Tidak ada');
+      sheetObject
+              .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: i + 1))
+              .value =
+          TextCellValue(peminjaman.tanggalPeminjaman ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.awalPeminjaman ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.akhirPeminjaman ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.jumlah ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.programStudi ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.kategori ?? 'Tidak diatur');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.detailKeperluan ?? 'Tidak ada');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 9, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.desainBenda ?? 'Tidak ada');
+      sheetObject
+          .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: i + 1))
+          .value = TextCellValue(peminjaman.status);
+    }
+
+    // Generate filename with current date
+    String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+    String fileName = 'peminjaman_data_${machineName}_$currentDate.xlsx';
+
+    // Save file for Android/iOS or Web
+    if (GetPlatform.isAndroid || GetPlatform.isIOS) {
+      Directory directory = await getApplicationDocumentsDirectory();
+      String outputFile = '${directory.path}/$fileName';
+      var bytes = excel.encode();
+      File(outputFile)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(bytes!);
+      Get.snackbar("Berhasil", "File Excel berhasil disimpan di $outputFile");
+    } else if (GetPlatform.isWeb) {
+      // Encode the Excel file
+      var bytes = excel.encode();
+
+      // Create a Blob and URL for download
+      final blob = html.Blob([bytes], 'application/vnd.ms-excel');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+
+      // Create an anchor element
+      final anchor = html.AnchorElement(href: url);
+
+      // Set attributes and trigger the download
+      anchor.setAttribute('download', fileName);
+      anchor
+          .click(); // Explicitly trigger the download by "clicking" the anchor
+
+      // Revoke the object URL after download
+      html.Url.revokeObjectUrl(url);
     }
   }
 
@@ -1001,4 +1243,3 @@ class PeminjamanUserAllbyAdminController extends GetxController {
 //     }
 //   }
 // }
-

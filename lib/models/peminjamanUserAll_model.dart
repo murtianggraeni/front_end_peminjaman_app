@@ -97,11 +97,58 @@ class Datum {
   // Getter Methode 2
   DateTime? get tanggalPeminjamanDate {
     try {
-      return DateFormat("EEE, dd MMM yyyy").parse(tanggalPeminjaman);
+      // Coba beberapa format tanggal yang mungkin
+      final formats = [
+        "EEE, d MMM yyyy",
+        "EEE, dd MMM yyyy",
+        "d MMM yyyy",
+        "dd MMM yyyy",
+        "yyyy-MM-dd",
+      ];
+
+      for (var format in formats) {
+        try {
+          return DateFormat(format).parse(tanggalPeminjaman);
+        } catch (_) {
+          // Lanjut ke format berikutnya jika gagal
+        }
+      }
+
+      // Jika semua format gagal, coba parsing manual
+      final parts = tanggalPeminjaman.split(' ');
+      if (parts.length >= 4) {
+        final day = int.tryParse(parts[1]);
+        final month = _parseMonth(parts[2]);
+        final year = int.tryParse(parts[3]);
+        if (day != null && month != null && year != null) {
+          return DateTime(year, month, day);
+        }
+      }
+
+      throw FormatException(
+          "Tidak dapat mem-parse tanggal: $tanggalPeminjaman");
     } catch (e) {
       print("Error parsing tanggalPeminjaman: $e");
       return null;
     }
+  }
+
+  int? _parseMonth(String month) {
+    const months = {
+      'Jan': 1,
+      'Feb': 2,
+      'Mar': 3,
+      'Apr': 4,
+      'May': 5,
+      'Jun': 6,
+      'Jul': 7,
+      'Aug': 8,
+      'Sep': 9,
+      'Oct': 10,
+      'Nov': 11,
+      'Dec': 12
+    };
+    return months[month.substring(0, 3)];
   }
 
   DateTime? get awalPeminjamanTime {
@@ -109,11 +156,11 @@ class Datum {
       final date = tanggalPeminjamanDate;
       if (date == null) return null;
 
-      // Parse time using a custom format
       final timeParts = awalPeminjaman.toLowerCase().split(':');
+      if (timeParts.length < 2) return null;
+
       int hours = int.parse(timeParts[0]);
-      int minutes = int.parse(timeParts[1]);
-      int seconds = int.parse(timeParts[2].split(' ')[0]);
+      int minutes = int.parse(timeParts[1].split(' ')[0]);
 
       if (awalPeminjaman.toLowerCase().contains('pm') && hours != 12) {
         hours += 12;
@@ -121,14 +168,7 @@ class Datum {
         hours = 0;
       }
 
-      return DateTime(
-        date.year,
-        date.month,
-        date.day,
-        hours,
-        minutes,
-        seconds,
-      );
+      return DateTime(date.year, date.month, date.day, hours, minutes);
     } catch (e) {
       print("Error parsing awalPeminjaman: $e");
       return null;
@@ -140,11 +180,11 @@ class Datum {
       final date = tanggalPeminjamanDate;
       if (date == null) return null;
 
-      // Parse time using a custom format
       final timeParts = akhirPeminjaman.toLowerCase().split(':');
+      if (timeParts.length < 2) return null;
+
       int hours = int.parse(timeParts[0]);
-      int minutes = int.parse(timeParts[1]);
-      int seconds = int.parse(timeParts[2].split(' ')[0]);
+      int minutes = int.parse(timeParts[1].split(' ')[0]);
 
       if (akhirPeminjaman.toLowerCase().contains('pm') && hours != 12) {
         hours += 12;
@@ -152,14 +192,7 @@ class Datum {
         hours = 0;
       }
 
-      return DateTime(
-        date.year,
-        date.month,
-        date.day,
-        hours,
-        minutes,
-        seconds,
-      );
+      return DateTime(date.year, date.month, date.day, hours, minutes);
     } catch (e) {
       print("Error parsing akhirPeminjaman: $e");
       return null;
@@ -221,6 +254,95 @@ class EnumValues<T> {
     return reverseMap;
   }
 }
+
+//   DateTime? get tanggalPeminjamanDate {
+//     try {
+//       return DateFormat("EEE, dd MMM yyyy").parse(tanggalPeminjaman);
+//     } catch (e) {
+//       print("Error parsing tanggalPeminjaman: $e");
+//       return null;
+//     }
+//   }
+
+//   DateTime? get awalPeminjamanTime {
+//     try {
+//       final date = tanggalPeminjamanDate;
+//       if (date == null) return null;
+
+//       // Parse time using a custom format
+//       final timeParts = awalPeminjaman.toLowerCase().split(':');
+//       int hours = int.parse(timeParts[0]);
+//       int minutes = int.parse(timeParts[1]);
+//       int seconds = int.parse(timeParts[2].split(' ')[0]);
+
+//       if (awalPeminjaman.toLowerCase().contains('pm') && hours != 12) {
+//         hours += 12;
+//       } else if (awalPeminjaman.toLowerCase().contains('am') && hours == 12) {
+//         hours = 0;
+//       }
+
+//       return DateTime(
+//         date.year,
+//         date.month,
+//         date.day,
+//         hours,
+//         minutes,
+//         seconds,
+//       );
+//     } catch (e) {
+//       print("Error parsing awalPeminjaman: $e");
+//       return null;
+//     }
+//   }
+
+//   DateTime? get akhirPeminjamanTime {
+//     try {
+//       final date = tanggalPeminjamanDate;
+//       if (date == null) return null;
+
+//       // Parse time using a custom format
+//       final timeParts = akhirPeminjaman.toLowerCase().split(':');
+//       int hours = int.parse(timeParts[0]);
+//       int minutes = int.parse(timeParts[1]);
+//       int seconds = int.parse(timeParts[2].split(' ')[0]);
+
+//       if (akhirPeminjaman.toLowerCase().contains('pm') && hours != 12) {
+//         hours += 12;
+//       } else if (akhirPeminjaman.toLowerCase().contains('am') && hours == 12) {
+//         hours = 0;
+//       }
+
+//       return DateTime(
+//         date.year,
+//         date.month,
+//         date.day,
+//         hours,
+//         minutes,
+//         seconds,
+//       );
+//     } catch (e) {
+//       print("Error parsing akhirPeminjaman: $e");
+//       return null;
+//     }
+//   }
+
+//   String get formattedTanggalPeminjaman {
+//     final date = tanggalPeminjamanDate;
+//     return date != null
+//         ? DateFormat('EEE, dd MMM yyyy').format(date)
+//         : tanggalPeminjaman;
+//   }
+
+//   String get formattedAwalPeminjaman {
+//     final time = awalPeminjamanTime;
+//     return time != null ? DateFormat('hh:mm a').format(time) : awalPeminjaman;
+//   }
+
+//   String get formattedAkhirPeminjaman {
+//     final time = akhirPeminjamanTime;
+//     return time != null ? DateFormat('hh:mm a').format(time) : akhirPeminjaman;
+//   }
+// }
 
   // Getter methods -1-
   // DateTime? get tanggalPeminjamanDate {

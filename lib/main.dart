@@ -84,7 +84,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
       home: _decideHomePage(), // Gunakan fungsi untuk memutuskan halaman utama
       // SideMenu(),
@@ -97,13 +96,13 @@ class MyApp extends StatelessWidget {
 
   Widget _decideHomePage() {
     if (accessToken == null) {
-      return WelcomeScreen();
+      return const WelcomeScreen();
     } else if (userRole == 'admin') {
-      return BottomNavBar(); // Admin BottomNavBar
+      return const BottomNavBar(); // Admin BottomNavBar
     } else if (userRole == 'user') {
-      return BottomNavBar(); // User BottomNavBar
+      return const BottomNavBar(); // User BottomNavBar
     } else {
-      return WelcomeScreen(); // Jika role tidak dikenali, kembalikan ke welcome
+      return const WelcomeScreen(); // Jika role tidak dikenali, kembalikan ke welcome
     }
   }
 }

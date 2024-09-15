@@ -3,7 +3,6 @@ import 'package:build_app/controller/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:build_app/page/main/user/main_page_user.dart';
 import 'package:build_app/page/main/admin/confirm_page.dart';
@@ -55,7 +54,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               ),
               child: BottomNavigationBar(
                 items: <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
+                  const BottomNavigationBarItem(
                     icon: Icon(MingCuteIcons.mgc_home_4_line),
                     label: 'Home',
                   ),

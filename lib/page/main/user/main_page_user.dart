@@ -1,5 +1,6 @@
 import 'package:build_app/controller/count_controller.dart';
 import 'package:build_app/controller/user_controller.dart';
+import 'package:build_app/controller/approvedPeminjaman_controller.dart';
 import 'package:build_app/models/count_model.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
@@ -14,13 +15,21 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class mainPageUser extends StatelessWidget {
+class mainPageUser extends StatefulWidget {
+  mainPageUser({Key? key}) : super(key: key);
+
+  @override
+  State<mainPageUser> createState() => _mainPageUserState();
+}
+
+class _mainPageUserState extends State<mainPageUser> {
   final CountController countC = Get.put(CountController());
   final UserController _userController = Get.put(UserController());
-
-  mainPageUser({Key? key}) : super(key: key);
+  final ApprovedPeminjamanController approvedPeminjamanController =
+      Get.put(ApprovedPeminjamanController());
 
   // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
@@ -100,21 +109,102 @@ class mainPageUser extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
-     _userController.checkLoggedIn();
+  void initState() {
+    super.initState();
+    print('Initializing mainPageUser');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      approvedPeminjamanController.fetchApprovedPeminjaman();
+    });
+  }
 
-    // // Periksa role pengguna
-    // if (_userController.role.value != 'user') {
-    //   //Jika bukan user, redirect atau tampilkan pesan error
-    //   return Scaffold(
-    //     body: Center(
-    //       child: Text(
-    //         'Anda tidak memiliki akses ke halaman ini',
-    //         style: GoogleFonts.inter(fontSize: 18.0, color: Colors.black),
-    //       ),
-    //     ),
-    //   );
-    // }
+  // Parsing Time Strings
+  TimeOfDay _parseTimeString(String timeString) {
+    try {
+      // Assuming timeString is in format "h:mm:ss a" (e.g., "2:00:00 PM")
+      print('Parsing time string: $timeString');
+      final parts = timeString.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+      if (timeString.toLowerCase().contains('pm') && hour != 12) {
+        hour += 12;
+      } else if (timeString.toLowerCase().contains('am') && hour == 12) {
+        hour = 0;
+      }
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      print('Error parsing time string: $e');
+      return TimeOfDay(hour: 0, minute: 0);
+    }
+  }
+
+  // Fungsi untuk mendapatkan warna berdasarkan mesin
+  Color _getColorForMachine(String namaMesin) {
+    print('Getting color for machine: $namaMesin');
+    switch (namaMesin.toLowerCase()) {
+      case "cnc milling":
+      case "cnc":
+        print('Returning blue for CNC');
+        return Colors.blue;
+      case "laser cutting":
+      case "laser":
+        print('Returning red for Laser Cutting');
+        return Colors.red;
+      case "3d printing":
+      case "printing":
+        print('Returning green for 3D Printing');
+        return Colors.green;
+      default:
+        print('Returning grey for unknown machine: $namaMesin');
+        return Colors.grey;
+    }
+  }
+
+  // Source for Calendar Appointments
+  CalendarDataSource _getCalendarDataSource() {
+    print('Getting calendar data source');
+    List<Appointment> appointments = [];
+    if (approvedPeminjamanController.approvedPeminjaman.value != null) {
+      print('Approved peminjaman data available');
+      for (var peminjaman
+          in approvedPeminjamanController.approvedPeminjaman.value!.data) {
+        print('Processing peminjaman: ${peminjaman.toJson()}');
+        try {
+          DateTime tanggal =
+              DateFormat("yyyy-MM-dd").parse(peminjaman.tanggalPeminjaman);
+
+          TimeOfDay awalTime = _parseTimeString(peminjaman.awalPeminjaman);
+          TimeOfDay akhirTime = _parseTimeString(peminjaman.akhirPeminjaman);
+
+          DateTime startTime = DateTime(tanggal.year, tanggal.month,
+              tanggal.day, awalTime.hour, awalTime.minute);
+          DateTime endTime = DateTime(tanggal.year, tanggal.month, tanggal.day,
+              akhirTime.hour, akhirTime.minute);
+
+          Color appointmentColor = _getColorForMachine(peminjaman.namaMesin);
+          print(
+              'Appointment: ${peminjaman.namaMesin} from $startTime to $endTime with color $appointmentColor');
+
+          appointments.add(Appointment(
+            startTime: startTime,
+            endTime: endTime,
+            subject: peminjaman.namaMesin,
+            color: appointmentColor,
+            notes: peminjaman.namaPemohon,
+          ));
+        } catch (e) {
+          print('Error processing peminjaman: $e');
+        }
+      }
+    } else {
+      print('No approved peminjaman data available');
+    }
+    print('Created ${appointments.length} appointments');
+    return _AppointmentDataSource(appointments);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _userController.checkLoggedIn();
 
     return customScaffoldPage(
       body: Column(
@@ -295,32 +385,6 @@ class mainPageUser extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 10.0),
-
-                    // SizedBox(
-                    //   height: 250, // Sesuaikan tinggi sesuai kebutuhan
-                    //   child: ListView.builder(
-                    //     scrollDirection: Axis.horizontal,
-                    //     itemCount:
-                    //         1000000, // Jumlah besar untuk simulasi infinite scroll
-                    //     itemBuilder: (context, index) {
-                    //       final mesin = listMesin[index % listMesin.length];
-                    //       return Padding(
-                    //         padding: const EdgeInsets.only(right: 11.0),
-                    //         child: buttonPeminjaman(
-                    //           page: mesin["page"],
-                    //           objekDipilih: mesin["objekDipilih"],
-                    //           merekMesin: mesin["merekMesin"],
-                    //           namaMesin: mesin["namaMesin"],
-                    //           namaLab: mesin["namaLab"],
-                    //           gambarMesin: mesin["gambarMesin"],
-                    //           leftImage: mesin["leftImage"],
-                    //           topImage: mesin["topImage"],
-                    //           topArrow: mesin["topArrow"],
-                    //         ),
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
                     SizedBox(
                       height: 250, // Sesuaikan tinggi sesuai kebutuhan
                       child: ListView.builder(
@@ -345,7 +409,6 @@ class mainPageUser extends StatelessWidget {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 35.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -371,24 +434,49 @@ class mainPageUser extends StatelessWidget {
                       height: 13.0,
                     ),
                     Container(
-                      height: 400,
-                      decoration: BoxDecoration(
-                        color: pageModeScheme.onPrimary,
-                        shape: BoxShape.rectangle,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: TableCalendar(
-                        focusedDay: DateTime.now(),
-                        firstDay: DateTime.utc(2024, 01, 01),
-                        lastDay: DateTime.utc(2050, 01, 01),
-                        calendarStyle: const CalendarStyle(
-                          cellMargin: EdgeInsets.all(8.0),
-                        ),
-                      ),
-                    ),
+                      height: 600,
+                      child: Obx(() {
+                        if (approvedPeminjamanController.isLoading.value) {
+                          return Center(child: CircularProgressIndicator());
+                        } else {
+                          return SfCalendar(
+                            view: CalendarView.week,
+                            dataSource: _getCalendarDataSource(),
+                            timeSlotViewSettings: TimeSlotViewSettings(
+                              startHour: 7,
+                              endHour: 18,
+                              nonWorkingDays: <int>[
+                                DateTime.saturday,
+                                DateTime.sunday
+                              ],
+                              timeFormat: 'HH:mm',
+                              timeInterval: Duration(minutes: 60),
+                            ),
+                            appointmentBuilder: appointmentBuilder,
+                            headerStyle: CalendarHeaderStyle(
+                              textStyle: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue[800]),
+                            ),
+                            viewHeaderStyle: ViewHeaderStyle(
+                              dayTextStyle: GoogleFonts.inter(
+                                  color: Colors.blue[800],
+                                  fontWeight: FontWeight.bold),
+                              dateTextStyle: GoogleFonts.inter(
+                                  color: Colors.blue[800],
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            onTap: (CalendarTapDetails details) {
+                              if (details.targetElement ==
+                                  CalendarElement.appointment) {
+                                _showEventDetails(details.appointments!.first);
+                              }
+                            },
+                          );
+                        }
+                      }),
+                    )
                   ],
                 ),
               ),
@@ -398,114 +486,76 @@ class mainPageUser extends StatelessWidget {
       ),
     );
   }
+
+  Widget appointmentBuilder(
+      BuildContext context, CalendarAppointmentDetails details) {
+    final Appointment appointment = details.appointments.first;
+    return Container(
+      decoration: BoxDecoration(
+        color: appointment.color.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Text(
+          appointment.subject,
+          style: GoogleFonts.inter(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+
+  void _showEventDetails(Appointment appointment) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Detail Peminjaman',
+            style: TextStyle(color: Colors.blue[800])),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading:
+                  Icon(Icons.precision_manufacturing, color: appointment.color),
+              title: Text('Mesin: ${appointment.subject}'),
+              titleTextStyle: GoogleFonts.inter(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.grey),
+              title: Text('Pemohon: ${appointment.notes}'),
+              titleTextStyle: GoogleFonts.inter(),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.access_time_filled, color: Colors.green),
+              title: Text(
+                  'Mulai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.startTime)}'),
+              titleTextStyle: GoogleFonts.inter(),
+            ),
+            ListTile(
+              leading: const Icon(Icons.access_time_filled, color: Colors.red),
+              title: Text(
+                  'Selesai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.endTime)}'),
+              titleTextStyle: GoogleFonts.inter(),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Tutup'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-                    // Tampilan Awal Form Peminjaman
-                    // --- Methode 2 ---
-                    // SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    // child: Row(
-                    //   children: [
-                    //     buttonPeminjaman(
-                    //       page: formPenggunaanCnc(),
-                    //       objekDipilih: "Memilih CNC Milling",
-                    //       merekMesin: "MTU 200 M",
-                    //       namaMesin: "CNC Milling",
-                    //       namaLab: "Lab. Elektro Mekanik",
-                    //       gambarMesin: "assets/images/foto_cnc.png",
-                    //       leftImage: 23.0,
-                    //       topImage: 4.0,
-                    //       topArrow: 2.0,
-                    //     ),
-                    //     const SizedBox(width: 11.0),
-                    //     buttonPeminjaman(
-                    //       page: formPenggunaanLasercut(),
-                    //       objekDipilih: "Memilih Laser Cutting",
-                    //       merekMesin: "TQL-1390",
-                    //       namaMesin: "Laser Cutting",
-                    //       namaLab: "Lab. Elektro Mekanik",
-                    //       gambarMesin: "assets/images/foto_lasercut.png",
-                    //       leftImage: 3.0,
-                    //       topImage: 18.0,
-                    //       topArrow: 11.0,
-                    //     ),
-                    //     const SizedBox(width: 11.0),
-                    //     buttonPeminjaman(
-                    //       page: formPenggunaanPrinting(),
-                    //       objekDipilih: "Memilih 3D Printing",
-                    //       merekMesin: "Anycubic 4Max Pro",
-                    //       namaMesin: "3D Printing",
-                    //       namaLab: "Lab. PLC & HMI",
-                    //       gambarMesin: "assets/images/foto_3dp.png",
-                    //       leftImage: 6.0,
-                    //       topImage: 9.0,
-                    //       topArrow: 4.5,
-                    //     ),
-                    //   ],
-                    // ),
-                    //),
-                    // SizedBox(
-                    //   height: 250.0, // Sesuaikan tinggi sesuai kebutuhan
-                    //   child: CarouselSlider.builder(
-                    //     itemCount: listMesin.length,
-                    //     itemBuilder:
-                    //         (BuildContext context, int index, int realIndex) {
-                    //       final mesin = listMesin[index];
-                    //       return Padding(
-                    //         padding: const EdgeInsets.only(right: 11.0),
-                    //         child: buttonPeminjaman(
-                    //           page: mesin["page"],
-                    //           objekDipilih: mesin["objekDipilih"],
-                    //           merekMesin: mesin["merekMesin"],
-                    //           namaMesin: mesin["namaMesin"],
-                    //           namaLab: mesin["namaLab"],
-                    //           gambarMesin: mesin["gambarMesin"],
-                    //           leftImage: mesin["leftImage"],
-                    //           topImage: mesin["topImage"],
-                    //           topArrow: mesin["topArrow"],
-                    //         ),
-                    //       );
-                    //     },
-                    //     options: CarouselOptions(
-                    //       // height: 247.0, // Sesuaikan tinggi carousel
-                    //       viewportFraction: 0.4, // Lebar setiap item
-                    //       enableInfiniteScroll:
-                    //           true, // Mengaktifkan infinite scroll
-                    //       // autoPlay: true,  // Mengaktifkan autoplay
-                    //       // autoPlayInterval: Duration(seconds: 3),  // Interval autoplay
-                    //       // enlargeCenterPage: true,  // Item tengah lebih besar
-                    //     ),
-                    //   ),
-                    // ),
-                    // CarouselSlider.builder(
-                    //   itemCount: listMesin.length,
-                    //   options: CarouselOptions(
-                    //     height: 250.0,
-                    //     viewportFraction: 0.8,
-                    //     initialPage: 0,
-                    //     enableInfiniteScroll: true,
-                    //     reverse: false,
-                    //     autoPlay: false,
-                    //     enlargeCenterPage: true,
-                    //     scrollDirection: Axis.horizontal,
-                    //   ),
-                    //   itemBuilder: (context, index, realIndex) {
-                    //     final mesin = listMesin[index %
-                    //         listMesin
-                    //             .length]; // Gunakan modulo untuk infinite loop
-                    //     return Padding(
-                    //       padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    //       child: buttonPeminjaman(
-                    //         page: mesin["page"],
-                    //         objekDipilih: mesin["objekDipilih"],
-                    //         merekMesin: mesin["merekMesin"],
-                    //         namaMesin: mesin["namaMesin"],
-                    //         namaLab: mesin["namaLab"],
-                    //         gambarMesin: mesin["gambarMesin"],
-                    //         leftImage: mesin["leftImage"],
-                    //         topImage: mesin["topImage"],
-                    //         topArrow: mesin["topArrow"],
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
+class _AppointmentDataSource extends CalendarDataSource {
+  _AppointmentDataSource(List<Appointment> source) {
+    appointments = source;
+  }
+}

@@ -11,8 +11,6 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bx.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 
-
-
 class detailPageLasercut extends StatelessWidget {
   final PeminjamanUserAllbyAdminController _controller = Get.put(
       PeminjamanUserAllbyAdminController(MachineType.LaserCutting),
@@ -92,7 +90,7 @@ class detailPageLasercut extends StatelessWidget {
         ),
         const SizedBox(width: 10.0),
         Container(
-          width: 120.0,
+          width: 90.0,
           height: 40.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
@@ -151,6 +149,12 @@ class detailPageLasercut extends StatelessWidget {
             ),
           ),
         ),
+        IconButton(
+          onPressed: () {
+            _controller.exportToExcel();
+          },
+          icon: const Icon(MingCuteIcons.mgc_file_export_line),
+        ),
       ],
     );
   }
@@ -193,7 +197,7 @@ class detailPageLasercut extends StatelessWidget {
             ),
           ],
           rows: _controller.filteredPeminjaman.map((peminjaman) {
-          // _controller.peminjaman.map((peminjaman) {
+            // _controller.peminjaman.map((peminjaman) {
             return DataRow2(
               cells: [
                 DataCell(

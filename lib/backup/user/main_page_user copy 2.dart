@@ -1,7 +1,5 @@
 import 'package:build_app/controller/count_controller.dart';
 import 'package:build_app/controller/user_controller.dart';
-import 'package:build_app/controller/approvedPeminjaman_controller.dart';
-import 'package:build_app/models/approvedPeminjaman_model.dart';
 import 'package:build_app/models/count_model.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
@@ -18,26 +16,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class mainPageUser extends StatefulWidget {
-
-  mainPageUser({Key? key}) : super(key: key);
-
-  @override
-  State<mainPageUser> createState() => _mainPageUserState();
-}
-
-class _mainPageUserState extends State<mainPageUser> {
+class mainPageUser extends StatelessWidget {
   final CountController countC = Get.put(CountController());
-
   final UserController _userController = Get.put(UserController());
 
-  final ApprovedPeminjamanController approvedPeminjamanController = Get.put(ApprovedPeminjamanController());
-
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-
-  DateTime _focusedDay = DateTime.now();
-
-  DateTime? _selectedDay;
+  mainPageUser({Key? key}) : super(key: key);
 
   // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
@@ -115,12 +98,6 @@ class _mainPageUserState extends State<mainPageUser> {
       "page": formPenggunaanPrinting(),
     },
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    approvedPeminjamanController.fetchApprovedPeminjaman();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -404,7 +381,7 @@ class _mainPageUserState extends State<mainPageUser> {
                         ),
                       ),
                       child: TableCalendar(
-
+                        
                         focusedDay: DateTime.now(),
                         firstDay: DateTime.utc(2024, 01, 01),
                         lastDay: DateTime.utc(2050, 01, 01),
@@ -533,4 +510,3 @@ class _mainPageUserState extends State<mainPageUser> {
                     //     );
                     //   },
                     // ),
-

@@ -12,8 +12,6 @@ import 'package:iconify_flutter/icons/bx.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:data_table_2/data_table_2.dart';
 
-
-
 class detailPageCnc extends StatelessWidget {
   final PeminjamanUserAllbyAdminController _controller =
       Get.put(PeminjamanUserAllbyAdminController(MachineType.CNC), tag: 'cnc');
@@ -79,11 +77,12 @@ class detailPageCnc extends StatelessWidget {
                   ? Colors.red
                   : Colors.grey,
             ),
+
           ),
         ),
         const SizedBox(width: 10.0),
         Container(
-          width: 120.0,
+          width: 90.0,
           height: 40.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
@@ -148,6 +147,13 @@ class detailPageCnc extends StatelessWidget {
             ),
           ),
         ),
+        IconButton(
+            onPressed: () {
+               _controller.exportToExcel();
+            },
+            icon: Icon(MingCuteIcons.mgc_file_export_fill),
+          ),
+       
       ],
     );
   }

@@ -66,19 +66,21 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
-      id: json['id'] as String,
-      namaPemohon: json['nama_pemohon'] as String,
-      status: json['status'] as String,
-      email: json['email'] as String?,
-      tanggalPeminjaman: json['tanggal_peminjaman'] as String?,
-      awalPeminjaman: json['awal_peminjaman'] as String?,
-      akhirPeminjaman: json['akhir_peminjaman'] as String?,
-      jumlah: json['jumlah'].toString(), // Convert int to String
-      programStudi: json['program_studi'] as String?,
-      kategori: json['kategori'] as String?,
-      detailKeperluan: json['detail_keperluan'] as String?,
-      desainBenda: json['desain_benda'] as String?,
-      waktu: json['waktu'] as String?,
+      id: json['id'] as String? ?? '',
+      namaPemohon: json['nama_pemohon'] as String? ?? 'Tidak ada nama',
+      status: json['status'] as String? ?? 'Tidak diketahui',
+      email: json['email'] as String? ?? 'Tidak ada email',
+      tanggalPeminjaman:
+          json['tanggal_peminjaman'] as String? ?? 'Tidak diatur',
+      awalPeminjaman: json['awal_peminjaman'] as String? ?? 'Tidak diatur',
+      akhirPeminjaman: json['akhir_peminjaman'] as String? ?? 'Tidak diatur',
+      jumlah: (json['jumlah'] ?? '').toString(),
+      programStudi: json['program_studi'] as String? ?? 'Tidak diatur',
+      kategori: json['kategori'] as String? ?? 'Tidak diatur',
+      detailKeperluan:
+          json['detail_keperluan'] as String? ?? 'Tidak ada detail',
+      desainBenda: json['desain_benda'] as String? ?? 'Tidak ada desain',
+      waktu: json['waktu'] as String? ?? 'Tidak diatur',
     );
   }
 
@@ -100,7 +102,7 @@ class Datum {
     };
   }
 
-    Datum copyWith({
+  Datum copyWith({
     String? id,
     String? email,
     String? namaPemohon,
@@ -131,7 +133,6 @@ class Datum {
       waktu: waktu ?? this.waktu,
     );
   }
-  
 }
 
 // To parse this JSON data, do
@@ -192,4 +193,3 @@ class Datum {
 //         "status": status,
 //     };
 // }
-

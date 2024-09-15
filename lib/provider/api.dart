@@ -1,7 +1,9 @@
 // api.dart
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class ApiController {
   // static const String URL_API = "https://kh8ppwzx-3000.asse.devtunnels.ms";
@@ -35,22 +37,43 @@ class ApiController {
     }
   }
 
-  Future<http.Response> peminjaman(Map<String, dynamic> data, machine) async {
+  // Future<http.Response> peminjaman(Map<String, dynamic> data, machine) async {
+  //   final SharedPreferences shared = await SharedPreferences.getInstance();
+  //   String? getToken = shared.getString("accessToken");
+  //   try {
+  //     final response =
+  //         await http.post(Uri.parse('$URL_API/user/$machine/peminjaman'),
+  //             headers: {
+  //               'Content-Type': 'application/json',
+  //               'Authorization': 'Bearer $getToken',
+  //             },
+  //             body: jsonEncode(data));
+  //     return response;
+  //   } catch (e) {
+  //     throw e;
+  //   }
+  // }
+
+  Future<http.Response> peminjaman(Map<String, dynamic> data, String machine, List<int> fileBytes, String fileName) async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
     String? getToken = shared.getString("accessToken");
-    try {
-      final response =
-          await http.post(Uri.parse('$URL_API/user/$machine/peminjaman'),
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $getToken',
-              },
-              body: jsonEncode(data));
-      return response;
-    } catch (e) {
-      throw e;
-    }
+    
+    var request = http.MultipartRequest('POST', Uri.parse('$URL_API/user/$machine/peminjaman'));
+    request.headers.addAll({
+      'Authorization': 'Bearer $getToken',
+    });
+    request.fields.addAll(data.map((key, value) => MapEntry(key, value.toString())));
+    request.files.add(http.MultipartFile.fromBytes(
+      'desain_benda',
+      fileBytes,
+      filename: fileName,
+      contentType: MediaType('application', 'octet-stream'),
+    ));
+    
+    var streamedResponse = await request.send();
+    return await http.Response.fromStream(streamedResponse);
   }
+
 
   Future<http.Response> countData() async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
@@ -233,4 +256,29 @@ class ApiController {
       throw e;
     }
   }
+
+  Future<http.Response> getApprovedPeminjaman() async {
+    final SharedPreferences shared = await SharedPreferences.getInstance();
+    String? getToken = shared.getString("accessToken");
+    try {
+      Uri url = Uri.parse('$URL_API/user/approved-peminjaman');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $getToken',
+        },
+      );
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Exception('Failed to fetch approved peminjaman data. Status code: ${response.statusCode}');
+
+      }
+    } catch (e) {
+      print('Error during fetchApprovedPeminjaman: $e');
+      throw e;
+    }
+  }
+  
 }

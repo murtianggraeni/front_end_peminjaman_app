@@ -754,7 +754,7 @@ class _formPenggunaanPrintingState extends State<formPenggunaanPrinting> {
                 height: 55.0,
               ),
               Text(
-                "Form Peminjaman CNC Milling",
+                "Form Peminjaman 3D Printing",
                 style: GoogleFonts.inter(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -1074,22 +1074,25 @@ class _formPenggunaanPrintingState extends State<formPenggunaanPrinting> {
                     const SizedBox(
                       height: 8.0,
                     ),
-                    customFormPeminjaman(
-                      controller: _fileText,
-                      judul: "Desain Benda",
-                      returnText: "Silahkan mengisi masukan desain benda",
-                      hintText: "Tambahkan file",
-                      icon: IconButton(
-                        onPressed: () {
-                          _pickFile();
-                        },
-                        icon: const Icon(
-                          MingCuteIcons.mgc_upload_2_line,
+                    Obx(
+                      () => customFormPeminjaman(
+                        controller: TextEditingController(
+                            text: _peminjamanC.fileNames.value),
+                        judul: "Desain Benda",
+                        returnText: "Silahkan mengisi masukan desain benda",
+                        hintText: "Tambahkan file",
+                        icon: IconButton(
+                          onPressed: () {
+                            _peminjamanC.pickFile();
+                          },
+                          icon: const Icon(
+                            MingCuteIcons.mgc_upload_2_line,
+                          ),
+                          color: const Color(0xFFB9B9B9),
                         ),
-                        color: const Color(0xFFB9B9B9),
+                        keyboardType: TextInputType.datetime,
+                        readOnly: true,
                       ),
-                      keyboardType: TextInputType.datetime,
-                      readOnly: true,
                     ),
                     const SizedBox(
                       height: 11.0,

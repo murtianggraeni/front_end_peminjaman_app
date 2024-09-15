@@ -265,7 +265,7 @@ class mainPageAdmin extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Form Peminjaman",
+                          "Monitoring Penggunaan Mesin",
                           style: GoogleFonts.inter(
                             fontSize: 14.0,
                             fontWeight: FontWeight.bold,
