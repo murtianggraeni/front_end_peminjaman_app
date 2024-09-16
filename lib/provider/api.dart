@@ -54,41 +54,75 @@ class ApiController {
   //   }
   // }
 
-  Future<http.Response> peminjaman(Map<String, dynamic> data, String machine, List<int> fileBytes, String fileName) async {
+  Future<http.Response> peminjaman(Map<String, dynamic> data, String machine,
+      List<int> fileBytes, String fileName) async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
     String? getToken = shared.getString("accessToken");
-    
-    var request = http.MultipartRequest('POST', Uri.parse('$URL_API/user/$machine/peminjaman'));
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$URL_API/user/$machine/peminjaman'));
     request.headers.addAll({
       'Authorization': 'Bearer $getToken',
     });
-    request.fields.addAll(data.map((key, value) => MapEntry(key, value.toString())));
+    request.fields
+        .addAll(data.map((key, value) => MapEntry(key, value.toString())));
     request.files.add(http.MultipartFile.fromBytes(
       'desain_benda',
       fileBytes,
       filename: fileName,
       contentType: MediaType('application', 'octet-stream'),
     ));
-    
+
     var streamedResponse = await request.send();
     return await http.Response.fromStream(streamedResponse);
   }
 
+  // Future<http.Response> countData() async {
+  //   final SharedPreferences shared = await SharedPreferences.getInstance();
+  //   String? getToken = shared.getString("accessToken");
+  //   try {
+  //     Uri url = Uri.parse('$URL_API/user/counts');
+  //     final response = await http.get(url, headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer $getToken',
+  //     });
+  //     if (response.statusCode == 200) {
+  //       return response;
+  //     } else {
+  //       throw Exception(
+  //           'Failed to fetch data CountData. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Error during fetchData: $e');
+  //     throw e;
+  //   }
+  // }
 
   Future<http.Response> countData() async {
     final SharedPreferences shared = await SharedPreferences.getInstance();
     String? getToken = shared.getString("accessToken");
+
     try {
       Uri url = Uri.parse('$URL_API/user/counts');
+      print('Requesting URL: $url'); // Log URL
+
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $getToken',
       });
+
+      print('Response status code: ${response.statusCode}'); // Log status code
+      print('Response body: ${response.body}'); // Log response body
+
       if (response.statusCode == 200) {
-        return response;
+        if (response.body.isNotEmpty) {
+          return response;
+        } else {
+          throw Exception('Response body kosong');
+        }
       } else {
         throw Exception(
-            'Failed to fetch data CountData. Status code: ${response.statusCode}');
+            'Gagal mengambil data CountData. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error during fetchData: $e');
@@ -272,13 +306,12 @@ class ApiController {
       if (response.statusCode == 200) {
         return response;
       } else {
-        throw Exception('Failed to fetch approved peminjaman data. Status code: ${response.statusCode}');
-
+        throw Exception(
+            'Failed to fetch approved peminjaman data. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error during fetchApprovedPeminjaman: $e');
       throw e;
     }
   }
-  
 }
