@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:build_app/provider/api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import '../models/sensor_Model.dart';
-import 'user_controller.dart';
-import '../routes/route_name.dart';
-import 'package:build_app/controller/user_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:http/http.dart';
+// import '../models/sensor_Model.dart';
+// import 'user_controller.dart';
+// import '../routes/route_name.dart';
+// import 'package:build_app/controller/user_controller.dart';
 
 // -- Metode 1 --
 // class LoginController extends GetxController {

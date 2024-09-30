@@ -34,6 +34,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ),
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(19.0),
                 topLeft: Radius.circular(19.0),

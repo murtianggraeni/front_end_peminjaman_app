@@ -151,7 +151,7 @@ class detailPageCnc extends StatelessWidget {
             onPressed: () {
                _controller.exportToExcel();
             },
-            icon: Icon(MingCuteIcons.mgc_file_export_fill),
+            icon: Icon(MingCuteIcons.mgc_file_export_line),
           ),
        
       ],

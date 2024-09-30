@@ -1,6 +1,7 @@
 import 'package:build_app/controller/count_controller.dart';
 import 'package:build_app/controller/user_controller.dart';
 import 'package:build_app/controller/approvedPeminjaman_controller.dart';
+import 'package:build_app/controller/logout_controller.dart';
 import 'package:build_app/models/count_model.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_printing.dart';
 import 'package:build_app/page/home/form_peminjaman/form_penggunaan_cnc.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class mainPageUser extends StatefulWidget {
@@ -30,6 +32,7 @@ class _mainPageUserState extends State<mainPageUser> {
   final UserController _userController = Get.put(UserController());
   final ApprovedPeminjamanController approvedPeminjamanController =
       Get.put(ApprovedPeminjamanController());
+  final LogoutController _logoutController = Get.put(LogoutController());
 
   // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
@@ -70,43 +73,6 @@ class _mainPageUserState extends State<mainPageUser> {
       ));
     }
   }
-
-  // Data mesin untuk peminjaman pada ButtonPeminjaman
-  final List<Map<String, dynamic>> listMesin = [
-    {
-      "objekDipilih": "Memilih CNC Milling",
-      "merekMesin": "MTU 200 M",
-      "namaMesin": "CNC Milling",
-      "namaLab": "Lab. Elektro Mekanik",
-      "gambarMesin": "assets/images/foto_cnc.png",
-      "leftImage": 23.0,
-      "topImage": 4.0,
-      "topArrow": 2.0,
-      "page": formPenggunaanCnc(),
-    },
-    {
-      "objekDipilih": "Memilih Laser Cutting",
-      "merekMesin": "TQL-1390",
-      "namaMesin": "Laser Cutting",
-      "namaLab": "Lab. Elektro Mekanik",
-      "gambarMesin": "assets/images/foto_lasercut.png",
-      "leftImage": 3.0,
-      "topImage": 18.0,
-      "topArrow": 11.0,
-      "page": formPenggunaanLasercut(),
-    },
-    {
-      "objekDipilih": "Memilih 3D Printing",
-      "merekMesin": "Anycubic 4Max Pro",
-      "namaMesin": "3D Printing",
-      "namaLab": "Lab. PLC & HMI",
-      "gambarMesin": "assets/images/foto_3dp.png",
-      "leftImage": 6.0,
-      "topImage": 9.0,
-      "topArrow": 4.5,
-      "page": formPenggunaanPrinting(),
-    },
-  ];
 
   @override
   void initState() {
@@ -207,6 +173,92 @@ class _mainPageUserState extends State<mainPageUser> {
     _userController.checkLoggedIn();
 
     return customScaffoldPage(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: pageModeScheme.primary,
+              ),
+              accountName: Text(
+                _userController.username.value,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              accountEmail: Text(
+                _userController.role.value,
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 14.0,
+                ),
+              ),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Color(0xFFE6EDF0),
+                child: ClipOval(
+                  child: Icon(
+                    MingCuteIcons.mgc_user_3_fill,
+                    size: 24.0,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications_active_sharp),
+              title: Text(
+                'Notifikasi',
+                style: GoogleFonts.inter(
+                  fontSize: 16.0,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(MingCuteIcons.mgc_exit_line),
+              title: Text(
+                'Log Out',
+                style: GoogleFonts.inter(
+                  fontSize: 16.0,
+                ),
+              ),
+              onTap: () {
+                print('Logout button pressed');
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Logout'),
+                      content: Text('Are you sure you want to logout?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            print('Logout cancelled');
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Logout'),
+                          onPressed: () async {
+                            print('Logout confirmed, attempting to logout');
+                            Navigator.of(context).pop();
+                            final success = await _logoutController.logout();
+                            print(
+                                'Logout result: ${success ? 'successful' : 'failed'}');
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -232,7 +284,7 @@ class _mainPageUserState extends State<mainPageUser> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Selamat datang kembali!",
+                      "Selamat datang kembali!!",
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w400,
                         fontSize: 15,
@@ -241,22 +293,31 @@ class _mainPageUserState extends State<mainPageUser> {
                     )
                   ],
                 ),
-                Container(
-                  height: 48,
-                  width: 48,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12.0),
-                    ),
-                    color: Color(0xFFDFE7EF),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_active_sharp,
-                    size: 24,
-                    color: Color(0xFF1D5973),
-                  ),
-                )
+                Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      height: 48,
+                      width: 48,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        color: Color(0xFFDFE7EF),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          MingCuteIcons.mgc_pin_fill,
+                          size: 24.0,
+                        ),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        color: const Color(0xFF1D5973),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -321,7 +382,7 @@ class _mainPageUserState extends State<mainPageUser> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
@@ -329,7 +390,7 @@ class _mainPageUserState extends State<mainPageUser> {
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData ||
                               snapshot.data!.data.id.isEmpty) {
-                            return Center(
+                            return const Center(
                               child: Text('No data available'),
                             );
                           } else {
@@ -385,28 +446,46 @@ class _mainPageUserState extends State<mainPageUser> {
                       ],
                     ),
                     const SizedBox(height: 10.0),
-                    SizedBox(
-                      height: 250, // Sesuaikan tinggi sesuai kebutuhan
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        // itemCount: 1000000, // Jumlah besar untuk simulasi infinite scroll
-                        itemBuilder: (context, index) {
-                          final mesin = listMesin[index % listMesin.length];
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 11.0),
-                            child: buttonPeminjaman(
-                              page: mesin["page"],
-                              objekDipilih: mesin["objekDipilih"],
-                              merekMesin: mesin["merekMesin"],
-                              namaMesin: mesin["namaMesin"],
-                              namaLab: mesin["namaLab"],
-                              gambarMesin: mesin["gambarMesin"],
-                              leftImage: mesin["leftImage"],
-                              topImage: mesin["topImage"],
-                              topArrow: mesin["topArrow"],
-                            ),
-                          );
-                        },
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          buttonPeminjaman(
+                            page: formPenggunaanCnc(),
+                            objekDipilih: "Memilih CNC Milling",
+                            merekMesin: "MTU 200 M",
+                            namaMesin: "CNC Milling",
+                            namaLab: "Lab. Elektro Mekanik",
+                            gambarMesin: "assets/images/foto_cnc.png",
+                            leftImage: 23.0,
+                            topImage: 4.0,
+                            topArrow: 2.0,
+                          ),
+                          const SizedBox(width: 11.0),
+                          buttonPeminjaman(
+                            page: formPenggunaanLasercut(),
+                            objekDipilih: "Memilih Laser Cutting",
+                            merekMesin: "TQL-1390",
+                            namaMesin: "Laser Cutting",
+                            namaLab: "Lab. Elektro Mekanik",
+                            gambarMesin: "assets/images/foto_lasercut.png",
+                            leftImage: 3.0,
+                            topImage: 18.0,
+                            topArrow: 11.0,
+                          ),
+                          const SizedBox(width: 11.0),
+                          buttonPeminjaman(
+                            page: formPenggunaanPrinting(),
+                            objekDipilih: "Memilih 3D Printing",
+                            merekMesin: "Anycubic 4Max Pro",
+                            namaMesin: "3D Printing",
+                            namaLab: "Lab. PLC & HMI",
+                            gambarMesin: "assets/images/foto_3dp.png",
+                            leftImage: 6.0,
+                            topImage: 9.0,
+                            topArrow: 4.5,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 35.0),
@@ -435,48 +514,52 @@ class _mainPageUserState extends State<mainPageUser> {
                     ),
                     Container(
                       height: 600,
-                      child: Obx(() {
-                        if (approvedPeminjamanController.isLoading.value) {
-                          return Center(child: CircularProgressIndicator());
-                        } else {
-                          return SfCalendar(
-                            view: CalendarView.week,
-                            dataSource: _getCalendarDataSource(),
-                            timeSlotViewSettings: TimeSlotViewSettings(
-                              startHour: 7,
-                              endHour: 18,
-                              nonWorkingDays: <int>[
-                                DateTime.saturday,
-                                DateTime.sunday
-                              ],
-                              timeFormat: 'HH:mm',
-                              timeInterval: Duration(minutes: 60),
-                            ),
-                            appointmentBuilder: appointmentBuilder,
-                            headerStyle: CalendarHeaderStyle(
-                              textStyle: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue[800]),
-                            ),
-                            viewHeaderStyle: ViewHeaderStyle(
-                              dayTextStyle: GoogleFonts.inter(
-                                  color: Colors.blue[800],
-                                  fontWeight: FontWeight.bold),
-                              dateTextStyle: GoogleFonts.inter(
-                                  color: Colors.blue[800],
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            onTap: (CalendarTapDetails details) {
-                              if (details.targetElement ==
-                                  CalendarElement.appointment) {
-                                _showEventDetails(details.appointments!.first);
-                              }
-                            },
-                          );
-                        }
-                      }),
-                    )
+                      child: Obx(
+                        () {
+                          if (approvedPeminjamanController.isLoading.value) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
+                            return SfCalendar(
+                              view: CalendarView.week,
+                              dataSource: _getCalendarDataSource(),
+                              timeSlotViewSettings: const TimeSlotViewSettings(
+                                startHour: 7,
+                                endHour: 18,
+                                nonWorkingDays: <int>[
+                                  DateTime.saturday,
+                                  DateTime.sunday
+                                ],
+                                timeFormat: 'HH:mm',
+                                timeInterval: Duration(minutes: 60),
+                              ),
+                              appointmentBuilder: appointmentBuilder,
+                              headerStyle: CalendarHeaderStyle(
+                                textStyle: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue[800]),
+                              ),
+                              viewHeaderStyle: ViewHeaderStyle(
+                                dayTextStyle: GoogleFonts.inter(
+                                    color: Colors.blue[800],
+                                    fontWeight: FontWeight.bold),
+                                dateTextStyle: GoogleFonts.inter(
+                                    color: Colors.blue[800],
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              onTap: (CalendarTapDetails details) {
+                                if (details.targetElement ==
+                                    CalendarElement.appointment) {
+                                  _showEventDetails(
+                                      details.appointments!.first);
+                                }
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -511,8 +594,10 @@ class _mainPageUserState extends State<mainPageUser> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Detail Peminjaman',
-            style: TextStyle(color: Colors.blue[800])),
+        title: Text(
+          'Detail Peminjaman',
+          style: TextStyle(color: Colors.blue[800]),
+        ),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -521,31 +606,39 @@ class _mainPageUserState extends State<mainPageUser> {
               leading:
                   Icon(Icons.precision_manufacturing, color: appointment.color),
               title: Text('Mesin: ${appointment.subject}'),
-              titleTextStyle: GoogleFonts.inter(),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Colors.grey),
               title: Text('Pemohon: ${appointment.notes}'),
-              titleTextStyle: GoogleFonts.inter(),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
             ),
             ListTile(
               leading:
                   const Icon(Icons.access_time_filled, color: Colors.green),
               title: Text(
                   'Mulai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.startTime)}'),
-              titleTextStyle: GoogleFonts.inter(),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.access_time_filled, color: Colors.red),
               title: Text(
                   'Selesai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.endTime)}'),
-              titleTextStyle: GoogleFonts.inter(),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
-            child: Text('Tutup'),
+            child: const Text('Tutup'),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],

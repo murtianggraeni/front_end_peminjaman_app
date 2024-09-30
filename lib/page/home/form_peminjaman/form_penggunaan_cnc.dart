@@ -23,6 +23,7 @@ class formPenggunaanCnc extends StatefulWidget {
 class _formPenggunaanCncState extends State<formPenggunaanCnc> {
   final PeminjamanController _peminjamanC = Get.put(PeminjamanController());
   final _formPeminjamanCnc = GlobalKey<FormState>();
+  static final DateFormat _timeFormat = DateFormat('hh:mm a');
 
 /* 1. FUNGSI UNTUK PEMILIHAN TANGGAL DAN WAKTU DI FORM PEMINJAMAN */
 // Untuk memilih tanggal peminjaman
@@ -49,100 +50,130 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
 
   // Untuk memilih waktu peminjaman
   void _showDayNightTimePicker(TextEditingController controller) {
-    TimeOfDay now = TimeOfDay.now();
+    final initialTime = _parseTimeString(controller.text) ?? TimeOfDay.now();
+
     Navigator.of(context).push(
       showPicker(
         context: context,
-        value: Time(
-            hour: now.hour, minute: now.minute), // Convert TimeOfDay to Time
+        value: Time(hour: initialTime.hour, minute: initialTime.minute),
         onChange: (Time newTime) {
-          // Validasi minute interval
-          if (newTime.minute != 0 && newTime.minute != 30) {
+          if (!_isValidMinuteInterval(newTime.minute)) {
+            _showInvalidTimeSnackbar();
+            return;
+          }
+
+          final selectedTime = newTime.toTimeOfDay();
+          final formattedTime = _formatTimeWithAMPM(selectedTime);
+
+          if (_peminjamanC.tanggalC.text.isEmpty) {
             Get.snackbar(
-              "Invalid Time",
-              'Please select a time with 0 or 30 minute intervals',
-              backgroundColor: Colors.redAccent,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 3),
+              "Peringatan",
+              "Silakan pilih tanggal terlebih dahulu.",
+              backgroundColor: Colors.yellow,
+              colorText: Colors.black,
             );
             return;
           }
 
-          final TimeOfDay selectedTime = newTime.toTimeOfDay();
-
-          final DateTime selectedDateTime = DateTime(
-            DateTime.now().year,
-            DateTime.now().month,
-            DateTime.now().day,
+          final selectedDate =
+              DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text);
+          final selectedDateTime = DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
             selectedTime.hour,
             selectedTime.minute,
           );
 
-          final DateTime? selectedDate = _peminjamanC.tanggalC.text.isNotEmpty
-              ? DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text)
-              : null;
-
-          if (selectedDate == null) {
+          if (!_isValidTimeForSelectedDate(selectedDateTime)) {
             Get.snackbar(
-                "Peringatan", "Silakan pilih tanggal terlebih dahulu.");
+              "Peringatan!",
+              "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.",
+              backgroundColor: Colors.yellow,
+              colorText: Colors.black,
+            );
             return;
           }
 
-          final bool isSameDate = selectedDate.year == DateTime.now().year &&
-              selectedDate.month == DateTime.now().month &&
-              selectedDate.day == DateTime.now().day;
-
-          if (isSameDate) {
-            final DateTime currentDateTime = DateTime.now();
-            if (selectedDateTime.isBefore(currentDateTime)) {
-              Get.snackbar("Peringatan!",
-                  "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.");
-              return;
-            }
-          }
-
           if (controller == _peminjamanC.akhirC) {
-            final TimeOfDay startTime = TimeOfDay.fromDateTime(
-              DateFormat('hh:mm a').parse(_peminjamanC.awalC.text),
-            );
-            final DateTime startDateTime = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              startTime.hour,
-              startTime.minute,
-            );
-            final DateTime endDateTime = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              selectedTime.hour,
-              selectedTime.minute,
-            );
-
-            if (endDateTime.isBefore(startDateTime) ||
-                endDateTime.isAtSameMomentAs(startDateTime)) {
-              Get.snackbar("Peringatan",
-                  "Waktu akhir peminjaman harus melebihi waktu awal peminjaman");
+            if (!_isValidEndTime(selectedTime)) {
+              Get.snackbar(
+                "Peringatan",
+                "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
+                backgroundColor: Colors.yellow,
+                colorText: Colors.black,
+              );
               return;
             }
           }
 
           setState(() {
-            controller.text = selectedTime.format(context);
+            controller.text = formattedTime;
           });
         },
         is24HrFormat: false,
-        minHour: 1,
-        maxHour: 23,
-        minMinute: 0,
-        // minuteInterval: TimePickerInterval.THIRTY,
-        sunAsset: Image.asset("assets/images/sun.png"),
-        moonAsset: Image.asset("assets/images/moon.png"),
+        minuteInterval: TimePickerInterval.THIRTY,
+        minHour: 7,
+        maxHour: 20,
         barrierDismissible: false,
         iosStylePicker: true,
+        sunAsset: Image.asset("assets/images/sun.png"),
+        moonAsset: Image.asset("assets/images/moon.png"),
       ),
     );
+  }
+
+  // Parse time string to TimeOfDay
+  TimeOfDay? _parseTimeString(String timeString) {
+    try {
+      final dateTime = _timeFormat.parse(timeString);
+      return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Show snackbar for invalid time
+  void _showInvalidTimeSnackbar() {
+    Get.snackbar(
+      "Invalid Time",
+      'Please select a time with 0 or 30 minute intervals',
+      backgroundColor: Colors.redAccent,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  // Format TimeOfDay to string with AM/PM
+  String _formatTimeWithAMPM(TimeOfDay time) {
+    final now = DateTime.now();
+    final dateTime =
+        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return _timeFormat.format(dateTime);
+  }
+
+  bool _isValidTimeForSelectedDate(DateTime selectedDateTime) {
+    final now = DateTime.now();
+    return selectedDateTime.isAfter(now);
+  }
+
+  bool _isValidMinuteInterval(int minute) {
+    return minute == 0 || minute == 30;
+  }
+
+  bool _isValidEndTime(TimeOfDay endTime) {
+    if (_peminjamanC.awalC.text.isEmpty) return true;
+
+    final startTime = _parseTimeString(_peminjamanC.awalC.text);
+    if (startTime == null) return true;
+
+    final now = DateTime.now();
+    final startDateTime = DateTime(
+        now.year, now.month, now.day, startTime.hour, startTime.minute);
+    final endDateTime =
+        DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
+
+    return endDateTime.isAfter(startDateTime);
   }
 
   /* 2. FUNGSI UNTUK MEMILIH DESAIN BENDA */
@@ -184,11 +215,13 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
   void _resetForm() {
     _formPeminjamanCnc.currentState?.reset();
     _peminjamanC.resetFormFields();
-    setState(() {
-      _selectedProgramStudi = null;
-      _selectedKategori = null;
-      _selectedDetail = null;
-    });
+    setState(
+      () {
+        _selectedProgramStudi = null;
+        _selectedKategori = null;
+        _selectedDetail = null;
+      },
+    );
   }
 
   // Method: Validasi Form
@@ -198,17 +231,19 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
         context: context,
         builder: (context) => CustomDialogWidget(
           onConfirmed: () {
-            _peminjamanC.peminjamanCncButton().then((success) {
-              if (success) {
-                _resetForm();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => afterSubmit(),
-                  ),
-                );
-              }
-            });
+            _peminjamanC.peminjamanCncButton().then(
+              (success) {
+                if (success) {
+                  _resetForm();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => afterSubmit(),
+                    ),
+                  );
+                }
+              },
+            );
           },
         ),
       );
@@ -740,211 +775,165 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
         ),
         elevation: 0, // agar appbar header tidak meninggalkan shadow
       ),
-      extendBodyBehindAppBar: true,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 23.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 55.0,
-              ),
-              Text(
-                "Form Peminjaman CNC Milling",
-                style: GoogleFonts.inter(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF6B7888),
+      extendBodyBehindAppBar: false,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 23.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 10.0,
                 ),
-              ),
-              const SizedBox(
-                height: 15.0,
-              ),
-              Form(
-                key: _formPeminjamanCnc,
-                child: Column(
-                  children: [
-                    customFormPeminjaman(
-                      controller: _peminjamanC.emailC,
-                      returnText: "Silahkan mengisi email",
-                      judul: "Email",
-                      hintText: "Contoh: ayu@mhs.polman-bandung.ac.id",
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    customFormPeminjaman(
-                      controller: _peminjamanC.namaC,
-                      returnText: "Silahkan mengisi nama lengkap",
-                      judul: "Nama Pemohon",
-                      hintText: "contoh: Ayu Asahi",
-                    ),
-                    customFormPeminjaman(
-                      controller: _peminjamanC.tanggalC,
-                      returnText: "Silahkan mengisi batas peminjaman",
-                      judul: "Tanggal Peminjaman",
-                      hintText: DateFormat('EE, dd/MMM/yy').format(
-                        DateTime.now(),
+                Text(
+                  "Form Peminjaman CNC Milling",
+                  style: GoogleFonts.inter(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF6B7888),
+                  ),
+                ),
+                const SizedBox(
+                  height: 15.0,
+                ),
+                Form(
+                  key: _formPeminjamanCnc,
+                  child: Column(
+                    children: [
+                      customFormPeminjaman(
+                        controller: _peminjamanC.emailC,
+                        returnText: "Silahkan mengisi email",
+                        judul: "Email",
+                        hintText: "Contoh: ayu@mhs.polman-bandung.ac.id",
+                        keyboardType: TextInputType.emailAddress,
                       ),
-                      icon: IconButton(
-                        onPressed: () {
-                          _showDatePicker();
-                        },
-                        icon: const Icon(
-                          MingCuteIcons.mgc_calendar_month_fill,
+                      customFormPeminjaman(
+                        controller: _peminjamanC.namaC,
+                        returnText: "Silahkan mengisi nama lengkap",
+                        judul: "Nama Pemohon",
+                        hintText: "contoh: Ayu Asahi",
+                      ),
+                      customFormPeminjaman(
+                        controller: _peminjamanC.tanggalC,
+                        returnText: "Silahkan mengisi batas peminjaman",
+                        judul: "Tanggal Peminjaman",
+                        hintText: DateFormat('EE, dd/MMM/yy').format(
+                          DateTime.now(),
                         ),
-                        //Iconify(Ion.calendar),
-                        color: const Color(0xFFB9B9B9),
+                        icon: IconButton(
+                          onPressed: () {
+                            _showDatePicker();
+                          },
+                          icon: const Icon(
+                            MingCuteIcons.mgc_calendar_month_fill,
+                          ),
+                          //Iconify(Ion.calendar),
+                          color: const Color(0xFFB9B9B9),
+                        ),
+                        keyboardType: TextInputType.datetime,
+                        readOnly: true,
                       ),
-                      keyboardType: TextInputType.datetime,
-                      readOnly: true,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: customFormPeminjaman(
-                            controller: _peminjamanC.awalC,
-                            judul: "Awal Peminjaman",
-                            returnText: "Silahkan mengisi batas peminjaman",
-                            hintText: DateFormat('hh:mm a').format(
-                              DateTime.now(),
-                            ),
-                            icon: IconButton(
-                              onPressed: () {
-                                _showDayNightTimePicker(_peminjamanC.awalC);
-                              },
-                              icon: const Icon(
-                                MingCuteIcons.mgc_time_fill,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: customFormPeminjaman(
+                              controller: _peminjamanC.awalC,
+                              judul: "Awal Peminjaman",
+                              returnText: "Silahkan mengisi batas peminjaman",
+                              hintText: DateFormat('hh:mm a').format(
+                                DateTime.now(),
                               ),
-                              color: const Color(0xFFB9B9B9),
-                            ),
-                            keyboardType: TextInputType.datetime,
-                            readOnly: true,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 6.0,
-                        ),
-                        Expanded(
-                          child: customFormPeminjaman(
-                            controller: _peminjamanC.akhirC,
-                            judul: "Akhir Peminjaman",
-                            returnText: "Silahkan mengisi batas peminjaman",
-                            hintText: DateFormat('hh:mm a').format(
-                              DateTime.now(),
-                            ),
-                            icon: IconButton(
-                              onPressed: () {
-                                _showDayNightTimePicker(_peminjamanC.akhirC);
-                              },
-                              icon: const Icon(
-                                MingCuteIcons.mgc_time_fill,
+                              icon: IconButton(
+                                onPressed: () {
+                                  _showDayNightTimePicker(_peminjamanC.awalC);
+                                },
+                                icon: const Icon(
+                                  MingCuteIcons.mgc_time_fill,
+                                ),
+                                color: const Color(0xFFB9B9B9),
                               ),
-                              color: const Color(0xFFB9B9B9),
+                              keyboardType: TextInputType.datetime,
+                              readOnly: true,
                             ),
-                            keyboardType: TextInputType.datetime,
-                            readOnly: true,
                           ),
-                        ),
-                      ],
-                    ),
-                    customFormPeminjaman(
-                      controller: _peminjamanC.jumlahC,
-                      judul: "Jumlah/Satuan",
-                      returnText:
-                          "Silahkan mengisi jumlah yang akan dilakukan pemesinan",
-                      hintText: "Contoh: 2 Part",
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Detail Keperluan",
-                        style: GoogleFonts.inter(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w300,
-                            color: const Color(0xFF6B7888)),
+                          const SizedBox(
+                            width: 6.0,
+                          ),
+                          Expanded(
+                            child: customFormPeminjaman(
+                              controller: _peminjamanC.akhirC,
+                              judul: "Akhir Peminjaman",
+                              returnText: "Silahkan mengisi batas peminjaman",
+                              hintText: DateFormat('hh:mm a').format(
+                                DateTime.now(),
+                              ),
+                              icon: IconButton(
+                                onPressed: () {
+                                  _showDayNightTimePicker(_peminjamanC.akhirC);
+                                },
+                                icon: const Icon(
+                                  MingCuteIcons.mgc_time_fill,
+                                ),
+                                color: const Color(0xFFB9B9B9),
+                              ),
+                              keyboardType: TextInputType.datetime,
+                              readOnly: true,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 3.0,
-                    ),
-                    // Jurusan
-                    DropdownButtonFormField<String>(
-                      value: _selectedJurusan,
-                      hint: const Text("Pilih Jurusan"),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedJurusan = newValue;
-                          _peminjamanC.jurusanC.text = newValue!;
-                          _selectedProgramStudi = null;
-                          _selectedKategori = null;
-                          _selectedDetail = null;
-                        });
-                      },
-                      items: jurusanOptions.map((String option) {
-                        return DropdownMenuItem<String>(
-                          value: option,
-                          child: Text(option),
-                        );
-                      }).toList(),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Silahkan pilih jurusan';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Color(0xFFD9D9D9),
-                          ),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.black12,
-                          ),
-                          borderRadius: BorderRadius.circular(10.0),
+                      customFormPeminjaman(
+                        controller: _peminjamanC.jumlahC,
+                        judul: "Jumlah/Satuan",
+                        returnText:
+                            "Silahkan mengisi jumlah yang akan dilakukan pemesinan",
+                        hintText: "Contoh: 2 Part",
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Detail Keperluan",
+                          style: GoogleFonts.inter(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w300,
+                              color: const Color(0xFF6B7888)),
                         ),
                       ),
-                      isExpanded: true,
-                      menuMaxHeight: 300,
-                    ),
-                    const SizedBox(
-                      height: 3.0,
-                    ),
-                    // Program Studi
-                    if (_selectedJurusan != null &&
-                        _selectedJurusan != 'Lainnya')
+                      const SizedBox(
+                        height: 3.0,
+                      ),
+                      // Jurusan
                       DropdownButtonFormField<String>(
-                        value: _selectedProgramStudi,
-                        hint: const Text("Pilih Program Studi"),
+                        value: _selectedJurusan,
+                        hint: const Text("Pilih Jurusan"),
                         onChanged: (newValue) {
                           setState(() {
-                            _selectedProgramStudi = newValue;
-                            _peminjamanC.prodiC.text = newValue!;
+                            _selectedJurusan = newValue;
+                            _peminjamanC.jurusanC.text = newValue!;
+                            _selectedProgramStudi = null;
                             _selectedKategori = null;
                             _selectedDetail = null;
                           });
                         },
-                        items: programStudiOptions[_selectedJurusan]!
-                            .map((String option) {
-                          return DropdownMenuItem(
+                        items: jurusanOptions.map((String option) {
+                          return DropdownMenuItem<String>(
                             value: option,
                             child: Text(option),
                           );
                         }).toList(),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Silahkan pilih program studi";
+                            return 'Silahkan pilih jurusan';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 34, 23, 23),
+                              color: Color(0xFFD9D9D9),
                             ),
                             borderRadius: BorderRadius.circular(10.0),
                           ),
@@ -958,171 +947,218 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                         isExpanded: true,
                         menuMaxHeight: 300,
                       ),
-                    const SizedBox(
-                      height: 3.0,
-                    ),
-                    // Kategori
-                    if (_selectedProgramStudi != null ||
-                        _selectedJurusan == 'Lainnya')
-                      DropdownButtonFormField<String>(
-                        value: _selectedKategori,
-                        hint: const Text("Pilih Kategori Peminjaman"),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedKategori = newValue;
-                            _peminjamanC.kategoriC.text = newValue!;
-                            _selectedDetail = null;
+                      const SizedBox(
+                        height: 3.0,
+                      ),
+                      // Program Studi
+                      if (_selectedJurusan != null &&
+                          _selectedJurusan != 'Lainnya')
+                        DropdownButtonFormField<String>(
+                          value: _selectedProgramStudi,
+                          hint: const Text("Pilih Program Studi"),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedProgramStudi = newValue;
+                              _peminjamanC.prodiC.text = newValue!;
+                              _selectedKategori = null;
+                              _selectedDetail = null;
+                            });
+                          },
+                          items: programStudiOptions[_selectedJurusan]!
+                              .map((String option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Silahkan pilih program studi";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color.fromARGB(255, 34, 23, 23),
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          isExpanded: true,
+                          menuMaxHeight: 300,
+                        ),
+                      const SizedBox(
+                        height: 3.0,
+                      ),
+                      // Kategori
+                      if (_selectedProgramStudi != null ||
+                          _selectedJurusan == 'Lainnya')
+                        DropdownButtonFormField<String>(
+                          value: _selectedKategori,
+                          hint: const Text("Pilih Kategori Peminjaman"),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedKategori = newValue;
+                              _peminjamanC.kategoriC.text = newValue!;
+                              _selectedDetail = null;
 
-                            // if (_isManualInputRequired()) {
-                            //   _selectedDetail = null;
-                            //   _peminjamanC.detailKeperluanC.text =
-                            //       ''; // Kosongkan untuk input manual
-                            // } else {
-                            //   _selectedDetail = null;
-                            //   _peminjamanC.detailKeperluanC
-                            //       .clear(); // Reset jika memilih kategori lain
-                            // }
-                          });
-                        },
-                        items: kategoriOptions.map((String option) {
-                          return DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          );
-                        }).toList(),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Silahkan pilih kategori peminjaman";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9D9D9),
+                              // if (_isManualInputRequired()) {
+                              //   _selectedDetail = null;
+                              //   _peminjamanC.detailKeperluanC.text =
+                              //       ''; // Kosongkan untuk input manual
+                              // } else {
+                              //   _selectedDetail = null;
+                              //   _peminjamanC.detailKeperluanC
+                              //       .clear(); // Reset jika memilih kategori lain
+                              // }
+                            });
+                          },
+                          items: kategoriOptions.map((String option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Silahkan pilih kategori peminjaman";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color(0xFFD9D9D9),
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            borderRadius: BorderRadius.circular(10.0),
                           ),
+                          isExpanded: true,
+                          menuMaxHeight: 300,
                         ),
-                        isExpanded: true,
-                        menuMaxHeight: 300,
+                      const SizedBox(
+                        height: 3.0,
                       ),
-                    const SizedBox(
-                      height: 3.0,
-                    ),
-                    // Detail Keperluan
-                    if (_selectedKategori != null &&
-                        _selectedKategori != 'Tugas Akhir' &&
-                        _selectedKategori != 'Proyek Akhir' &&
-                        _selectedProgramStudi != null &&
-                        _selectedJurusan != 'FE' &&
-                        _selectedJurusan != 'Lainnya')
-                      DropdownButtonFormField<String>(
-                        value: _selectedDetail,
-                        hint: const Text("Pilih Detail Keperluan"),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedDetail = newValue;
-                            _peminjamanC.detailKeperluanC.text = newValue!;
-                          });
-                        },
-                        items: detailOptions[_selectedProgramStudi]![
-                                _selectedKategori]!
-                            .map((String option) {
-                          return DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          );
-                        }).toList(),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Silahkan pilih detail keperluan';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9D9D9),
+                      // Detail Keperluan
+                      if (_selectedKategori != null &&
+                          _selectedKategori != 'Tugas Akhir' &&
+                          _selectedKategori != 'Proyek Akhir' &&
+                          _selectedProgramStudi != null &&
+                          _selectedJurusan != 'FE' &&
+                          _selectedJurusan != 'Lainnya')
+                        DropdownButtonFormField<String>(
+                          value: _selectedDetail,
+                          hint: const Text("Pilih Detail Keperluan"),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedDetail = newValue;
+                              _peminjamanC.detailKeperluanC.text = newValue!;
+                            });
+                          },
+                          items: detailOptions[_selectedProgramStudi]![
+                                  _selectedKategori]!
+                              .map((String option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Silahkan pilih detail keperluan';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color(0xFFD9D9D9),
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: Colors.black12,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.black12,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          isExpanded: true,
+                          menuMaxHeight: 300,
+                        ),
+                      if (_selectedKategori != null && _isManualInputRequired())
+                        customFormPeminjaman(
+                          controller: _peminjamanC.detailKeperluanC,
+                          judul: "Detail Keperluan",
+                          returnText: "Silahkan isi detail keperluan",
+                          hintText: "Masukkan detail keperluan",
+                        ),
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      Obx(
+                        () => customFormPeminjaman(
+                          controller: TextEditingController(
+                              text: _peminjamanC.fileNames.value),
+                          judul: "Desain Benda",
+                          returnText: "Silahkan mengisi masukan desain benda",
+                          hintText: "Tambahkan file",
+                          icon: IconButton(
+                            onPressed: () {
+                              _peminjamanC.pickFile();
+                            },
+                            icon: const Icon(
+                              MingCuteIcons.mgc_upload_2_line,
+                            ),
+                            color: const Color(0xFFB9B9B9),
+                          ),
+                          keyboardType: TextInputType.datetime,
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 11.0,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(328, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            backgroundColor: const Color(0xFFEFF1F4),
+                          ),
+                          // onPressed: _validateForm,
+                          onPressed: _validateForm,
+                          child: Text(
+                            "Submit",
+                            style: GoogleFonts.inter(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF6B7888),
+                            ),
                           ),
                         ),
-                        isExpanded: true,
-                        menuMaxHeight: 300,
                       ),
-                    if (_selectedKategori != null && _isManualInputRequired())
-                      customFormPeminjaman(
-                        controller: _peminjamanC.detailKeperluanC,
-                        judul: "Detail Keperluan",
-                        returnText: "Silahkan isi detail keperluan",
-                        hintText: "Masukkan detail keperluan",
-                      ),
-                    const SizedBox(
-                      height: 8.0,
-                    ),
-                    Obx(
-                      () =>
-                    customFormPeminjaman(
-                      controller: TextEditingController(
-                          text: _peminjamanC.fileNames.value),
-                      judul: "Desain Benda",
-                      returnText: "Silahkan mengisi masukan desain benda",
-                      hintText: "Tambahkan file",
-                      icon: IconButton(
-                        onPressed: () {
-                          _peminjamanC.pickFile();
-                        },
-                        icon: const Icon(
-                          MingCuteIcons.mgc_upload_2_line,
-                        ),
-                        color: const Color(0xFFB9B9B9),
-                      ),
-                      keyboardType: TextInputType.datetime,
-                      readOnly: true,
-                    ),
-                    ),
-                    const SizedBox(
-                      height: 11.0,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(328, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          backgroundColor: const Color(0xFFEFF1F4),
-                        ),
-                        // onPressed: _validateForm,
-                        onPressed: _validateForm,
-                        child: Text(
-                          "Submit",
-                          style: GoogleFonts.inter(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF6B7888),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

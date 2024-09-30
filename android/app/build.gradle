@@ -23,8 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
+    compileSdkVersion 34
     namespace "com.example.build_app"
-    compileSdkVersion flutter.compileSdkVersion
     ndkVersion "25.1.8937393" // Pastikan versi NDK ini yang tertinggi
 
     compileOptions {

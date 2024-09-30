@@ -1,5 +1,7 @@
 import 'package:build_app/controller/count_controller.dart';
 import 'package:build_app/controller/user_controller.dart';
+import 'package:build_app/controller/logout_controller.dart';
+import 'package:build_app/controller/approvedPeminjaman_controller.dart';
 import 'package:build_app/models/count_model.dart';
 import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_cnc.dart';
 import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_lasercut.dart';
@@ -17,54 +19,29 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:ming_cute_icons/ming_cute_icons.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class mainPageAdmin extends StatelessWidget {
+class mainPageAdmin extends StatefulWidget {
+  mainPageAdmin({Key? key}) : super(key: key);
+
+  @override
+  State<mainPageAdmin> createState() => _mainPageAdminState();
+}
+
+class _mainPageAdminState extends State<mainPageAdmin> {
   final CountController countC = Get.put(CountController());
+
   final UserController _userController = Get.put(UserController());
 
-  mainPageAdmin({Key? key}) : super(key: key);
+  final LogoutController _logoutController = Get.put(LogoutController());
+
+  final ApprovedPeminjamanController approvedPeminjamanController =
+      Get.put(ApprovedPeminjamanController());
+
   // // final UserController userController = Get.find<UserController>();
-  // final List<dashboardInformasiPeminjaman> dataList = [
-  //   const dashboardInformasiPeminjaman(
-  //     namaMesin: "CNC Milling",
-  //     dataAcc: "12 Data",
-  //     dataTidakAcc: "01 Data",
-  //     dataDiproses: "24 Data",
-  //     alamatInformasiLanjutan: RouteName.halaman_informasi_cnc,
-  //   ),
-  //   const dashboardInformasiPeminjaman(
-  //     namaMesin: "Laser Cutting",
-  //     dataAcc: "23 Data",
-  //     dataTidakAcc: "11 Data",
-  //     dataDiproses: "08 Data",
-  //     alamatInformasiLanjutan: RouteName.halaman_informasi_lasercut,
-  //   ),
-  //   const dashboardInformasiPeminjaman(
-  //     namaMesin: "3D Printing",
-  //     dataAcc: "09 Data",
-  //     dataTidakAcc: "19 Data",
-  //     dataDiproses: "16 Data",
-  //     alamatInformasiLanjutan: RouteName.halaman_informasi_printing,
-  //   ),
-  // ];
-
-  // Widget carouselView(int index) {
-  //   final dashboardInformasiPeminjaman data = dataList[index];
-  //   return carouselCard(data);
-  // }
-
-  // Widget carouselCard(dashboardInformasiPeminjaman data) {
-  //   return dashboardInformasiPeminjaman(
-  //     namaMesin: data.namaMesin,
-  //     dataAcc: data.dataAcc,
-  //     dataTidakAcc: data.dataTidakAcc,
-  //     dataDiproses: data.dataDiproses,
-  //     alamatInformasiLanjutan: data.alamatInformasiLanjutan,
-  //   );
-  // }
-
-  // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
     return dashboardInformasiPeminjaman(
       namaMesin: data.namaMesin,
@@ -105,10 +82,190 @@ class mainPageAdmin extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    print('Initializing mainPageAdmin');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      approvedPeminjamanController.fetchApprovedPeminjaman();
+    });
+  }
+
+  // Parsing Time Strings
+  TimeOfDay _parseTimeString(String timeString) {
+    try {
+      // Assuming timeString is in format "h:mm:ss a" (e.g., "2:00:00 PM")
+      print('Parsing time string: $timeString');
+      final parts = timeString.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+      if (timeString.toLowerCase().contains('pm') && hour != 12) {
+        hour += 12;
+      } else if (timeString.toLowerCase().contains('am') && hour == 12) {
+        hour = 0;
+      }
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      print('Error parsing time string: $e');
+      return TimeOfDay(hour: 0, minute: 0);
+    }
+  }
+
+  // Fungsi untuk mendapatkan warna berdasarkan mesin
+  Color _getColorForMachine(String namaMesin) {
+    print('Getting color for machine: $namaMesin');
+    switch (namaMesin.toLowerCase()) {
+      case "cnc milling":
+      case "cnc":
+        print('Returning blue for CNC');
+        return Colors.blue;
+      case "laser cutting":
+      case "laser":
+        print('Returning red for Laser Cutting');
+        return Colors.red;
+      case "3d printing":
+      case "printing":
+        print('Returning green for 3D Printing');
+        return Colors.green;
+      default:
+        print('Returning grey for unknown machine: $namaMesin');
+        return Colors.grey;
+    }
+  }
+
+  // Source for Calendar Appointments
+  CalendarDataSource _getCalendarDataSource() {
+    print('Getting calendar data source');
+    List<Appointment> appointments = [];
+    if (approvedPeminjamanController.approvedPeminjaman.value != null) {
+      print('Approved peminjaman data available');
+      for (var peminjaman
+          in approvedPeminjamanController.approvedPeminjaman.value!.data) {
+        print('Processing peminjaman: ${peminjaman.toJson()}');
+        try {
+          DateTime tanggal =
+              DateFormat("yyyy-MM-dd").parse(peminjaman.tanggalPeminjaman);
+
+          TimeOfDay awalTime = _parseTimeString(peminjaman.awalPeminjaman);
+          TimeOfDay akhirTime = _parseTimeString(peminjaman.akhirPeminjaman);
+
+          DateTime startTime = DateTime(tanggal.year, tanggal.month,
+              tanggal.day, awalTime.hour, awalTime.minute);
+          DateTime endTime = DateTime(tanggal.year, tanggal.month, tanggal.day,
+              akhirTime.hour, akhirTime.minute);
+
+          Color appointmentColor = _getColorForMachine(peminjaman.namaMesin);
+          print(
+              'Appointment: ${peminjaman.namaMesin} from $startTime to $endTime with color $appointmentColor');
+
+          appointments.add(Appointment(
+            startTime: startTime,
+            endTime: endTime,
+            subject: peminjaman.namaMesin,
+            color: appointmentColor,
+            notes: peminjaman.namaPemohon,
+          ));
+        } catch (e) {
+          print('Error processing peminjaman: $e');
+        }
+      }
+    } else {
+      print('No approved peminjaman data available');
+    }
+    print('Created ${appointments.length} appointments');
+    return _AppointmentDataSource(appointments);
+  }
+
+  @override
   Widget build(BuildContext context) {
     _userController.checkLoggedIn();
 
     return customScaffoldPage(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: pageModeScheme.primary,
+              ),
+              accountName: Text(
+                _userController.username.value,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              accountEmail: Text(
+                _userController.role.value,
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 14.0,
+                ),
+              ),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Color(0xFFE6EDF0),
+                child: ClipOval(
+                  child: Icon(
+                    MingCuteIcons.mgc_user_3_fill,
+                    size: 48.0,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.notifications_active_sharp),
+              title: Text(
+                'Notifikasi',
+                style: GoogleFonts.inter(
+                  fontSize: 16.0,
+                ),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(MingCuteIcons.mgc_exit_line),
+              title: Text(
+                'Log Out',
+                style: GoogleFonts.inter(
+                  fontSize: 16.0,
+                ),
+              ),
+              onTap: () {
+                print('Logout button pressed');
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            print('Logout cancelled');
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Logout'),
+                          onPressed: () async {
+                            print('Logout confirmed, attempting to logout');
+                            Navigator.of(context).pop();
+                            final success = await _logoutController.logout();
+                            print(
+                                'Logout result: ${success ? 'successful' : 'failed'}');
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -146,22 +303,31 @@ class mainPageAdmin extends StatelessWidget {
                     )
                   ],
                 ),
-                Container(
-                  height: 48,
-                  width: 48,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12.0),
-                    ),
-                    color: Color(0xFFDFE7EF),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_active_sharp,
-                    size: 24,
-                    color: Color(0xFF1D5973),
-                  ),
-                )
+                Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      height: 48,
+                      width: 48,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        color: Color(0xFFDFE7EF),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          MingCuteIcons.mgc_pin_fill,
+                          size: 24.0,
+                        ),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        color: const Color(0xFF1D5973),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -226,7 +392,7 @@ class mainPageAdmin extends StatelessWidget {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                               child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
@@ -234,7 +400,7 @@ class mainPageAdmin extends StatelessWidget {
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData ||
                               snapshot.data!.data.id.isEmpty) {
-                            return Center(
+                            return const Center(
                               child: Text('No data available'),
                             );
                           } else {
@@ -306,7 +472,7 @@ class mainPageAdmin extends StatelessWidget {
                             topImage: 4.0,
                             topArrow: 2.0,
                           ),
-                          SizedBox(width: 11.0),
+                          const SizedBox(width: 11.0),
                           buttonPeminjaman(
                             page: monitoringPenggunaanLasercut(),
                             objekDipilih: "Memilih Laser Cutting",
@@ -318,7 +484,7 @@ class mainPageAdmin extends StatelessWidget {
                             topImage: 18.0,
                             topArrow: 11.0,
                           ),
-                          SizedBox(width: 11.0),
+                          const SizedBox(width: 11.0),
                           buttonPeminjaman(
                             page: monitoringPenggunaanPrinting(),
                             objekDipilih: "Memilih 3D Printing",
@@ -359,24 +525,72 @@ class mainPageAdmin extends StatelessWidget {
                       height: 13.0,
                     ),
                     Container(
-                      height: 400,
-                      decoration: BoxDecoration(
-                        color: pageModeScheme.onPrimary,
-                        shape: BoxShape.rectangle,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: TableCalendar(
-                        focusedDay: DateTime.now(),
-                        firstDay: DateTime.utc(2024, 01, 01),
-                        lastDay: DateTime.utc(2050, 01, 01),
-                        calendarStyle: const CalendarStyle(
-                          cellMargin: EdgeInsets.all(8.0),
-                        ),
+                      height: 600,
+                      child: Obx(
+                        () {
+                          if (approvedPeminjamanController.isLoading.value) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
+                            return SfCalendar(
+                              view: CalendarView.week,
+                              dataSource: _getCalendarDataSource(),
+                              timeSlotViewSettings: const TimeSlotViewSettings(
+                                startHour: 7,
+                                endHour: 18,
+                                nonWorkingDays: <int>[
+                                  DateTime.saturday,
+                                  DateTime.sunday
+                                ],
+                                timeFormat: 'HH:mm',
+                                timeInterval: Duration(minutes: 60),
+                              ),
+                              appointmentBuilder: appointmentBuilder,
+                              headerStyle: CalendarHeaderStyle(
+                                textStyle: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue[800]),
+                              ),
+                              viewHeaderStyle: ViewHeaderStyle(
+                                dayTextStyle: GoogleFonts.inter(
+                                    color: Colors.blue[800],
+                                    fontWeight: FontWeight.bold),
+                                dateTextStyle: GoogleFonts.inter(
+                                    color: Colors.blue[800],
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              onTap: (CalendarTapDetails details) {
+                                if (details.targetElement ==
+                                    CalendarElement.appointment) {
+                                  _showEventDetails(
+                                      details.appointments!.first);
+                                }
+                              },
+                            );
+                          }
+                        },
                       ),
                     ),
+                    // Container(
+                    //   height: 400,
+                    //   decoration: BoxDecoration(
+                    //     color: pageModeScheme.onPrimary,
+                    //     shape: BoxShape.rectangle,
+                    //     borderRadius: const BorderRadius.only(
+                    //       topLeft: Radius.circular(20.0),
+                    //       topRight: Radius.circular(20.0),
+                    //     ),
+                    //   ),
+                    //   child: TableCalendar(
+                    //     focusedDay: DateTime.now(),
+                    //     firstDay: DateTime.utc(2024, 01, 01),
+                    //     lastDay: DateTime.utc(2050, 01, 01),
+                    //     calendarStyle: const CalendarStyle(
+                    //       cellMargin: EdgeInsets.all(8.0),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -386,5 +600,87 @@ class mainPageAdmin extends StatelessWidget {
       ),
     );
     // });
+  }
+
+  Widget appointmentBuilder(
+      BuildContext context, CalendarAppointmentDetails details) {
+    final Appointment appointment = details.appointments.first;
+    return Container(
+      decoration: BoxDecoration(
+        color: appointment.color.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Text(
+          appointment.subject,
+          style: GoogleFonts.inter(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+
+  void _showEventDetails(Appointment appointment) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Detail Peminjaman',
+          style: TextStyle(color: Colors.blue[800]),
+        ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading:
+                  Icon(Icons.precision_manufacturing, color: appointment.color),
+              title: Text('Mesin: ${appointment.subject}'),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.grey),
+              title: Text('Pemohon: ${appointment.notes}'),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.access_time_filled, color: Colors.green),
+              title: Text(
+                  'Mulai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.startTime)}'),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.access_time_filled, color: Colors.red),
+              title: Text(
+                  'Selesai: ${DateFormat('dd MMM yyyy, HH:mm').format(appointment.endTime)}'),
+              titleTextStyle: GoogleFonts.inter(
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Tutup'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AppointmentDataSource extends CalendarDataSource {
+  _AppointmentDataSource(List<Appointment> source) {
+    appointments = source;
   }
 }

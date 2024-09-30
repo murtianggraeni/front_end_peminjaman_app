@@ -37,6 +37,40 @@ class ApiController {
     }
   }
 
+Future<http.Response> logout() async {
+  final SharedPreferences shared = await SharedPreferences.getInstance();
+  String? getToken = shared.getString("accessToken");
+  print('Attempting to logout. Token exists: ${getToken != null}');
+  
+  try {
+    if (getToken == null) {
+      print('No token found, considering as already logged out');
+      return http.Response('{"success":true,"message":"Logged out successfully"}', 200);
+    }
+    
+    print('Sending logout request to server');
+    final response = await http.post(
+      Uri.parse('$URL_API/auth/logout'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $getToken',
+      },
+    );
+    
+    print('Logout API response status: ${response.statusCode}');
+    print('Logout API response body: ${response.body}');
+    
+    if (response.statusCode == 200) {
+      print('Successful logout, removing token from local storage');
+      await shared.remove("accessToken");
+    }
+    return response;
+  } catch (e) {
+    print('Error during logout API call: $e');
+    throw e;
+  }
+}
+
   // Future<http.Response> peminjaman(Map<String, dynamic> data, machine) async {
   //   final SharedPreferences shared = await SharedPreferences.getInstance();
   //   String? getToken = shared.getString("accessToken");

@@ -23,6 +23,7 @@ class formPenggunaanLasercut extends StatefulWidget {
 class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
   final PeminjamanController _peminjamanC = Get.put(PeminjamanController());
   final _formPeminjamanLasercut = GlobalKey<FormState>();
+  static final DateFormat _timeFormat = DateFormat('hh:mm a');
 
 /* 1. FUNGSI UNTUK PEMILIHAN TANGGAL DAN WAKTU DI FORM PEMINJAMAN */
 // Untuk memilih tanggal peminjaman
@@ -49,100 +50,130 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
 
   // Untuk memilih waktu peminjaman
   void _showDayNightTimePicker(TextEditingController controller) {
-    TimeOfDay now = TimeOfDay.now();
+    final initialTime = _parseTimeString(controller.text) ?? TimeOfDay.now();
+
     Navigator.of(context).push(
       showPicker(
         context: context,
-        value: Time(
-            hour: now.hour, minute: now.minute), // Convert TimeOfDay to Time
+        value: Time(hour: initialTime.hour, minute: initialTime.minute),
         onChange: (Time newTime) {
-          // Validasi minute interval
-          if (newTime.minute != 0 && newTime.minute != 30) {
+          if (!_isValidMinuteInterval(newTime.minute)) {
+            _showInvalidTimeSnackbar();
+            return;
+          }
+
+          final selectedTime = newTime.toTimeOfDay();
+          final formattedTime = _formatTimeWithAMPM(selectedTime);
+
+          if (_peminjamanC.tanggalC.text.isEmpty) {
             Get.snackbar(
-              "Invalid Time",
-              'Please select a time with 0 or 30 minute intervals',
-              backgroundColor: Colors.redAccent,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 3),
+              "Peringatan",
+              "Silakan pilih tanggal terlebih dahulu.",
+              backgroundColor: Colors.yellow,
+              colorText: Colors.black,
             );
             return;
           }
 
-          final TimeOfDay selectedTime = newTime.toTimeOfDay();
-
-          final DateTime selectedDateTime = DateTime(
-            DateTime.now().year,
-            DateTime.now().month,
-            DateTime.now().day,
+          final selectedDate =
+              DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text);
+          final selectedDateTime = DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
             selectedTime.hour,
             selectedTime.minute,
           );
 
-          final DateTime? selectedDate = _peminjamanC.tanggalC.text.isNotEmpty
-              ? DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text)
-              : null;
-
-          if (selectedDate == null) {
+          if (!_isValidTimeForSelectedDate(selectedDateTime)) {
             Get.snackbar(
-                "Peringatan", "Silakan pilih tanggal terlebih dahulu.");
+              "Peringatan!",
+              "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.",
+              backgroundColor: Colors.yellow,
+              colorText: Colors.black,
+            );
             return;
           }
 
-          final bool isSameDate = selectedDate.year == DateTime.now().year &&
-              selectedDate.month == DateTime.now().month &&
-              selectedDate.day == DateTime.now().day;
-
-          if (isSameDate) {
-            final DateTime currentDateTime = DateTime.now();
-            if (selectedDateTime.isBefore(currentDateTime)) {
-              Get.snackbar("Peringatan!",
-                  "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.");
-              return;
-            }
-          }
-
           if (controller == _peminjamanC.akhirC) {
-            final TimeOfDay startTime = TimeOfDay.fromDateTime(
-              DateFormat('hh:mm a').parse(_peminjamanC.awalC.text),
-            );
-            final DateTime startDateTime = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              startTime.hour,
-              startTime.minute,
-            );
-            final DateTime endDateTime = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              selectedTime.hour,
-              selectedTime.minute,
-            );
-
-            if (endDateTime.isBefore(startDateTime) ||
-                endDateTime.isAtSameMomentAs(startDateTime)) {
-              Get.snackbar("Peringatan",
-                  "Waktu akhir peminjaman harus melebihi waktu awal peminjaman");
+            if (!_isValidEndTime(selectedTime)) {
+              Get.snackbar(
+                "Peringatan",
+                "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
+                backgroundColor: Colors.yellow,
+                colorText: Colors.black,
+              );
               return;
             }
           }
 
           setState(() {
-            controller.text = selectedTime.format(context);
+            controller.text = formattedTime;
           });
         },
         is24HrFormat: false,
+        minuteInterval: TimePickerInterval.THIRTY,
         minHour: 7,
         maxHour: 20,
-        minMinute: 0,
-        minuteInterval: TimePickerInterval.THIRTY,
-        sunAsset: Image.asset("assets/images/sun.png"),
-        moonAsset: Image.asset("assets/images/moon.png"),
         barrierDismissible: false,
         iosStylePicker: true,
+        sunAsset: Image.asset("assets/images/sun.png"),
+        moonAsset: Image.asset("assets/images/moon.png"),
       ),
     );
+  }
+
+  // Parse time string to TimeOfDay
+  TimeOfDay? _parseTimeString(String timeString) {
+    try {
+      final dateTime = _timeFormat.parse(timeString);
+      return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Show snackbar for invalid time
+  void _showInvalidTimeSnackbar() {
+    Get.snackbar(
+      "Invalid Time",
+      'Please select a time with 0 or 30 minute intervals',
+      backgroundColor: Colors.redAccent,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  // Format TimeOfDay to string with AM/PM
+  String _formatTimeWithAMPM(TimeOfDay time) {
+    final now = DateTime.now();
+    final dateTime =
+        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return _timeFormat.format(dateTime);
+  }
+
+  bool _isValidTimeForSelectedDate(DateTime selectedDateTime) {
+    final now = DateTime.now();
+    return selectedDateTime.isAfter(now);
+  }
+
+  bool _isValidMinuteInterval(int minute) {
+    return minute == 0 || minute == 30;
+  }
+
+  bool _isValidEndTime(TimeOfDay endTime) {
+    if (_peminjamanC.awalC.text.isEmpty) return true;
+
+    final startTime = _parseTimeString(_peminjamanC.awalC.text);
+    if (startTime == null) return true;
+
+    final now = DateTime.now();
+    final startDateTime = DateTime(
+        now.year, now.month, now.day, startTime.hour, startTime.minute);
+    final endDateTime =
+        DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
+
+    return endDateTime.isAfter(startDateTime);
   }
 
   /* 2. FUNGSI UNTUK MEMILIH DESAIN BENDA */
@@ -740,7 +771,7 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
         ),
         elevation: 0, // agar appbar header tidak meninggalkan shadow
       ),
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -750,7 +781,7 @@ class _formPenggunaanLasercutState extends State<formPenggunaanLasercut> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 55.0,
+                height: 10.0,
               ),
               Text(
                 "Form Peminjaman Laser Cutting",

@@ -106,8 +106,13 @@ class _cardMonitoringState extends State<cardMonitoring> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 11.0),
                 child: Container(
-                  width: 103.0,
-                  height: 19.0,
+                  // Menggunakan constraints sebagai pengganti lebar tetap
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width *
+                        0.35, // 35% dari lebar layar
+                    minWidth: 110, // Lebar minimum
+                  ),
+                  height: 19.0, // Mempertahankan tinggi asli
                   decoration: BoxDecoration(
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(10.0),
@@ -115,30 +120,78 @@ class _cardMonitoringState extends State<cardMonitoring> {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    //MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center, // Menyelaraskan item secara vertikal
                     children: [
-                      Text(
-                        "detail pengajuan",
-                        style: GoogleFonts.inter(
-                          fontSize: 9.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                          //Color(0XFF09244B),
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0), // Padding horizontal untuk teks
+                          child: Text(
+                            "detail pengajuan",
+                            style: GoogleFonts.inter(
+                              fontSize:
+                                  9.0, // Sedikit ditingkatkan untuk keterbacaan
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
-                      // const SizedBox(
-                      //   width: 0.0,
-                      // ),
-                      const Icon(
-                        //MingCuteIcons.mgc_arrow_right_circle_line,
-                        MingCuteIcons.mgc_right_small_fill,
-                        size: 18.0,
-                      )
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 4.0), // Sedikit padding di kanan ikon
+                        child: const Icon(
+                          MingCuteIcons.mgc_right_small_fill,
+                          size: 18.0,
+                          color: Colors.black,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
+            // Align(
+            //   alignment: Alignment.bottomRight,
+            //   child: Padding(
+            //     padding: const EdgeInsets.only(bottom: 11.0),
+            //     child: Container(
+            //       width: 103.0,
+            //       height: 19.0,
+            //       decoration: BoxDecoration(
+            //         shape: BoxShape.rectangle,
+            //         borderRadius: BorderRadius.circular(10.0),
+            //         color: const Color(0xFFD9D9D9),
+            //       ),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.end,
+            //         //MainAxisAlignment.center,
+            //         children: [
+            //           Text(
+            //             "detail pengajuan",
+            //             style: GoogleFonts.inter(
+            //               fontSize: 9.0,
+            //               fontWeight: FontWeight.w600,
+            //               color: Colors.black,
+            //               //Color(0XFF09244B),
+            //             ),
+            //           ),
+            //           // const SizedBox(
+            //           //   width: 0.0,
+            //           // ),
+            //           const Icon(
+            //             //MingCuteIcons.mgc_arrow_right_circle_line,
+            //             MingCuteIcons.mgc_right_small_fill,
+            //             size: 18.0,
+            //           )
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

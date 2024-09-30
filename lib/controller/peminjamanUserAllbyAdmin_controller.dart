@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'dart:html' as html; // Untuk Flutter web
+// import 'dart:html' as html; // Untuk Flutter web
 import 'package:build_app/provider/api.dart';
 import 'package:build_app/models/getPeminjamanAllAdmin_model.dart';
 import 'package:build_app/enums/machine_type.dart';
@@ -435,49 +435,73 @@ class PeminjamanUserAllbyAdminController extends GetxController {
               children: [
                 ListTile(
                   title: const Text("Email"),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
                   subtitle: Text(detailData.email ?? 'Tidak tersedia'),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Tanggal Peminjaman"),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
                   subtitle:
                       Text(detailData.tanggalPeminjaman ?? 'Tidak tersedia'),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Waktu Awal"),
                   subtitle: Text(_formatTime(
                       detailData.awalPeminjaman ?? 'Tidak tersedia')),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Waktu Akhir"),
                   subtitle: Text(_formatTime(
                       detailData.akhirPeminjaman ?? 'Tidak tersedia')),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Jumlah/Satuan"),
                   subtitle: Text(detailData.jumlah ?? 'Tidak tersedia'),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Keperluan"),
                   subtitle:
                       Text(detailData.detailKeperluan ?? 'Tidak tersedia'),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
                 ListTile(
                   title: const Text("Desain Benda"),
@@ -491,16 +515,20 @@ class PeminjamanUserAllbyAdminController extends GetxController {
                       ),
                     ),
                   ),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  titleTextStyle: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600, color: Colors.black),
                   subtitleTextStyle: GoogleFonts.inter(),
                 ),
                 ListTile(
                   title: Text("Status"),
                   subtitle: Text(detailData.status),
-                  titleTextStyle:
-                      GoogleFonts.inter(fontWeight: FontWeight.w600),
-                  subtitleTextStyle: GoogleFonts.inter(),
+                  titleTextStyle: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  subtitleTextStyle: GoogleFonts.inter(
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -598,15 +626,24 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   }
 
   String _formatTime(String? timeStr) {
+    print('Raw time string received: $timeStr');
     if (timeStr == null || timeStr.isEmpty) return 'Tidak tersedia';
-    try {
-      DateFormat inputFormat = DateFormat("HH:mm:ss");
-      DateTime time = inputFormat.parse(timeStr);
-      return DateFormat('hh:mm:ss a').format(time);
-    } catch (e) {
-      print('Error parsing time: $e');
-      return 'Unparseable: $timeStr';
-    }
+
+    // Pisahkan waktu dan AM/PM
+    List<String> parts = timeStr.split(' ');
+    if (parts.length != 2) return 'Format tidak valid';
+
+    // Pisahkan jam, menit, dan detik
+    List<String> timeParts = parts[0].split(':');
+    if (timeParts.length != 3) return 'Format waktu tidak valid';
+
+    // Tambahkan nol di depan jika jam hanya satu digit
+    String hour = timeParts[0].padLeft(2, '0');
+    String formattedTime =
+        '$hour:${timeParts[1]}:${timeParts[2]} ${parts[1].toUpperCase()}';
+
+    print('Formatted time: $formattedTime');
+    return formattedTime;
   }
 
   Future<void> exportToExcel() async {
@@ -682,32 +719,58 @@ class PeminjamanUserAllbyAdminController extends GetxController {
 
     // Save file for Android/iOS or Web
     if (GetPlatform.isAndroid || GetPlatform.isIOS) {
-      Directory directory = await getApplicationDocumentsDirectory();
-      String outputFile = '${directory.path}/$fileName';
-      var bytes = excel.encode();
-      File(outputFile)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(bytes!);
-      Get.snackbar("Berhasil", "File Excel berhasil disimpan di $outputFile");
-    } else if (GetPlatform.isWeb) {
-      // Encode the Excel file
-      var bytes = excel.encode();
+      Directory? directory;
+      if (GetPlatform.isAndroid) {
+        directory = Directory('/storage/emulated/0/Download');
+        // Periksa apakah direktori ada
+        if (!await directory.exists()) {
+          // Jika tidak ada, gunakan getExternalStorageDirectory
+          directory = await getExternalStorageDirectory();
+        }
+      } else if (GetPlatform.isIOS) {
+        directory = await getApplicationDocumentsDirectory();
+      }
 
-      // Create a Blob and URL for download
-      final blob = html.Blob([bytes], 'application/vnd.ms-excel');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-
-      // Create an anchor element
-      final anchor = html.AnchorElement(href: url);
-
-      // Set attributes and trigger the download
-      anchor.setAttribute('download', fileName);
-      anchor
-          .click(); // Explicitly trigger the download by "clicking" the anchor
-
-      // Revoke the object URL after download
-      html.Url.revokeObjectUrl(url);
+      if (directory != null) {
+        String outputFile = '${directory.path}/$fileName';
+        var bytes = excel.encode();
+        File(outputFile)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(bytes!);
+        Get.snackbar(
+            "Berhasil", "File Excel berhasil disimpan di folder Download");
+      } else {
+        Get.snackbar(
+            "Error", "Tidak dapat menemukan direktori untuk menyimpan file");
+      }
     }
+    // if (GetPlatform.isAndroid || GetPlatform.isIOS) {
+    //   Directory directory = await getApplicationDocumentsDirectory();
+    //   String outputFile = '${directory.path}/$fileName';
+    //   var bytes = excel.encode();
+    //   File(outputFile)
+    //     ..createSync(recursive: true)
+    //     ..writeAsBytesSync(bytes!);
+    //   Get.snackbar("Berhasil", "File Excel berhasil disimpan di $outputFile");
+    // }
+    // } else if (GetPlatform.isWeb) {
+    //   // Encode the Excel file
+    //   var bytes = excel.encode();
+
+    //   // Create a Blob and URL for download
+    //   final blob = html.Blob([bytes], 'application/vnd.ms-excel');
+    //   final url = html.Url.createObjectUrlFromBlob(blob);
+
+    //   // Create an anchor element
+    //   final anchor = html.AnchorElement(href: url);
+
+    //   // Set attributes and trigger the download
+    //   anchor.setAttribute('download', fileName);
+    //   anchor
+    //       .click(); // Explicitly trigger the download by "clicking" the anchor
+
+    //   // Revoke the object URL after download
+    //   html.Url.revokeObjectUrl(url);
   }
 
   @override
