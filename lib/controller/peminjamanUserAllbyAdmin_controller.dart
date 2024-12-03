@@ -32,20 +32,27 @@ class PeminjamanUserAllbyAdminController extends GetxController {
   Rx<MachineType> currentMachineType;
 
   PeminjamanUserAllbyAdminController(MachineType initialMachineType)
-      : currentMachineType = initialMachineType.obs;
-
-  // Variabel observable untuk menyimpan data peminjaman
-  RxList<Datum> peminjaman = <Datum>[].obs;
-
-  // Tambahkan variabel baru untuk menyimpan hasil filter
-  RxList<Datum> filteredPeminjaman = <Datum>[].obs;
+      : currentMachineType = initialMachineType.obs {
+    ever(currentMachineType, (_) => fetchData());
+  }
 
   // Variabel untuk mengatur status, filter, dan pengurutan
   var status = false.obs;
-  var statusFilter = 'All'.obs;
-  var filter = ''.obs;
   var sortAscending = true.obs;
   var selectedCheckboxes = <String>[].obs;
+
+  // Variabel observable untuk menyimpan data peminjaman
+  RxList<Datum> peminjaman = <Datum>[].obs;
+  RxList<Datum> filteredPeminjaman = <Datum>[].obs;
+
+  // Tambahkan variabel untuk loading state
+  var isLoading = false.obs;
+
+  // Tambahkan variabel untuk status dan filter
+  var statusFilter = 'All'.obs;
+  var filter = ''.obs;
+
+  Timer? _dataRefreshTimer;
 
   // Stream controller untuk membroadcast pembaruan data peminjaman
   final _sensorStreamController = StreamController<List<Datum>>.broadcast();
@@ -66,6 +73,52 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     fetchData();
   }
 
+  // // Tambahkan method untuk mengurutkan data berdasarkan waktu terbaru
+  // void sortByLatest() {
+  //   peminjaman.sort((a, b) {
+  //     // Convert waktu to String if needed and then parse
+  //     try {
+  //       DateTime timeA =
+  //           DateFormat("yyyy-MM-dd HH:mm:ss").parse(a.waktu.toString());
+  //       DateTime timeB =
+  //           DateFormat("yyyy-MM-dd HH:mm:ss").parse(b.waktu.toString());
+  //       return timeB.compareTo(timeA); // Descending order (terbaru ke terlama)
+  //     } catch (e) {
+  //       print('Error parsing date: $e');
+  //       print('waktu A: ${a.waktu} (${a.waktu.runtimeType})');
+  //       print('waktu B: ${b.waktu} (${b.waktu.runtimeType})');
+  //       return 0;
+  //     }
+  //   });
+
+  //   filterPeminjaman();
+  //   update();
+  // }
+
+  void sortPeminjamanByLatest() {
+    peminjaman.sort((a, b) {
+      try {
+        // // Null check dan default value untuk waktu
+        // String timeStrA = a.waktu ?? DateTime.now().toIso8601String();
+        // String timeStrB = b.waktu ?? DateTime.now().toIso8601String();
+
+        // DateTime timeA = DateTime.parse(timeStrA);
+        // DateTime timeB = DateTime.parse(timeStrB);
+        // return timeB.compareTo(timeA);
+        // If either waktu is null, use DateTime.now() as fallback
+        DateTime timeA = a.waktu ?? DateTime.now();
+        DateTime timeB = b.waktu ?? DateTime.now();
+        return timeB.compareTo(timeA); // Sort descending (latest first)
+      } catch (e) {
+        print('Error sorting: $e');
+        return 0;
+      }
+    });
+
+    filterPeminjaman();
+    update();
+  }
+
   // Metode yang dipanggil saat controller diinisialisasi
   @override
   void onInit() {
@@ -74,57 +127,152 @@ class PeminjamanUserAllbyAdminController extends GetxController {
     filteredPeminjaman.assignAll(peminjaman);
     print('Fetching data for: ${currentMachineType.value.toApiString()}');
     fetchData();
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    _dataRefreshTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      print('Auto refreshing data...'); // Untuk debugging
+      fetchData();
+    });
   }
 
   // Metode untuk mengambil data peminjaman dari API
   Future<void> fetchData() async {
     try {
-      // final response = await apiController.PeminjamanUserAllforAdmin(machineType.toApiString());
-      print(
-          'Machine Type sent to API: ${currentMachineType.value.toApiString()}');
+      isLoading.value = true;
+      update();
       final response = await apiController.PeminjamanUserAllforAdmin(
-          currentMachineType.value.toApiString()); // Gunakan currentMachineType
-      // Log status code dan response body untuk debugging
-      print('Response Status: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+          currentMachineType.value.toApiString());
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        final dynamic responseData = json.decode(response.body);
-        if (responseData is Map<String, dynamic> &&
-            responseData['data'] is List) {
-          peminjaman.assignAll(
-            responseData['data']
-                .map<Datum>((data) => Datum.fromJson(data))
-                .toList(),
-          );
-          filteredPeminjaman
-              .assignAll(peminjaman); // Inisialisasi filteredPeminjaman
-          update();
-        } else {
-          print('Invalid data format: ${responseData.runtimeType}');
+        try {
+          final dynamic responseData = json.decode(response.body);
+          if (responseData is Map<String, dynamic> &&
+              responseData['data'] is List) {
+            peminjaman.assignAll(
+              responseData['data']
+                  .map<Datum>((data) => Datum.fromJson(data))
+                  .toList(),
+            );
+            sortPeminjamanByLatest();
+            filteredPeminjaman.assignAll(peminjaman);
+          } else {
+            print('Invalid data format: ${responseData}');
+          }
+        } catch (e) {
+          print('Error parsing response: $e');
+          Get.snackbar('Error', 'Failed to parse data.');
         }
-        // if (response.statusCode == 200) {
-        //   final dynamic responseData = json.decode(response.body);
-        //   if (responseData is Map<String, dynamic> &&
-        //       responseData['data'] is List) {
-        //     peminjaman.assignAll(
-        //       responseData['data']
-        //           .map<Datum>((data) => Datum.fromJson(data))
-        //           .toList(),
-        //     );
-        //     _sensorStreamController.add(peminjaman.toList());
-        //     update();
-        //   } else {
-        //     print('Invalid data format: ${responseData.runtimeType}');
-        //   }
       } else {
-        throw Exception(
-            'Failed to fetch data PeminjamanUserAllbyAdminController. Status code: ${response.statusCode}');
+        print('Failed to fetch data. Status code: ${response.statusCode}');
+        Get.snackbar('Error',
+            'Failed to fetch data. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching data: $e');
-      Get.snackbar('Error', 'Failed to fetch data. Please try again.');
+      Get.snackbar('Error', 'Failed to fetch data.');
+    } finally {
+      isLoading.value = false;
+      update();
     }
   }
+
+  // Future<void> fetchData() async {
+  //   try {
+  //     isLoading.value = true; // Set isLoading jadi true ketika API dipanggil
+  //     update(); // Update untuk memicu perubahan UI
+  //     print('Fetching data...');
+  //     final response = await apiController.PeminjamanUserAllforAdmin(
+  //         currentMachineType.value.toApiString());
+
+  //     print('Response status code: ${response.statusCode}');
+  //     print('Response body: ${response.body}');
+
+  //     if (response.statusCode == 200) {
+  //       final dynamic responseData = json.decode(response.body);
+  //       if (responseData is Map<String, dynamic> &&
+  //           responseData['data'] is List) {
+  //         peminjaman.assignAll(
+  //           responseData['data']
+  //               .map<Datum>((data) => Datum.fromJson(data))
+  //               .toList(),
+  //         );
+
+  //         // Sort data setelah mendapatkan response
+  //         sortPeminjamanByLatest();
+
+  //         filteredPeminjaman.assignAll(peminjaman);
+  //         update(); // Memperbarui UI setelah data diterima
+  //       } else {
+  //         print('Invalid data format');
+  //       }
+  //     } else {
+  //       print('Failed to fetch data. Status code: ${response.statusCode}');
+  //       throw Exception('Failed to fetch data');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //     Get.snackbar('Error', 'Failed to fetch data.');
+  //   } finally {
+  //     isLoading.value =
+  //         false; // Set isLoading jadi false setelah API selesai dipanggil
+  //     update(); // Update UI lagi setelah selesai
+  //   }
+  // }
+
+  // Metode untuk mengambil data peminjaman dari API
+  // Future<void> fetchData() async {
+  //   try {
+  //     // final response = await apiController.PeminjamanUserAllforAdmin(machineType.toApiString());
+  //     print(
+  //         'Machine Type sent to API: ${currentMachineType.value.toApiString()}');
+  //     final response = await apiController.PeminjamanUserAllforAdmin(
+  //         currentMachineType.value.toApiString()); // Gunakan currentMachineType
+  //     // Log status code dan response body untuk debugging
+  //     print('Response Status: ${response.statusCode}');
+  //     print('Response Body: ${response.body}');
+  //     if (response.statusCode == 200) {
+  //       final dynamic responseData = json.decode(response.body);
+  //       if (responseData is Map<String, dynamic> &&
+  //           responseData['data'] is List) {
+  //         peminjaman.assignAll(
+  //           responseData['data']
+  //               .map<Datum>((data) => Datum.fromJson(data))
+  //               .toList(),
+  //         );
+  //         filteredPeminjaman
+  //             .assignAll(peminjaman); // Inisialisasi filteredPeminjaman
+  //         update();
+  //       } else {
+  //         print('Invalid data format: ${responseData.runtimeType}');
+  //       }
+  //       // if (response.statusCode == 200) {
+  //       //   final dynamic responseData = json.decode(response.body);
+  //       //   if (responseData is Map<String, dynamic> &&
+  //       //       responseData['data'] is List) {
+  //       //     peminjaman.assignAll(
+  //       //       responseData['data']
+  //       //           .map<Datum>((data) => Datum.fromJson(data))
+  //       //           .toList(),
+  //       //     );
+  //       //     _sensorStreamController.add(peminjaman.toList());
+  //       //     update();
+  //       //   } else {
+  //       //     print('Invalid data format: ${responseData.runtimeType}');
+  //       //   }
+  //     } else {
+  //       throw Exception(
+  //           'Failed to fetch data PeminjamanUserAllbyAdminController. Status code: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //     Get.snackbar('Error', 'Failed to fetch data. Please try again.');
+  //   }
+  // }
 
   // Metode untuk menampilkan detail peminjaman
   Future<void> showDetails(BuildContext context, Datum peminjaman) async {
@@ -162,6 +310,28 @@ class PeminjamanUserAllbyAdminController extends GetxController {
           peminjaman.status.toLowerCase() == statusFilter.value.toLowerCase();
       return matchesFilter && matchesStatus;
     }).toList();
+
+    // Sort filtered data juga
+    // Sort filtered data
+    filteredPeminjaman.sort((a, b) {
+      try {
+        // Null check dan default value untuk waktu
+        // String timeStrA = a.waktu ?? DateTime.now().toIso8601String();
+        // String timeStrB = b.waktu ?? DateTime.now().toIso8601String();
+
+        // DateTime timeA = DateTime.parse(timeStrA);
+        // DateTime timeB = DateTime.parse(timeStrB);
+        // If either waktu is null, use DateTime.now() as fallback
+        DateTime timeA = a.waktu ?? DateTime.now();
+        DateTime timeB = b.waktu ?? DateTime.now();
+        return timeB.compareTo(timeA); // Sort descending (latest first) // Descending order
+      } catch (e) {
+        print('Error parsing date in sort: $e');
+        print('Value A: ${a.waktu}');
+        print('Value B: ${b.waktu}');
+        return 0;
+      }
+    });
 
     update(); // Memicu pembaruan UI
   }
@@ -482,7 +652,8 @@ class PeminjamanUserAllbyAdminController extends GetxController {
                 ),
                 ListTile(
                   title: const Text("Jumlah/Satuan"),
-                  subtitle: Text(detailData.jumlah ?? 'Tidak tersedia'),
+                  subtitle:
+                      Text(detailData.jumlah?.toString() ?? 'Tidak tersedia'),
                   titleTextStyle: GoogleFonts.inter(
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
@@ -694,8 +865,9 @@ class PeminjamanUserAllbyAdminController extends GetxController {
           .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: i + 1))
           .value = TextCellValue(peminjaman.akhirPeminjaman ?? 'Tidak diatur');
       sheetObject
-          .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i + 1))
-          .value = TextCellValue(peminjaman.jumlah ?? 'Tidak diatur');
+              .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: i + 1))
+              .value =
+          TextCellValue(peminjaman.jumlah?.toString() ?? 'Tidak diatur');
       sheetObject
           .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: i + 1))
           .value = TextCellValue(peminjaman.programStudi ?? 'Tidak diatur');
@@ -775,6 +947,7 @@ class PeminjamanUserAllbyAdminController extends GetxController {
 
   @override
   void onClose() {
+    _dataRefreshTimer?.cancel();
     _sensorStreamController.close();
     super.onClose();
   }

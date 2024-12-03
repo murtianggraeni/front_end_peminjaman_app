@@ -1,3 +1,18 @@
+// sensor_model.dart
+
+class SensorData {
+  bool button;
+
+  SensorData({required this.button});
+
+  Map<String, dynamic> toJson() {
+    return {
+      "button": button,
+    };
+  }
+}
+
+
 // To parse this JSON data, do
 //
 //     final sensorModel = sensorModelFromJson(jsonString);
@@ -63,17 +78,3 @@
 //         "__v": v,
 //     };
 // }
-
-// sensor_model.dart
-
-class SensorData {
-  bool button;
-
-  SensorData({required this.button});
-
-  Map<String, dynamic> toJson() {
-    return {
-      "button": button,
-    };
-  }
-}

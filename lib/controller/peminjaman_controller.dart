@@ -17,12 +17,16 @@ class PeminjamanController extends GetxController {
   TextEditingController detailKeperluanC = TextEditingController();
   TextEditingController prodiC = TextEditingController();
   TextEditingController kategoriC = TextEditingController();
+  TextEditingController tipePenggunaC = TextEditingController();
+  TextEditingController nomorIdentitasC = TextEditingController();
+  TextEditingController asalInstansiC = TextEditingController();
 
   final ApiController apiController = ApiController();
 
   // Use RxList for reactive state
   // RxList<String> pickedFileNames = <String>[].obs;
   // RxString fileNames = ''.obs; // Reactive variable for file names as string
+  RxBool isSubmitting = false.obs;
   Rx<PlatformFile?> pickedFile = Rx<PlatformFile?>(null);
   RxString fileNames = ''.obs;
   Rx<File?> selectedFile = Rx<File?>(null);
@@ -39,6 +43,9 @@ class PeminjamanController extends GetxController {
     detailKeperluanC.clear();
     prodiC.clear();
     kategoriC.clear();
+    tipePenggunaC.clear();
+    nomorIdentitasC.clear();
+    asalInstansiC.clear();
     pickedFile.value = null;
     fileNames.value = '';
     // fileNames.value = ''; // Clear file names
@@ -151,6 +158,7 @@ class PeminjamanController extends GetxController {
   // }
 
   Future<bool> peminjamanCncButton() async {
+    isSubmitting.value = true;
     if (pickedFile.value == null) {
       Get.snackbar('Error', 'Please select a design file');
       return false;
@@ -169,6 +177,10 @@ class PeminjamanController extends GetxController {
       'detail_keperluan': detailKeperluanC.text,
       'program_studi': prodiC.text,
       'kategori': kategoriC.text,
+      'tipe_pengguna': tipePenggunaC.text,
+      'nomor_identitas': nomorIdentitasC.text,
+      'asal_instansi':
+          tipePenggunaC.text == 'external' ? asalInstansiC.text : null,
     };
 
     try {
@@ -195,6 +207,7 @@ class PeminjamanController extends GetxController {
         return false;
       }
     } catch (e) {
+      isSubmitting.value = false;
       Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
       return false;
     }
@@ -241,6 +254,7 @@ class PeminjamanController extends GetxController {
   // }
 
   Future<bool> peminjamanLaserButton() async {
+    isSubmitting.value = true;
     if (pickedFile.value == null) {
       Get.snackbar('Error', 'Please select a design file');
       return false;
@@ -257,6 +271,10 @@ class PeminjamanController extends GetxController {
       'detail_keperluan': detailKeperluanC.text,
       'program_studi': prodiC.text,
       'kategori': kategoriC.text,
+      'tipe_pengguna': tipePenggunaC.text,
+      'nomor_identitas': nomorIdentitasC.text,
+      'asal_instansi':
+          tipePenggunaC.text == 'external' ? asalInstansiC.text : null,
     };
 
     try {
@@ -279,6 +297,7 @@ class PeminjamanController extends GetxController {
         return false;
       }
     } catch (e) {
+      isSubmitting.value = false;
       Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
       return false;
     }
@@ -341,6 +360,10 @@ class PeminjamanController extends GetxController {
       'detail_keperluan': detailKeperluanC.text,
       'program_studi': prodiC.text,
       'kategori': kategoriC.text,
+      'tipe_pengguna': tipePenggunaC.text,
+      'nomor_identitas': nomorIdentitasC.text,
+      'asal_instansi':
+          tipePenggunaC.text == 'external' ? asalInstansiC.text : null,
     };
 
     try {
@@ -363,6 +386,7 @@ class PeminjamanController extends GetxController {
         return false;
       }
     } catch (e) {
+      isSubmitting.value = false;
       Get.snackbar('Error', 'Terjadi kesalahan: ${e.toString()}');
       return false;
     }

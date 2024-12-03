@@ -46,24 +46,64 @@
 // }
 
 import 'package:build_app/controller/user_controller.dart';
+import 'package:build_app/controller/extendPeminjaman_controller.dart';
+import 'package:build_app/controller/detailPeminjaman_controller.dart';
+import 'package:build_app/services/firebase_messaging_handler.dart';
+import 'package:build_app/page/screens/verificationCode_page.dart';
+import 'package:build_app/firebase_options.dart';
 import 'package:build_app/page/screens/welcome_screen.dart';
 import 'package:build_app/page/widget/custom_buttom_nav.dart';
 import 'package:build_app/routes/page_route.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:build_app/services/notification_services.dart';
+import 'package:build_app/services/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> initServices() async {
+  // First, initialize controllers
+  Get.put(DetailPeminjamanController());
+  Get.put(ExtendPeminjamanController());
+
+  // Then, initialize notification service
+  try {
+    final notificationService = await NotificationService().init();
+    Get.put(notificationService);
+  } catch (e) {
+    print('Error initializing notification service: $e');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LoggerService.initialize();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // Initialize notification service
+  // Initialize all services before running app
+  await initServices();
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
+
   String? accessToken = prefs.getString('accessToken');
   String? role = prefs.getString('role'); // Ambil role dari SharedPreferences
+  bool isVerifying = prefs.getBool('isVerifying') ?? false;
+  String? verifyingEmail = prefs.getString('verifyingEmail');
 
   // Initialize UserController
   Get.put(UserController()); // Add this line to initialize UserController
 
-  runApp(MyApp(accessToken: accessToken, userRole: role));
+  runApp(MyApp(
+    accessToken: accessToken,
+    userRole: role,
+    isVerifying: isVerifying,
+    verifyingEmail: verifyingEmail,
+  ));
   // runApp(MyApp(accessToken: accessToken)); // UTAMA
   // Get.put(PeminjamanUserAllbyAdminController());
 }
@@ -71,7 +111,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   final String? accessToken;
   final String? userRole;
-  MyApp({this.accessToken, this.userRole});
+  final bool isVerifying;
+  final String? verifyingEmail;
+  MyApp({
+    this.accessToken,
+    this.userRole,
+    required this.isVerifying,
+    this.verifyingEmail,
+  });
 
   // This widget is the root of your application.
   @override
@@ -95,14 +142,33 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _decideHomePage() {
-    if (accessToken == null) {
+    if (isVerifying) {
+      // Jika dalam proses verifikasi
+      return VerificationCodePage(email: verifyingEmail!);
+    } else if (accessToken == null) {
+      // Jika belum login
       return const WelcomeScreen();
     } else if (userRole == 'admin') {
-      return const BottomNavBar(); // Admin BottomNavBar
+      // Halaman admin
+      return const BottomNavBar();
     } else if (userRole == 'user') {
-      return const BottomNavBar(); // User BottomNavBar
+      // Halaman user
+      return const BottomNavBar();
     } else {
-      return const WelcomeScreen(); // Jika role tidak dikenali, kembalikan ke welcome
+      // Default halaman welcome
+      return const WelcomeScreen();
     }
   }
+
+  // Widget _decideHomePage() {
+  //   if (accessToken == null) {
+  //     return const WelcomeScreen();
+  //   } else if (userRole == 'admin') {
+  //     return const BottomNavBar(); // Admin BottomNavBar
+  //   } else if (userRole == 'user') {
+  //     return const BottomNavBar(); // User BottomNavBar
+  //   } else {
+  //     return const WelcomeScreen(); // Jika role tidak dikenali, kembalikan ke welcome
+  //   }
+  // }
 }

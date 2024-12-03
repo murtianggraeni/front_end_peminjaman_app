@@ -4,6 +4,7 @@ abstract class RouteName {
   static const welcome_screen = '/welcome_screen';
   static const signup_screen = '/signup_screen';
   static const signin_screen = '/signin_screen';
+  static const verificationCode_page = '/verificationCode_page';
   static const forget_password = '/forget_password';
   static const custom_buttom_nav = '/custom_button_nav';
   static const main_page_user = '/main_page_user';

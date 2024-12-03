@@ -4,6 +4,7 @@ import 'package:build_app/provider/api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:build_app/controller/user_controller.dart';
 // import 'package:http/http.dart';
 // import '../models/sensor_Model.dart';
 // import 'user_controller.dart';
@@ -63,10 +64,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 // }
 
 class LoginController extends GetxController {
+
+  final UserController userController = Get.find<UserController>();
+
   TextEditingController passwordC = TextEditingController();
   TextEditingController emailC = TextEditingController();
 
   final ApiController apiController = ApiController();
+
+  // Fungsi untuk menambahkan timestamp ke log
+  void logWithTimestamp(String message) {
+    final now = DateTime.now();
+    final formattedTime = '${now.day.toString().padLeft(2, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.year} ${now.hour.toString().padLeft(2, '0')}:'
+        '${now.minute.toString().padLeft(2, '0')}:'
+        '${now.second.toString().padLeft(2, '0')}';
+    print('[$formattedTime] : $message');
+  }
 
   Future<bool> loginWithEmail() async {
     try {
@@ -80,20 +95,26 @@ class LoginController extends GetxController {
         final userData = jsonResponse['data'];
         final accessToken = userData['accessToken'];
         final userName = userData['userName'];
+        final userEmail = emailC.text;
+
+        // Simpan email ke userController
+        userController.email.value = userEmail;
 
         final userRole = userData['userRole']; // Tangkap role dari respons
 
         // Tambahkan log untuk memeriksa nilai role
-        print('Role yang diterima dari backend: $userRole');
+        logWithTimestamp('Role yang diterima dari backend: $userRole');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', accessToken);
         await prefs.setString('userName', userName);
+        await prefs.setString('email', userEmail);
 
         await prefs.setString('role', userRole); // Store role
-        print('username: $userName');
-        print('token: $accessToken');
-        print('role: $userRole'); // Print role to check if it is received correctly
+        logWithTimestamp('username: $userName');
+        logWithTimestamp('token: $accessToken');
+        logWithTimestamp(
+            'role: $userRole'); // Print role to check if it is received correctly
 
         emailC.clear();
         passwordC.clear();
@@ -101,7 +122,7 @@ class LoginController extends GetxController {
             snackPosition: SnackPosition.TOP,
             backgroundColor: Colors.green,
             colorText: Colors.white);
-        print("Login berhasil");
+        logWithTimestamp("Login berhasil");
         return true;
       } else {
         throw (jsonResponse['message'] ?? "Login gagal");

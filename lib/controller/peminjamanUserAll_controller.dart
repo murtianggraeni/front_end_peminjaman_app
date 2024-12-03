@@ -73,17 +73,17 @@ class PeminjamanUserAllController extends GetxController {
           );
 
           // Logging untuk mengecek nilai setelah konversi
-          for (var data in peminjaman) {
-            print('ID: ${data.id}');
-            print('Nama Pemohon: ${data.namaPemohon}');
-            print('Tanggal Peminjaman (raw): ${data.tanggalPeminjaman}');
-            print('Tanggal Peminjaman (parsed): ${data.tanggalPeminjamanDate}');
-            print('Awal Peminjaman (raw): ${data.awalPeminjaman}');
-            print('Awal Peminjaman (parsed): ${data.awalPeminjamanTime}');
-            print('Akhir Peminjaman (raw): ${data.akhirPeminjaman}');
-            print('Akhir Peminjaman (parsed): ${data.akhirPeminjamanTime}');
-            print('---');
-          }
+          // for (var data in peminjaman) {
+          //   print('ID: ${data.id}');
+          //   print('Nama Pemohon: ${data.namaPemohon}');
+          //   print('Tanggal Peminjaman (raw): ${data.tanggalPeminjaman}');
+          //   print('Tanggal Peminjaman (parsed): ${data.tanggalPeminjamanDate}');
+          //   print('Awal Peminjaman (raw): ${data.awalPeminjaman}');
+          //   print('Awal Peminjaman (parsed): ${data.awalPeminjamanTime}');
+          //   print('Akhir Peminjaman (raw): ${data.akhirPeminjaman}');
+          //   print('Akhir Peminjaman (parsed): ${data.akhirPeminjamanTime}');
+          //   print('---');
+          // }
 
           // Urutkan data berdasarkan waktu terbaru
           peminjaman.sort((a, b) => b.waktu.compareTo(a.waktu));

@@ -19,6 +19,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:build_app/services/notification_services.dart';
+import 'package:build_app/controller/user_notification_controller.dart';
 
 class mainPageUser extends StatefulWidget {
   mainPageUser({Key? key}) : super(key: key);
@@ -33,6 +35,68 @@ class _mainPageUserState extends State<mainPageUser> {
   final ApprovedPeminjamanController approvedPeminjamanController =
       Get.put(ApprovedPeminjamanController());
   final LogoutController _logoutController = Get.put(LogoutController());
+
+  // Tambahkan controller untuk notifikasi
+  final UserNotificationController notificationController =
+      Get.put(UserNotificationController());
+  late final NotificationService notificationService;
+
+  @override
+  void initState() {
+    super.initState();
+    print('Initializing mainPageUser');
+    notificationService = Get.find<NotificationService>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      approvedPeminjamanController.fetchApprovedPeminjaman();
+      _setupNotifications();
+    });
+  }
+
+  Future<void> _setupNotifications() async {
+    try {
+      // Cek role user
+      
+      if (_userController.role.value == 'user') {
+        // Load existing notifications untuk user ini
+         await notificationController.loadUserNotifications();
+
+        // Setup notifikasi user dengan userId untuk filter
+        await notificationService.setupUserNotifications(
+           // Tambahkan userId untuk filter
+          onStatusChange: () {
+            // Refresh notifikasi ketika ada perubahan status
+            notificationController.loadUserNotifications();
+            approvedPeminjamanController.fetchApprovedPeminjaman();
+
+            Get.snackbar(
+              'Status Peminjaman',
+              'Status peminjaman Anda telah diperbarui',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.blue,
+              colorText: Colors.white,
+            );
+          },
+          onPeminjamanEnding: () {
+            // Refresh data ketika peminjaman akan berakhir
+            approvedPeminjamanController.fetchApprovedPeminjaman();
+
+            Get.snackbar(
+              'Peminjaman Akan Berakhir',
+              'Peminjaman Anda akan segera berakhir',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.orange,
+              colorText: Colors.white,
+            );
+          },
+        );
+      } else {
+        print('Not a user role, skipping user notification setup');
+      }
+    } catch (e) {
+      print('Error setting up notifications: $e');
+    }
+  }
 
   // Kelas untuk informasi peminjaman
   Widget carouselCard(dashboardInformasiPeminjaman data) {
@@ -74,14 +138,14 @@ class _mainPageUserState extends State<mainPageUser> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    print('Initializing mainPageUser');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      approvedPeminjamanController.fetchApprovedPeminjaman();
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   print('Initializing mainPageUser');
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     approvedPeminjamanController.fetchApprovedPeminjaman();
+  //   });
+  // }
 
   // Parsing Time Strings
   TimeOfDay _parseTimeString(String timeString) {

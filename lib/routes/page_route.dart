@@ -1,3 +1,5 @@
+import 'package:build_app/page/main/admin/monitoring/monitoring_bindings.dart';
+import 'package:build_app/page/screens/verificationCode_page.dart';
 import 'package:get/get.dart';
 import 'package:build_app/routes/route_name.dart';
 import 'package:build_app/page/widget/custom_buttom_nav.dart';
@@ -33,6 +35,12 @@ class AppPage {
     GetPage(
       name: RouteName.signin_screen,
       page: () => const SignInScreen(),
+    ),
+    GetPage(
+      name: RouteName.verificationCode_page,
+      page: () => VerificationCodePage(
+        email: Get.arguments,
+      ),
     ),
     GetPage(
       name: RouteName.forget_password,
@@ -77,18 +85,22 @@ class AppPage {
     GetPage(
       name: RouteName.detail_monitoring_cnc,
       page: () => detailPageCnc(),
+      binding: MonitoringBindings(),
     ),
     GetPage(
       name: RouteName.detail_monitoring_lasercut,
       page: () => detailPageLasercut(),
+      binding: MonitoringBindings(),
     ),
     GetPage(
       name: RouteName.detail_monitoring_printing,
       page: () => detailPagePrinting(),
+      binding: MonitoringBindings(),
     ),
     GetPage(
       name: RouteName.monitoring_penggunaan_cnc,
       page: () => monitoringPenggunaanCnc(),
+      
     ),
     GetPage(
       name: RouteName.monitoring_penggunaan_lasercut,

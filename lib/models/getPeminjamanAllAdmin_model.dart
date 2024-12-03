@@ -1,5 +1,6 @@
 // --getPeminjamanAllAdmin_model.dart Metode 2--
 import 'dart:convert';
+import 'dart:ffi';
 
 AdminPeminjamanAll adminPeminjamanAllFromJson(String str) =>
     AdminPeminjamanAll.fromJson(json.decode(str));
@@ -40,18 +41,24 @@ class Datum {
   String? tanggalPeminjaman;
   String? awalPeminjaman;
   String? akhirPeminjaman;
-  String? jumlah; // Pastikan ini tipe yang benar
+  int? jumlah; // Pastikan ini tipe yang benar
   String? programStudi;
   String? kategori;
   String? detailKeperluan;
   String? desainBenda;
   String status;
-  String? waktu;
+  // String? waktu;
+  DateTime? waktu;
+  String tipePengguna;
+  String nomorIdentitas;
+  String? asalInstansi;
 
   Datum({
     required this.id,
     required this.namaPemohon,
     required this.status,
+    required this.tipePengguna,
+    required this.nomorIdentitas,
     this.email,
     this.tanggalPeminjaman,
     this.awalPeminjaman,
@@ -62,6 +69,7 @@ class Datum {
     this.detailKeperluan,
     this.desainBenda,
     this.waktu,
+    this.asalInstansi,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) {
@@ -69,18 +77,25 @@ class Datum {
       id: json['id'] as String? ?? '',
       namaPemohon: json['nama_pemohon'] as String? ?? 'Tidak ada nama',
       status: json['status'] as String? ?? 'Tidak diketahui',
+      tipePengguna: json['tipe_pengguna'] as String? ?? 'Tidak diketahui',
+      nomorIdentitas: json['nomor_identitas'] as String? ?? 'Tidak ada',
       email: json['email'] as String? ?? 'Tidak ada email',
       tanggalPeminjaman:
           json['tanggal_peminjaman'] as String? ?? 'Tidak diatur',
       awalPeminjaman: json['awal_peminjaman'] as String? ?? 'Tidak diatur',
       akhirPeminjaman: json['akhir_peminjaman'] as String? ?? 'Tidak diatur',
-      jumlah: (json['jumlah'] ?? '').toString(),
+      jumlah: (json['jumlah'] ?? ''),
       programStudi: json['program_studi'] as String? ?? 'Tidak diatur',
       kategori: json['kategori'] as String? ?? 'Tidak diatur',
       detailKeperluan:
           json['detail_keperluan'] as String? ?? 'Tidak ada detail',
       desainBenda: json['desain_benda'] as String? ?? 'Tidak ada desain',
-      waktu: json['waktu'] as String? ?? 'Tidak diatur',
+      // waktu: json['waktu'] as String? ?? 'Tidak diatur',
+      waktu: json['waktu'] != null
+          ? DateTime.tryParse(
+              json['waktu']) // Attempt to parse the string to DateTime
+          : null, // If not available, leave as null
+      asalInstansi: json['asal_instansi'] as String?,
     );
   }
 
@@ -98,7 +113,11 @@ class Datum {
       "kategori": kategori,
       "detail_keperluan": detailKeperluan,
       "desain_benda": desainBenda,
-      "waktu": waktu,
+      // "waktu": waktu,
+      "waktu": waktu?.toIso8601String(),
+      "tipe_pengguna": tipePengguna,
+      "nomor_identitas": nomorIdentitas,
+      "asal_instansi": asalInstansi,
     };
   }
 
@@ -109,13 +128,17 @@ class Datum {
     String? tanggalPeminjaman,
     String? awalPeminjaman,
     String? akhirPeminjaman,
-    String? jumlah,
+    int? jumlah,
     String? programStudi,
     String? kategori,
     String? detailKeperluan,
     String? desainBenda,
     String? status,
-    String? waktu,
+    // String? waktu,
+    DateTime? waktu,
+    String? tipePengguna,
+    String? nomorIdentitas,
+    String? asalInstansi,
   }) {
     return Datum(
       id: id ?? this.id,
@@ -131,6 +154,9 @@ class Datum {
       desainBenda: desainBenda ?? this.desainBenda,
       status: status ?? this.status,
       waktu: waktu ?? this.waktu,
+      tipePengguna: tipePengguna ?? this.tipePengguna,
+      nomorIdentitas: nomorIdentitas ?? this.nomorIdentitas,
+      asalInstansi: asalInstansi ?? this.asalInstansi,
     );
   }
 }

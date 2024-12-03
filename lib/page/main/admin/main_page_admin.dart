@@ -2,15 +2,25 @@ import 'package:build_app/controller/count_controller.dart';
 import 'package:build_app/controller/user_controller.dart';
 import 'package:build_app/controller/logout_controller.dart';
 import 'package:build_app/controller/approvedPeminjaman_controller.dart';
+import 'package:build_app/controller/admin_notification_controller.dart';
+import 'package:build_app/controller/machine_status_controller.dart';
+
 import 'package:build_app/models/count_model.dart';
 import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_cnc.dart';
 import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_lasercut.dart';
 import 'package:build_app/page/main/admin/widget_admin/monitoring_penggunaan_printing.dart';
+import 'package:build_app/page/main/admin/admin_notification_dialog.dart';
+
 import 'package:build_app/page/main/custom_main_page.dart';
 import 'package:build_app/page/main/user/widget_user/custom_dashboard_choose.dart';
 import 'package:build_app/page/home/informasi_page/widget/custom_dashboard_informasi_peminjaman.dart';
 import 'package:build_app/page/main/user/widget_user/custom_dashboard_peminjaman.dart';
+import 'package:build_app/page/widget/status_mesin_card.dart';
+
 import 'package:build_app/routes/route_name.dart';
+
+import 'package:build_app/services/notification_services.dart';
+
 import 'package:build_app/theme/theme.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +32,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ming_cute_icons/ming_cute_icons.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class mainPageAdmin extends StatefulWidget {
   mainPageAdmin({Key? key}) : super(key: key);
@@ -40,6 +49,43 @@ class _mainPageAdminState extends State<mainPageAdmin> {
 
   final ApprovedPeminjamanController approvedPeminjamanController =
       Get.put(ApprovedPeminjamanController());
+
+  final MachineStatusController _machineStatusController =
+      Get.put(MachineStatusController());
+
+  // Add controllers for notification
+  final AdminNotificationController notificationController =
+      Get.put(AdminNotificationController());
+  late final NotificationService notificationService;
+
+  Future<void> _setupNotifications() async {
+    try {
+      // Load existing notifications
+      await notificationController.loadNotifications();
+
+      // Check if user is admin
+      if (_userController.role.value == 'admin') {
+        // Setup admin notifications with callback
+        await notificationService.setupAdminNotifications(
+          onNewPeminjaman: () {
+            // Refresh notifications when new peminjaman comes
+            notificationController.loadNotifications();
+
+            // Optional: Show snackbar
+            Get.snackbar(
+              'Peminjaman Baru',
+              'Ada pengajuan peminjaman baru',
+              snackPosition: SnackPosition.TOP,
+              backgroundColor: Colors.blue,
+              colorText: Colors.white,
+            );
+          },
+        );
+      }
+    } catch (e) {
+      print('Error setting up notifications: $e');
+    }
+  }
 
   // // final UserController userController = Get.find<UserController>();
   Widget carouselCard(dashboardInformasiPeminjaman data) {
@@ -85,9 +131,27 @@ class _mainPageAdminState extends State<mainPageAdmin> {
   void initState() {
     super.initState();
     print('Initializing mainPageAdmin');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Initialize notification service
+      notificationService = Get.find<NotificationService>();
+
+      // Setup notifications
+      await _setupNotifications();
+
+      // Fetch approved peminjaman
       approvedPeminjamanController.fetchApprovedPeminjaman();
+
+      // Start fetching machine status
+      _machineStatusController.fetchAllMachineStatus();
     });
+  }
+
+  void _showNotifications() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) => AdminNotificationDialog(),
+    );
   }
 
   // Parsing Time Strings
@@ -214,15 +278,61 @@ class _mainPageAdminState extends State<mainPageAdmin> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.notifications_active_sharp),
+              leading: Stack(
+                children: [
+                  const Icon(
+                    Icons.notifications_active_sharp,
+                    color: Color(0xFF1D5973),
+                  ),
+                  Obx(() {
+                    if (notificationController.unreadCount.value > 0) {
+                      return Positioned(
+                        right: -2,
+                        top: -2,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${notificationController.unreadCount.value}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                ],
+              ),
               title: Text(
                 'Notifikasi',
-                style: GoogleFonts.inter(
-                  fontSize: 16.0,
-                ),
+                style: GoogleFonts.inter(fontSize: 16.0),
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close drawer first
+                _showNotifications(); // Show notifications dialog
+              },
             ),
+            // ListTile(
+            //   leading: const Icon(Icons.notifications_active_sharp),
+            //   title: Text(
+            //     'Notifikasi',
+            //     style: GoogleFonts.inter(
+            //       fontSize: 16.0,
+            //     ),
+            //   ),
+            //   onTap: () {},
+            // ),
             ListTile(
               leading: const Icon(MingCuteIcons.mgc_exit_line),
               title: Text(
@@ -253,6 +363,14 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                             print('Logout confirmed, attempting to logout');
                             Navigator.of(context).pop();
                             final success = await _logoutController.logout();
+                            Get.snackbar(
+                              'Logout',
+                              success ? 'Logout successful' : 'Logout failed',
+                              snackPosition: SnackPosition.TOP,
+                              backgroundColor:
+                                  success ? Colors.green : Colors.red,
+                              colorText: Colors.white,
+                            );
                             print(
                                 'Logout result: ${success ? 'successful' : 'failed'}');
                           },
@@ -294,7 +412,7 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Selamat datang kembali!",
+                      "Selamat datang kembali!!",
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w400,
                         fontSize: 14,
@@ -400,8 +518,11 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData ||
                               snapshot.data!.data.id.isEmpty) {
-                            return const Center(
-                              child: Text('No data available'),
+                            return Center(
+                              child: Text(
+                                'No data available',
+                                style: GoogleFonts.inter(),
+                              ),
                             );
                           } else {
                             Counts counts = snapshot.data!;
@@ -495,6 +616,52 @@ class _mainPageAdminState extends State<mainPageAdmin> {
                             leftImage: 6.0,
                             topImage: 9.0,
                             topArrow: 4.5,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 35.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Status Penggunaan Mesin",
+                          style: GoogleFonts.inter(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10.0),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          StatusMesinCard(
+                            merekMesin: "MTU 200 M",
+                            namaMesin: "CNC Milling",
+                            namaLab: "Lab. Elektro Mekanik",
+                            gambarMesin: "assets/images/foto_cnc.png",
+                            stream: _machineStatusController.cncStatus.stream,
+                          ),
+                          const SizedBox(width: 11.0),
+                          StatusMesinCard(
+                            merekMesin: "TQL-1390",
+                            namaMesin: "Laser Cutting",
+                            namaLab: "Lab. Elektro Mekanik",
+                            gambarMesin: "assets/images/foto_lasercut.png",
+                            stream: _machineStatusController.laserStatus.stream,
+                          ),
+                          const SizedBox(width: 11.0),
+                          StatusMesinCard(
+                            merekMesin: "Anycubic 4Max Pro",
+                            namaMesin: "3D Printing",
+                            namaLab: "Lab. PLC & HMI",
+                            gambarMesin: "assets/images/foto_3dp.png",
+                            stream:
+                                _machineStatusController.printingStatus.stream,
                           ),
                         ],
                       ),

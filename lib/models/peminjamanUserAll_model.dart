@@ -51,6 +51,10 @@ class Datum {
   // DateTime? akhirPeminjaman;
   Status status;
   DateTime waktu;
+  bool isStarted;
+  String tipePengguna;
+  String nomorIdentitas;
+  String? asalInstansi;
 
   Datum({
     required this.id,
@@ -62,6 +66,10 @@ class Datum {
     required this.akhirPeminjaman,
     required this.status,
     required this.waktu,
+    required this.isStarted,
+    required this.tipePengguna,
+    required this.nomorIdentitas,
+    this.asalInstansi,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -75,6 +83,10 @@ class Datum {
         status: statusValues.map[json["status"]]!,
         waktu:
             DateTime.parse(json["waktu"]).toLocal(), // Konversi ke waktu lokal
+        isStarted: json['isStarted'] ?? false,
+        tipePengguna: json["tipe_pengguna"],
+        nomorIdentitas: json["nomor_identitas"],
+        asalInstansi: json["asal_instansi"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,6 +99,10 @@ class Datum {
         "akhir_peminjaman": akhirPeminjaman,
         "status": statusValues.reverse[status],
         "waktu": waktu,
+        'isStarted': isStarted,
+        "tipe_pengguna": tipePengguna,
+        "nomor_identitas": nomorIdentitas,
+        "asal_instansi": asalInstansi,
       };
 
   // Tambahkan getter untuk mendapatkan tanggal yang diformat

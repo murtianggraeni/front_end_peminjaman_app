@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:build_app/controller/peminjaman_controller.dart';
 import 'package:build_app/page/home/form_peminjaman/widget/custom_form_page.dart';
@@ -52,76 +53,237 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
   void _showDayNightTimePicker(TextEditingController controller) {
     final initialTime = _parseTimeString(controller.text) ?? TimeOfDay.now();
 
-    Navigator.of(context).push(
-      showPicker(
-        context: context,
-        value: Time(hour: initialTime.hour, minute: initialTime.minute),
-        onChange: (Time newTime) {
-          if (!_isValidMinuteInterval(newTime.minute)) {
-            _showInvalidTimeSnackbar();
-            return;
-          }
+    // Tampilkan dialog peringatan terlebih dahulu
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Mencegah dialog ditutup dengan tap di luar
+      builder: (context) => AlertDialog(
+        title: Text(
+          "Peringatan Penggunaan Waktu",
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: Colors.red[700], // Memberikan warna untuk emphasis
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri untuk list
+          children: [
+            Text(
+              "Harap perhatikan:",
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("1. ", style: GoogleFonts.inter(fontSize: 13)),
+                Expanded(
+                  child: Text(
+                    "Mesin akan mati otomatis saat waktu habis tanpa peringatan.",
+                    style: GoogleFonts.inter(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("2. ", style: GoogleFonts.inter(fontSize: 13)),
+                Expanded(
+                  child: Text(
+                    "Tambahkan waktu lebih 10-15 menit dari estimasi penggunaan untuk mengantisipasi.",
+                    style: GoogleFonts.inter(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("3. ", style: GoogleFonts.inter(fontSize: 13)),
+                Expanded(
+                  child: Text(
+                    "Waktu tambahan diperlukan untuk proses setup awal dan finishing akhir.",
+                    style: GoogleFonts.inter(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Tutup dialog peringatan
+              // Lanjut ke time picker
+              Navigator.of(context).push(
+                showPicker(
+                  context: context,
+                  value:
+                      Time(hour: initialTime.hour, minute: initialTime.minute),
+                  onChange: (Time newTime) {
+                    /*  */
+                    // if (!_isValidMinuteInterval(newTime.minute)) {
+                    //   _showInvalidTimeSnackbar();
+                    //   return;
+                    // }
 
-          final selectedTime = newTime.toTimeOfDay();
-          final formattedTime = _formatTimeWithAMPM(selectedTime);
+                    final selectedTime = newTime.toTimeOfDay();
+                    final formattedTime = _formatTimeWithAMPM(selectedTime);
 
-          if (_peminjamanC.tanggalC.text.isEmpty) {
-            Get.snackbar(
-              "Peringatan",
-              "Silakan pilih tanggal terlebih dahulu.",
-              backgroundColor: Colors.yellow,
-              colorText: Colors.black,
-            );
-            return;
-          }
+                    if (_peminjamanC.tanggalC.text.isEmpty) {
+                      Get.snackbar(
+                        "Peringatan",
+                        "Silakan pilih tanggal terlebih dahulu.",
+                        backgroundColor: Colors.yellow,
+                        colorText: Colors.black,
+                      );
+                      return;
+                    }
 
-          final selectedDate =
-              DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text);
-          final selectedDateTime = DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
+                    final selectedDate = DateFormat('EE, d MMM yyyy')
+                        .parse(_peminjamanC.tanggalC.text);
+                    final selectedDateTime = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    );
 
-          if (!_isValidTimeForSelectedDate(selectedDateTime)) {
-            Get.snackbar(
-              "Peringatan!",
-              "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.",
-              backgroundColor: Colors.yellow,
-              colorText: Colors.black,
-            );
-            return;
-          }
+                    if (!_isValidTimeForSelectedDate(selectedDateTime)) {
+                      Get.snackbar(
+                        "Peringatan!",
+                        "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.",
+                        backgroundColor: Colors.yellow,
+                        colorText: Colors.black,
+                      );
+                      return;
+                    }
 
-          if (controller == _peminjamanC.akhirC) {
-            if (!_isValidEndTime(selectedTime)) {
-              Get.snackbar(
-                "Peringatan",
-                "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
-                backgroundColor: Colors.yellow,
-                colorText: Colors.black,
+                    if (controller == _peminjamanC.akhirC) {
+                      if (!_isValidEndTime(selectedTime)) {
+                        Get.snackbar(
+                          "Peringatan",
+                          "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
+                          backgroundColor: Colors.yellow,
+                          colorText: Colors.black,
+                        );
+                        return;
+                      }
+                    }
+
+                    setState(() {
+                      controller.text = formattedTime;
+                    });
+                  },
+                  is24HrFormat: false,
+                  minuteInterval: TimePickerInterval.ONE,
+                  minHour: 7,
+                  maxHour: 23,
+                  barrierDismissible: false,
+                  iosStylePicker: true,
+                  sunAsset: Image.asset("assets/images/sun.png"),
+                  moonAsset: Image.asset("assets/images/moon.png"),
+                ),
               );
-              return;
-            }
-          }
-
-          setState(() {
-            controller.text = formattedTime;
-          });
-        },
-        is24HrFormat: false,
-        minuteInterval: TimePickerInterval.THIRTY,
-        minHour: 7,
-        maxHour: 20,
-        barrierDismissible: false,
-        iosStylePicker: true,
-        sunAsset: Image.asset("assets/images/sun.png"),
-        moonAsset: Image.asset("assets/images/moon.png"),
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.blue[50],
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text(
+              "Saya Mengerti",
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500,
+                color: Colors.blue[700],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  // void _showDayNightTimePicker(TextEditingController controller) {
+  //   final initialTime = _parseTimeString(controller.text) ?? TimeOfDay.now();
+
+  //   Navigator.of(context).push(
+  //     showPicker(
+  //       context: context,
+  //       value: Time(hour: initialTime.hour, minute: initialTime.minute),
+  //       onChange: (Time newTime) {/*  */
+  //         // if (!_isValidMinuteInterval(newTime.minute)) {
+  //         //   _showInvalidTimeSnackbar();
+  //         //   return;
+  //         // }
+
+  //         final selectedTime = newTime.toTimeOfDay();
+  //         final formattedTime = _formatTimeWithAMPM(selectedTime);
+
+  //         if (_peminjamanC.tanggalC.text.isEmpty) {
+  //           Get.snackbar(
+  //             "Peringatan",
+  //             "Silakan pilih tanggal terlebih dahulu.",
+  //             backgroundColor: Colors.yellow,
+  //             colorText: Colors.black,
+  //           );
+  //           return;
+  //         }
+
+  //         final selectedDate =
+  //             DateFormat('EE, d MMM yyyy').parse(_peminjamanC.tanggalC.text);
+  //         final selectedDateTime = DateTime(
+  //           selectedDate.year,
+  //           selectedDate.month,
+  //           selectedDate.day,
+  //           selectedTime.hour,
+  //           selectedTime.minute,
+  //         );
+
+  //         if (!_isValidTimeForSelectedDate(selectedDateTime)) {
+  //           Get.snackbar(
+  //             "Peringatan!",
+  //             "Peminjaman tidak bisa dilakukan pada waktu yang sudah lewat.",
+  //             backgroundColor: Colors.yellow,
+  //             colorText: Colors.black,
+  //           );
+  //           return;
+  //         }
+
+  //         if (controller == _peminjamanC.akhirC) {
+  //           if (!_isValidEndTime(selectedTime)) {
+  //             Get.snackbar(
+  //               "Peringatan",
+  //               "Waktu akhir peminjaman harus melebihi waktu awal peminjaman",
+  //               backgroundColor: Colors.yellow,
+  //               colorText: Colors.black,
+  //             );
+  //             return;
+  //           }
+  //         }
+
+  //         setState(() {
+  //           controller.text = formattedTime;
+  //         });
+  //       },
+  //       is24HrFormat: false,
+  //       minuteInterval: TimePickerInterval.ONE,
+  //       minHour: 7,
+  //       maxHour: 23,
+  //       barrierDismissible: false,
+  //       iosStylePicker: true,
+  //       sunAsset: Image.asset("assets/images/sun.png"),
+  //       moonAsset: Image.asset("assets/images/moon.png"),
+  //     ),
+  //   );
+  // }
 
   // Parse time string to TimeOfDay
   TimeOfDay? _parseTimeString(String timeString) {
@@ -134,15 +296,15 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
   }
 
   // Show snackbar for invalid time
-  void _showInvalidTimeSnackbar() {
-    Get.snackbar(
-      "Invalid Time",
-      'Please select a time with 0 or 30 minute intervals',
-      backgroundColor: Colors.redAccent,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 3),
-    );
-  }
+  // void _showInvalidTimeSnackbar() {
+  //   Get.snackbar(
+  //     "Invalid Time",
+  //     'Please select a time with 0 or 30 minute intervals',
+  //     backgroundColor: Colors.redAccent,
+  //     colorText: Colors.white,
+  //     duration: const Duration(seconds: 3),
+  //   );
+  // }
 
   // Format TimeOfDay to string with AM/PM
   String _formatTimeWithAMPM(TimeOfDay time) {
@@ -157,9 +319,9 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
     return selectedDateTime.isAfter(now);
   }
 
-  bool _isValidMinuteInterval(int minute) {
-    return minute == 0 || minute == 30;
-  }
+  // bool _isValidMinuteInterval(int minute) {
+  //   return minute == 0 || minute == 30;
+  // }
 
   bool _isValidEndTime(TimeOfDay endTime) {
     if (_peminjamanC.awalC.text.isEmpty) return true;
@@ -252,6 +414,14 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
           'Peringatan', 'Silahkan isi form dengan benar sebelum submit');
     }
   }
+
+  // List untuk tipePengguna
+  final List<String> tipePenggunaOptions = [
+    'Mahasiswa',
+    'Pekerja',
+    'PKL',
+    'Eksternal'
+  ];
 
   // List untuk Dropdown jurusan
   final List<String> jurusanOptions = ['AE', 'DE', 'FE', 'ME', 'Lainnya'];
@@ -747,6 +917,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
     },
   };
 
+  String? _selectedTipePengguna;
   String? _selectedJurusan;
   String? _selectedProgramStudi;
   String? _selectedKategori;
@@ -814,8 +985,92 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                         controller: _peminjamanC.namaC,
                         returnText: "Silahkan mengisi nama lengkap",
                         judul: "Nama Pemohon",
-                        hintText: "contoh: Ayu Asahi",
+                        hintText: "contoh: Ayu Maulana",
                       ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Profil Pengguna",
+                          style: GoogleFonts.inter(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w300,
+                              color: const Color(0xFF6B7888)),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 3.0,
+                      ),
+                      DropdownButtonFormField<String>(
+                        value: _selectedTipePengguna,
+                        hint: const Text("Pilih Tipe Pengguna"),
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selectedTipePengguna = newValue;
+                            _peminjamanC.tipePenggunaC.text = newValue!;
+                          });
+                        },
+                        items: tipePenggunaOptions.map((String option) {
+                          return DropdownMenuItem<String>(
+                            value: option,
+                            child: Text(option.toUpperCase()),
+                          );
+                        }).toList(),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Silahkan pilih profil pengguna.';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color(0xFFD9D9D9),
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12,
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                        isExpanded: true,
+                      ),
+                      const SizedBox(
+                        height: 11.0,
+                      ),
+                      customFormPeminjaman(
+                        controller: _peminjamanC.nomorIdentitasC,
+                        returnText: _selectedTipePengguna == 'Mahasiswa'
+                            ? "NIM harus berupa minimal 8 digit angka"
+                            : _selectedTipePengguna == 'Eksternal'
+                                ? "Nomor identitas minimal 3 karakter"
+                                : _selectedTipePengguna == 'PKL'
+                                    ? "No. Koin sesuai jurusan"
+                                    : "NIP harus berupa 18 digit angka",
+                        judul: _selectedTipePengguna == 'Mahasiswa'
+                            ? "NIM"
+                            : _selectedTipePengguna == 'Eksternal'
+                                ? "Nomor Identitas"
+                                : _selectedTipePengguna == 'PKL'
+                                    ? "No. Koin"
+                                    : "NIP",
+                        hintText: _selectedTipePengguna == 'Mahasiswa'
+                            ? "Contoh: 121140123"
+                            : _selectedTipePengguna == 'Eksternal'
+                                ? "Contoh: 3273******"
+                                : _selectedTipePengguna == 'PKL'
+                                    ? "Contoh: 0123456"
+                                    : "Contoh: 197101011999031002",
+                      ),
+                      if (_selectedTipePengguna == 'Eksternal')
+                        customFormPeminjaman(
+                          controller: _peminjamanC.asalInstansiC,
+                          returnText: "Silahkan mengisi asal instansi",
+                          judul: "Asal Instansi",
+                          hintText: "Contoh: Universitas Telkom",
+                        ),
                       customFormPeminjaman(
                         controller: _peminjamanC.tanggalC,
                         returnText: "Silahkan mengisi batas peminjaman",
@@ -823,18 +1078,24 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                         hintText: DateFormat('EE, dd/MMM/yy').format(
                           DateTime.now(),
                         ),
-                        icon: IconButton(
-                          onPressed: () {
-                            _showDatePicker();
-                          },
-                          icon: const Icon(
-                            MingCuteIcons.mgc_calendar_month_fill,
-                          ),
-                          //Iconify(Ion.calendar),
-                          color: const Color(0xFFB9B9B9),
+                        onTap: () => _showDatePicker(),
+                        icon: const Icon(
+                          MingCuteIcons.mgc_calendar_month_fill,
+                          color: Color(0xFFB9B9B9),
                         ),
+                        // IconButton(
+                        //   onPressed: () {
+                        //     _showDatePicker();
+                        //   },
+                        //   icon: const Icon(
+                        //     MingCuteIcons.mgc_calendar_month_fill,
+                        //   ),
+                        //   //Iconify(Ion.calendar),
+                        //   color: const Color(0xFFB9B9B9),
+                        // ),
                         keyboardType: TextInputType.datetime,
                         readOnly: true,
+                        isDateOrTime: true,
                       ),
                       Row(
                         children: [
@@ -846,17 +1107,15 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                               hintText: DateFormat('hh:mm a').format(
                                 DateTime.now(),
                               ),
-                              icon: IconButton(
-                                onPressed: () {
-                                  _showDayNightTimePicker(_peminjamanC.awalC);
-                                },
-                                icon: const Icon(
-                                  MingCuteIcons.mgc_time_fill,
-                                ),
-                                color: const Color(0xFFB9B9B9),
+                              onTap: () =>
+                                  _showDayNightTimePicker(_peminjamanC.awalC),
+                              icon: const Icon(
+                                MingCuteIcons.mgc_time_fill,
+                                color: Color(0xFFB9B9B9),
                               ),
                               keyboardType: TextInputType.datetime,
                               readOnly: true,
+                              isDateOrTime: true,
                             ),
                           ),
                           const SizedBox(
@@ -866,21 +1125,19 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                             child: customFormPeminjaman(
                               controller: _peminjamanC.akhirC,
                               judul: "Akhir Peminjaman",
-                              returnText: "Silahkan mengisi batas peminjaman",
+                              returnText: "Silahkan mengisi batas peminjaman.",
                               hintText: DateFormat('hh:mm a').format(
                                 DateTime.now(),
                               ),
-                              icon: IconButton(
-                                onPressed: () {
-                                  _showDayNightTimePicker(_peminjamanC.akhirC);
-                                },
-                                icon: const Icon(
-                                  MingCuteIcons.mgc_time_fill,
-                                ),
+                              onTap: () =>
+                                  _showDayNightTimePicker(_peminjamanC.akhirC),
+                              icon: const Icon(
+                                MingCuteIcons.mgc_time_fill,
                                 color: const Color(0xFFB9B9B9),
                               ),
                               keyboardType: TextInputType.datetime,
                               readOnly: true,
+                              isDateOrTime: true,
                             ),
                           ),
                         ],
@@ -889,8 +1146,8 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                         controller: _peminjamanC.jumlahC,
                         judul: "Jumlah/Satuan",
                         returnText:
-                            "Silahkan mengisi jumlah yang akan dilakukan pemesinan",
-                        hintText: "Contoh: 2 Part",
+                            "Silahkan mengisi jumlah yang akan dilakukan pemesinan.",
+                        hintText: "Contoh: 2",
                       ),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -955,7 +1212,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           _selectedJurusan != 'Lainnya')
                         DropdownButtonFormField<String>(
                           value: _selectedProgramStudi,
-                          hint: const Text("Pilih Program Studi"),
+                          hint: const Text("Pilih Program Studi."),
                           onChanged: (newValue) {
                             setState(() {
                               _selectedProgramStudi = newValue;
@@ -973,7 +1230,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           }).toList(),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Silahkan pilih program studi";
+                              return "Silahkan pilih program studi.";
                             }
                             return null;
                           },
@@ -1002,7 +1259,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           _selectedJurusan == 'Lainnya')
                         DropdownButtonFormField<String>(
                           value: _selectedKategori,
-                          hint: const Text("Pilih Kategori Peminjaman"),
+                          hint: const Text("Pilih Kategori Peminjaman."),
                           onChanged: (newValue) {
                             setState(() {
                               _selectedKategori = newValue;
@@ -1028,7 +1285,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           }).toList(),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Silahkan pilih kategori peminjaman";
+                              return "Silahkan pilih kategori peminjaman.";
                             }
                             return null;
                           },
@@ -1061,7 +1318,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           _selectedJurusan != 'Lainnya')
                         DropdownButtonFormField<String>(
                           value: _selectedDetail,
-                          hint: const Text("Pilih Detail Keperluan"),
+                          hint: const Text("Pilih Detail Keperluan."),
                           onChanged: (newValue) {
                             setState(() {
                               _selectedDetail = newValue;
@@ -1078,7 +1335,7 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           }).toList(),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Silahkan pilih detail keperluan';
+                              return 'Silahkan pilih detail keperluan.';
                             }
                             return null;
                           },
@@ -1103,8 +1360,8 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                         customFormPeminjaman(
                           controller: _peminjamanC.detailKeperluanC,
                           judul: "Detail Keperluan",
-                          returnText: "Silahkan isi detail keperluan",
-                          hintText: "Masukkan detail keperluan",
+                          returnText: "Silahkan isi detail keperluan.",
+                          hintText: "Masukkan detail keperluan.",
                         ),
                       const SizedBox(
                         height: 8.0,
@@ -1114,19 +1371,17 @@ class _formPenggunaanCncState extends State<formPenggunaanCnc> {
                           controller: TextEditingController(
                               text: _peminjamanC.fileNames.value),
                           judul: "Desain Benda",
-                          returnText: "Silahkan mengisi masukan desain benda",
+                          returnText:
+                              "Silahkan mengisi masukan desain benda dalam PDF.",
                           hintText: "Tambahkan file",
-                          icon: IconButton(
-                            onPressed: () {
-                              _peminjamanC.pickFile();
-                            },
-                            icon: const Icon(
-                              MingCuteIcons.mgc_upload_2_line,
-                            ),
+                          onTap: () => _peminjamanC.pickFile(),
+                          icon: const Icon(
+                            MingCuteIcons.mgc_upload_2_line,
                             color: const Color(0xFFB9B9B9),
                           ),
                           keyboardType: TextInputType.datetime,
                           readOnly: true,
+                          isDateOrTime: true,
                         ),
                       ),
                       const SizedBox(
@@ -1216,13 +1471,47 @@ class _CustomDialogWidgetState extends State<CustomDialogWidget> {
   }
 }
 
-class CardDialog extends StatelessWidget {
+class CardDialog extends StatefulWidget {
   final VoidCallback onConfirmed;
 
   const CardDialog({
     super.key,
     required this.onConfirmed,
   });
+
+  @override
+  State<CardDialog> createState() => _CardDialogState();
+}
+
+class _CardDialogState extends State<CardDialog> {
+  bool _isSubmitting = false;
+  // Timer untuk reset button jika tidak ada respon
+  Timer? _resetTimer;
+
+  @override
+  void dispose() {
+    _resetTimer?.cancel();
+    super.dispose();
+  }
+
+  void _handleSubmit() {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    // Set timer untuk reset button setelah 10 detik jika tidak ada respon
+    _resetTimer = Timer(const Duration(seconds: 10), () {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    });
+
+    widget.onConfirmed();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1233,8 +1522,7 @@ class CardDialog extends StatelessWidget {
       ),
       margin: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: const Color(
-            0xFFEDF9FE), //const Color(0xFFCEE5EF) //const Color(0xFFD9D9D9) //const Color(0XFF2a303e)
+        color: const Color(0xFFEDF9FE),
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Column(
@@ -1244,9 +1532,7 @@ class CardDialog extends StatelessWidget {
             "assets/images/alert.png",
             width: 72.0,
           ),
-          const SizedBox(
-            height: 24.0,
-          ),
+          const SizedBox(height: 24.0),
           Text(
             "Peringatan!",
             style: GoogleFonts.montserrat(
@@ -1255,9 +1541,7 @@ class CardDialog extends StatelessWidget {
               color: const Color(0xFFEC5B5B),
             ),
           ),
-          const SizedBox(
-            height: 4.0,
-          ),
+          const SizedBox(height: 4.0),
           Text(
             "Apakah data yang diisi sudah sesuai?",
             textAlign: TextAlign.center,
@@ -1266,9 +1550,7 @@ class CardDialog extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-          const SizedBox(
-            height: 32.0,
-          ),
+          const SizedBox(height: 32.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1288,12 +1570,8 @@ class CardDialog extends StatelessWidget {
                     color: Color(0xFFEC5B5B),
                   ),
                 ),
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text(
-                  "Batal",
-                ),
+                onPressed: _isSubmitting ? null : () => Get.back(),
+                child: const Text("Batal"),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1306,11 +1584,20 @@ class CardDialog extends StatelessWidget {
                     vertical: 8.0,
                     horizontal: 32.0,
                   ),
+                  minimumSize: const Size(88, 36),
                 ),
-                onPressed: () {
-                  onConfirmed();
-                },
-                child: const Text("Ya"),
+                onPressed: _isSubmitting ? null : _handleSubmit,
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text("Ya"),
               ),
             ],
           )
@@ -1319,6 +1606,110 @@ class CardDialog extends StatelessWidget {
     );
   }
 }
+
+// class CardDialog extends StatelessWidget {
+//   final VoidCallback onConfirmed;
+
+//   const CardDialog({
+//     super.key,
+//     required this.onConfirmed,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(
+//         horizontal: 32.0,
+//         vertical: 16.0,
+//       ),
+//       margin: const EdgeInsets.all(14.0),
+//       decoration: BoxDecoration(
+//         color: const Color(
+//             0xFFEDF9FE), //const Color(0xFFCEE5EF) //const Color(0xFFD9D9D9) //const Color(0XFF2a303e)
+//         borderRadius: BorderRadius.circular(12.0),
+//       ),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Image.asset(
+//             "assets/images/alert.png",
+//             width: 72.0,
+//           ),
+//           const SizedBox(
+//             height: 24.0,
+//           ),
+//           Text(
+//             "Peringatan!",
+//             style: GoogleFonts.montserrat(
+//               fontSize: 24.0,
+//               fontWeight: FontWeight.bold,
+//               color: const Color(0xFFEC5B5B),
+//             ),
+//           ),
+//           const SizedBox(
+//             height: 4.0,
+//           ),
+//           Text(
+//             "Apakah data yang diisi sudah sesuai?",
+//             textAlign: TextAlign.center,
+//             style: GoogleFonts.poppins(
+//               fontWeight: FontWeight.w300,
+//               color: Colors.black,
+//             ),
+//           ),
+//           const SizedBox(
+//             height: 32.0,
+//           ),
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               OutlinedButton(
+//                 style: OutlinedButton.styleFrom(
+//                   shape: const RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.all(
+//                       Radius.circular(6.0),
+//                     ),
+//                   ),
+//                   padding: const EdgeInsets.symmetric(
+//                     vertical: 8.0,
+//                     horizontal: 32.0,
+//                   ),
+//                   foregroundColor: const Color(0xFFEC5B5B),
+//                   side: const BorderSide(
+//                     color: Color(0xFFEC5B5B),
+//                   ),
+//                 ),
+//                 onPressed: () {
+//                   Get.back();
+//                 },
+//                 child: const Text(
+//                   "Batal",
+//                 ),
+//               ),
+//               ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(6.0),
+//                   ),
+//                   backgroundColor: const Color(0xFF5BEC84),
+//                   foregroundColor: const Color(0xFF2A303E),
+//                   padding: const EdgeInsets.symmetric(
+//                     vertical: 8.0,
+//                     horizontal: 32.0,
+//                   ),
+//                 ),
+//                 onPressed: () {
+//                   onConfirmed();
+//                 },
+//                 child: const Text("Ya"),
+//               ),
+//             ],
+//           )
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 // Fungsi untuk menampilkan animasi setelah di submit
 class afterSubmit extends StatefulWidget {
